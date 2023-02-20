@@ -1,6 +1,6 @@
 # API Gateway REST API definition
 resource "aws_api_gateway_rest_api" "main" {
-  name        = "archvision-services-api"
+  name        = "datalayer-services-api"
   description = "${var.aws_profile} services API [Deployed: ${timestamp()}]"
 }
 
@@ -10,22 +10,22 @@ resource "aws_api_gateway_stage" "production" {
   stage_name    = "prod"
 }
 
-resource "aws_api_gateway_deployment" "production-deployment" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  description = "${var.aws_profile}:: API Gateway deployment for job queue lambdas"
+#resource "aws_api_gateway_deployment" "production-deployment" {
+#  rest_api_id = aws_api_gateway_rest_api.main.id
+#  description = "${var.aws_profile}:: API Gateway deployment for job queue lambdas"
 
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.main
-    ]))
-  }
+#  triggers = {
+#    redeployment = sha1(jsonencode([
+#      aws_api_gateway_rest_api.main
+#    ]))
+#  }
 
-  lifecycle {
-    create_before_destroy = true
-  }
+#  lifecycle {
+#    create_before_destroy = true
+#  }
 
-  depends_on = [aws_api_gateway_rest_api.main]
-}
+#  depends_on = [aws_api_gateway_rest_api.main]
+#}
 
 resource "aws_api_gateway_usage_plan" "api-usage-plan" {
   name = "${var.aws_profile}-api-usage-plan"
