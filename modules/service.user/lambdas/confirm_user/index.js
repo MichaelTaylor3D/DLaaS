@@ -46,7 +46,7 @@ const confirmAccount = async (
 };
 
 exports.handler = async (event, context, callback) => {
-  const confirmationCode = event?.pathParameters?.confirmationCode;
+  const confirmationCode = event?.queryStringParameters?.code;
 
   await confirmAccount(confirmationCode);
 
@@ -55,7 +55,7 @@ exports.handler = async (event, context, callback) => {
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({
       message:
-        "User created successfully, Check your email for the confirmation code.",
+        "User confirmed you may now login.",
     }),
   });
 };

@@ -5,13 +5,25 @@ const pbkdf2 = require("pbkdf2");
 const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
-function isPasswordCorrect(
-  savedHash,
-  savedSalt,
-  savedIterations,
-  passwordAttempt
-) {
-  return savedHash == pbkdf2(passwordAttempt, savedSalt, savedIterations);
+function verifyPassword(persistedPassword, passwordAttempt) {
+  return new Promise((resolve, reject) => {
+    crypto.pbkdf2(
+      passwordAttempt,
+      persistedPassword.salt,
+      persistedPassword.iterations,
+      PASSWORD_LENGTH,
+      DIGEST,
+      (error, hash) => {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve(
+          persistedPassword.hash === hash.toString(BYTE_TO_STRING_ENCODING)
+        );
+      }
+    );
+  });
 }
 
 const generateAccessToken = async (username) => {

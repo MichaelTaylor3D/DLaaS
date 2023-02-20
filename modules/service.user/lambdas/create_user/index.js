@@ -3,9 +3,14 @@
 const _ = require("lodash");
 const mysql = require("mysql");
 const crypto = require("crypto");
-const pbkdf2 = require("pbkdf2");
 const SES = require("aws-sdk/clients/ses");
 const { getConfigurationFile } = require("./utils");
+
+const PASSWORD_LENGTH = 256;
+const SALT_LENGTH = 64;
+const ITERATIONS = 10000;
+const DIGEST = "sha256";
+const BYTE_TO_STRING_ENCODING = "hex"; // this could be base64, for instance
 
 const ses = new SES({
   apiVersion: "2010-12-01",
@@ -13,14 +18,30 @@ const ses = new SES({
 });
 
 const hashPassword = (password) => {
-  const salt = crypto.randomBytes(128).toString("base64");
-  const hash = pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512");
+  return new Promise((resolve, reject) => {
+    const salt = crypto
+      .randomBytes(SALT_LENGTH)
+      .toString(BYTE_TO_STRING_ENCODING);
+    crypto.pbkdf2(
+      password,
+      salt,
+      ITERATIONS,
+      PASSWORD_LENGTH,
+      DIGEST,
+      (error, hash) => {
+        if (error) {
+          return reject(error);
+        }
 
-  return {
-    salt,
-    hash
-  };
-}
+        resolve({
+          salt,
+          hash: hash.toString(BYTE_TO_STRING_ENCODING),
+          iterations: ITERATIONS,
+        });
+      }
+    );
+  });
+};
 
 const insertUserIntoDb = async (
   username,
@@ -59,7 +80,8 @@ const insertUserIntoDb = async (
       email,
       passwordHash,
       salt,
-      confirmationCode
+      confirmationCode,
+      createdAt: Date.now(),
     };
 
     connection.query(sql, params, (error) => {
@@ -79,7 +101,7 @@ exports.handler = async (event, context, callback) => {
   const username = _.get(requestBody, "username");
   const email = _.get(requestBody, "email");
   const password = _.get(requestBody, "password");
-  const { salt, hash } = hashPassword(password);
+  const { salt, hash } = await hashPassword(password);
   const confirmationCode = crypto.randomBytes(25).toString("hex");
 
   await insertUserIntoDb(username, email, hash, salt, confirmationCode);
@@ -92,7 +114,9 @@ exports.handler = async (event, context, callback) => {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data: "Your account has been created successfully. Your confirmation code is: " + confirmationCode,
+            Data:
+              `<div>Your account has been created successfully. click on the link below to activate your account.</div>
+              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>VERIFY</a>`,
           },
         },
       },
@@ -104,7 +128,8 @@ exports.handler = async (event, context, callback) => {
     statusCode: 200,
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({
-      message: 'User created successfully, Check your email for the confirmation code.',
+      message:
+        "User created successfully, Check your email for the confirmation code.",
     }),
   });
-}
+};
