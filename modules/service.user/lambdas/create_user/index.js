@@ -59,8 +59,7 @@ const insertUserIntoDb = async (
       email,
       passwordHash,
       salt,
-      confirmationCode,
-      createdAt: Date.now()
+      confirmationCode
     };
 
     connection.query(sql, params, (error) => {
