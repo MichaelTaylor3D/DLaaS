@@ -4,11 +4,11 @@ resource "aws_api_gateway_rest_api" "main" {
   description = "${var.aws_profile} services API [Deployed: ${timestamp()}]"
 }
 
-resource "aws_api_gateway_stage" "production" {
-  deployment_id = aws_api_gateway_deployment.production-deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  stage_name    = "prod"
-}
+#resource "aws_api_gateway_stage" "production" {
+#  deployment_id = aws_api_gateway_deployment.production-deployment.id
+#  rest_api_id   = aws_api_gateway_rest_api.main.id
+#  stage_name    = "prod"
+#}
 
 #resource "aws_api_gateway_deployment" "production-deployment" {
 #  rest_api_id = aws_api_gateway_rest_api.main.id
@@ -58,17 +58,17 @@ resource "aws_api_gateway_base_path_mapping" "archvision-api-base-path-mapping" 
   domain_name = aws_api_gateway_domain_name.api-subdomain.domain_name
 }
 
-resource "aws_s3_bucket_object" "api-config-upload" {
-  bucket       = aws_s3_bucket.storage-devops-bucket.id
-  key          = "configurations/api.config.json"
-  content_type = "application/json"
-  content      = <<EOF
-  {  
-    "endpoint": "${aws_api_gateway_deployment.production-deployment.invoke_url}",
-    "api_key": "${aws_api_gateway_api_key.app-key.value}
-  }
-  EOF
-}
+#resource "aws_s3_bucket_object" "api-config-upload" {
+#  bucket       = aws_s3_bucket.storage-devops-bucket.id
+#  key          = "configurations/api.config.json"
+#  content_type = "application/json"
+#  content      = <<EOF
+#  {  
+#    "endpoint": "${aws_api_gateway_deployment.production-deployment.invoke_url}",
+#    "api_key": "${aws_api_gateway_api_key.app-key.value}
+#  }
+#  EOF
+#}
 
 
 output "api_gateway_id"   { value = aws_api_gateway_rest_api.main.id }
