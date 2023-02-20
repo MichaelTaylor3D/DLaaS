@@ -106,7 +106,7 @@ resource "aws_api_gateway_integration" "login-method-lambda-api-integration" {
     type                    = "AWS_PROXY"
 
     # The URI at which the API is invoked
-    uri                     = aws_lambda_function.login-user-function-handler.invoke_arn
+    uri                     = aws_lambda_function.login-function-handler.invoke_arn
 }
 
 
