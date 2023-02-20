@@ -3,7 +3,7 @@ terraform {
     organization = "TaylorDigitalServices"
 
     workspaces {
-      name = "Datalayer-Storage"
+      name = "DatalayerStorageService"
     }
   }
 }
