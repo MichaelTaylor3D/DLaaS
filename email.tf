@@ -37,7 +37,7 @@ resource "aws_route53_record" "spf_mail_from" {
 }
 
 resource "aws_route53_record" "spf_domain" {
-  zone_id = aws_route53_zone.service-zonez.zone_id   
+  zone_id = aws_route53_zone.service-zone.zone_id   
   name    = var.service_domain
   type    = "TXT"
   ttl     = "600"
