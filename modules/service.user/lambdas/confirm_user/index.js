@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const { getConfigurationFile } = require("./utils");
 
 const confirmAccount = async (
   confirmationCode

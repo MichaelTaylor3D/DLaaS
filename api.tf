@@ -64,7 +64,8 @@ resource "aws_s3_bucket_object" "api-config-upload" {
   content_type = "application/json"
   content      = <<EOF
   {  
-    "api_key": "${aws_api_gateway_api_key.app-key.value}
+    "api_key": "${aws_api_gateway_api_key.app-key.value}",
+    "token_secret": "e83b52cfc8d8e09fbb97adace903715d3c191381195f48a2e12169e3601e2690d3d32f48b11a151f369419727727464baefd046050a1f2cc025ed73546b40259"
   }
   EOF
 }

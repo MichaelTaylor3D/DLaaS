@@ -1,11 +1,11 @@
 "use strict";
 
 const _ = require("lodash");
-const AWS = require("aws-sdk");
 const mysql = require("mysql");
 const crypto = require("crypto");
 const pbkdf2 = require("pbkdf2");
-import SES from "aws-sdk/clients/ses";
+const SES = require("aws-sdk/clients/ses");
+const { getConfigurationFile } = require("./utils");
 
 const ses = new SES({
   apiVersion: "2010-12-01",
