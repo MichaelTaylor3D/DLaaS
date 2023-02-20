@@ -20,11 +20,3 @@ resource "aws_s3_bucket_object" "job_status_enum_upload" {
   }
   EOF
 }
-
-resource "aws_s3_bucket_object" "jobs_config_upload" {
-  bucket       = var.dev_bucket_id
-  content_type = "application/json"
-  key          = "configurations/jobs.config.json"
-  source       = "${path.module}/jobs.config.json"
-  etag         = filemd5("${path.module}/jobs.config.json")
-}
