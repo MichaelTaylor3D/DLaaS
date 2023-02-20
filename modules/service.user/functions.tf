@@ -102,7 +102,7 @@ resource "aws_lambda_permission" "confirm-user-api-gateway" {
 
 ### START Confirm Account LAMBDA ###
 
-data "archive_file" "login-user-function-source" {
+data "archive_file" "login-function-source" {
   type        = "zip"
   source_dir  = "${path.module}/lambdas/login"
   output_path = "${path.module}/lambdas/login-tf-handler-${random_uuid.archive.result}.zip"
