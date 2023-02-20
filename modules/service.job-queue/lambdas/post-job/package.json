@@ -1,9 +1,0 @@
-{
-  "name": "post-job",
-  "version": "0.0.0",
-  "dependencies": {
-    "lodash": "^4.17.21",
-    "mysql": "^2.18.1",
-    "uuidv4": "^6.2.7"
-  }
-}
