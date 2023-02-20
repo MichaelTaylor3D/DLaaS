@@ -14,7 +14,7 @@ function isPasswordCorrect(
   return savedHash == pbkdf2(passwordAttempt, savedSalt, savedIterations);
 }
 
-const getSaltForUser = async (username) => {
+const getSaltAndHashForUser = async (username) => {
   const dbConfig = await getConfigurationFile("db.config.json");
 
   const connection = mysql.createConnection({
@@ -39,7 +39,7 @@ const getSaltForUser = async (username) => {
 
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT meta_value 
+      SELECT meta.meta_value, users.password_hash
       FROM meta
       INNER JOIN users on users.id = meta.user_id
       WHERE meta_key = 'salt'
@@ -60,10 +60,12 @@ const getSaltForUser = async (username) => {
   });
 };
 
-exports.handler = async (event, context, callback) => {
-  const confirmationCode = event?.pathParameters?.confirmationCode;
 
-  await confirmAccount(confirmationCode);
+exports.handler = async (event, context, callback) => {
+    const requestBody = JSON.parse(event.body);
+    const username = _.get(requestBody, "username");
+    const passwordAttempt = _.get(requestBody, "password");
+    const { salt, hash } = getSaltAndHashForUser(username);
 
   callback(null, {
     statusCode: 200,

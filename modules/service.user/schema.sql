@@ -38,3 +38,13 @@ BEGIN
   UPDATE users SET confirmed = true WHERE id = @userId;
 END
 $$
+
+DELIMITER $$
+CREATE PROCEDURE confirm_account(
+	confirmationCode VARCHAR(100)
+) 
+BEGIN	
+  SELECT user_id INTO @userId from user_meta WHERE meta_key = 'confirmationCode' AND meta_value = confirmationCode LIMIT 1;
+  UPDATE users SET confirmed = true WHERE id = @userId;
+END
+$$
