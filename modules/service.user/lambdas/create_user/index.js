@@ -14,13 +14,11 @@ const ses = new SES({
 
 const hashPassword = (password) => {
   const salt = crypto.randomBytes(128).toString("base64");
-  const iterations = 10000;
-  const hash = pbkdf2(password, salt, iterations);
+  const hash = pbkdf2.pbkdf2Sync(password, salt, 1, 32, "sha512");
 
   return {
     salt,
-    hash,
-    iterations,
+    hash
   };
 }
 
