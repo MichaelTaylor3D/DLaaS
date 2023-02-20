@@ -6,7 +6,7 @@ terraform {
   }
 
   backend "remote" {
-    organization = "TDS"
+    organization = "TaylorDigitalServices"
 
     workspaces {
       name = "DataLayerStorage"
