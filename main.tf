@@ -1,5 +1,5 @@
 terraform {
-  backend "remote" {
+  cloud {
     organization = "TaylorDigitalServices"
 
     workspaces {
@@ -7,7 +7,6 @@ terraform {
     }
   }
 }
-
 
 provider "aws" {
   access_key = var.aws_access_key
