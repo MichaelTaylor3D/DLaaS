@@ -30,7 +30,7 @@ const verifyPassword = (persistedPassword, passwordAttempt) => {
       }
     );
   });
-}
+};
 
 const generateAccessToken = async (username) => {
   const apiConfig = await getConfigurationFile("api.config.json");
@@ -64,14 +64,12 @@ const getSaltAndHashForUser = async (username) => {
 
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT meta.user_id, meta.meta_value, users.password_hash
-      FROM meta
-      INNER JOIN users on users.id = meta.user_id
-      WHERE meta_key = 'salt'
+      SELECT users.salt, users.id as user_id, users.password_hash as hash
+      FROM users
       AND users.username = ':username';
     `;
 
-    const params = { salt };
+    const params = { username };
 
     connection.query(sql, params, (error, results) => {
       if (error) {
@@ -131,7 +129,7 @@ exports.handler = async (event, context, callback) => {
   const passwordAttempt = _.get(requestBody, "password");
   const { salt, hash, user_id } = getSaltAndHashForUser(username);
 
-  if (!verifyPassword({hash, salt}, passwordAttempt)) {
+  if (!verifyPassword({ hash, salt }, passwordAttempt)) {
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
