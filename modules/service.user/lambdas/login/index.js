@@ -5,12 +5,18 @@ const pbkdf2 = require("pbkdf2");
 const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
-function verifyPassword(persistedPassword, passwordAttempt) {
+const PASSWORD_LENGTH = 256;
+const SALT_LENGTH = 64;
+const ITERATIONS = 10000;
+const DIGEST = "sha256";
+const BYTE_TO_STRING_ENCODING = "hex"; // this could be base64, for instance
+
+const verifyPassword = (persistedPassword, passwordAttempt) => {
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(
       passwordAttempt,
       persistedPassword.salt,
-      persistedPassword.iterations,
+      ITERATIONS,
       PASSWORD_LENGTH,
       DIGEST,
       (error, hash) => {
@@ -125,7 +131,7 @@ exports.handler = async (event, context, callback) => {
   const passwordAttempt = _.get(requestBody, "password");
   const { salt, hash, user_id } = getSaltAndHashForUser(username);
 
-  if (!isPasswordCorrect(hash, salt, 10000, passwordAttempt)) {
+  if (!verifyPassword({hash, salt}, passwordAttempt)) {
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
