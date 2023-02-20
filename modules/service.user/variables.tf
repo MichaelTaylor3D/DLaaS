@@ -11,4 +11,3 @@ variable "root_resource_id"            {}
 variable "api_gateway_arn"             {}
 variable "default_lambda_role_arn"     {}
 variable "allow_ssh_security_group_id" {}
-variable "key_pair"                    {}

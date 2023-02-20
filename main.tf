@@ -41,7 +41,6 @@ module "service-user" {
 
   # Security
   allow_ssh_security_group_id = aws_security_group.allow-ssh-security-group.id
-  key_pair                    = module.key_pair.key_pair_key_name
 
   # EC2 - Compute
   worker_ami                  = var.worker_ami
