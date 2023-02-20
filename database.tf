@@ -86,7 +86,6 @@ resource "aws_iam_role" "s3_import" {
 resource "random_password" "username" {
   length           = 15
   special          = false
-  override_special = "_%@"
 }
 
 resource "random_password" "password" {
