@@ -5,6 +5,12 @@ const AWS = require("aws-sdk");
 const mysql = require("mysql");
 const crypto = require("crypto");
 const pbkdf2 = require("pbkdf2");
+import SES from "aws-sdk/clients/ses";
+
+const ses = new SES({
+  apiVersion: "2010-12-01",
+  region: "us-east-1",
+});
 
 const hashPassword = (password) => {
   const salt = crypto.randomBytes(128).toString("base64");
@@ -81,7 +87,21 @@ exports.handler = async (event, context, callback) => {
 
   await insertUserIntoDb(username, email, hash, salt, confirmationCode);
 
-  // send email with confirmation code
+  await ses
+    .sendEmail({
+      Destination: { ToAddresses: [email] },
+      Message: {
+        Subject: { Charset: "UTF-8", Data: "DataLayer Storage" },
+        Body: {
+          Text: {
+            Charset: "UTF-8",
+            Data: "Your account has been created successfully. Your confirmation code is: " + confirmationCode,
+          },
+        },
+      },
+      Source: "admin@datalayer.storage",
+    })
+    .promise();
 
   callback(null, {
     statusCode: 200,

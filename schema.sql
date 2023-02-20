@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.datastores(
   size INT
 );
 
-ALTER TABLE dlstorage_services.user_meta ADD INDEX `user_index` (`user_id`);
+ALTER TABLE dlstorage_services.datastores ADD INDEX `user_index` (`user_id`);
 
 -- User Transactions Table
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.user_transactions(
   transaction_id VARCHAR(100) NOT NULL UNIQUE,
 );
 
-ALTER TABLE dlstorage_services.user_meta ADD INDEX `user_index` (`user_id`);
+ALTER TABLE dlstorage_services.user_transactions ADD INDEX `user_index` (`user_id`);
 
 -- User Access Tokens Table
 
@@ -47,10 +47,10 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.access_tokens(
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   access_token INT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL 7 HOUR,
+  created_at TIMESTAMP NOT NULL,
 );
 
-ALTER TABLE dlstorage_services.user_meta ADD INDEX `user_index` (`user_id`);
+ALTER TABLE dlstorage_services.access_tokens ADD INDEX `user_index` (`user_id`);
 
 -- User Secrets Table
 
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.client_access_keys(
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 
-ALTER TABLE dlstorage_services.user_meta ADD INDEX `user_index` (`user_id`);
+ALTER TABLE dlstorage_services.client_access_keys ADD INDEX `user_index` (`user_id`);
 
 -- meta Table
 
