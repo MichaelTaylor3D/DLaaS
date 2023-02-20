@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.access_tokens(
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   access_token INT NOT NULL,
-  created_at TIMESTAMP NOT NULL,
+  expires_on TIMESTAMP NOT NULL
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE dlstorage_services.access_tokens ADD INDEX `user_index` (`user_id`);

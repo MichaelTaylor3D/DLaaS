@@ -1,5 +1,5 @@
 {
-  "name": "dlstorage",
+  "name": "confirm_account",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jsonwebtoken": "^9.0.0"
+    "lodash": "^4.17.21",
+    "mysql": "^2.18.1"
   }
 }
