@@ -31,6 +31,17 @@ CREATE TABLE IF NOT EXISTS dlstorage_services.datastores(
 
 ALTER TABLE dlstorage_services.datastores ADD INDEX `user_index` (`user_id`);
 
+-- Mirrors Table
+
+CREATE TABLE IF NOT EXISTS dlstorage_services.user_mirrors(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  singleton_id VARCHAR(100) NOT NULL UNIQUE,
+  name VARCHAR(100)
+);
+
+ALTER TABLE dlstorage_services.datastores ADD INDEX `user_index` (`user_id`);
+
 -- User Transactions Table
 
 CREATE TABLE IF NOT EXISTS dlstorage_services.user_transactions(
