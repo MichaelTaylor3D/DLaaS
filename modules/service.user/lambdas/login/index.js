@@ -65,7 +65,7 @@ const getSaltAndHashForUser = async (username) => {
 
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT user_meta.salt, users.id as user_id, users.password_hash as hash
+      SELECT user_meta.salt, users.id as user_id, users.password_hash as hash, user.confirmed as confirmed
       FROM users
       INNER JOIN user_meta on users.id = user_meta.user_id
       WHERE users.username = :username;
@@ -89,7 +89,20 @@ exports.handler = async (event, context, callback) => {
   const requestBody = JSON.parse(event.body);
   const username = _.get(requestBody, "username");
   const passwordAttempt = _.get(requestBody, "password");
-  const { salt, hash, user_id } = await getSaltAndHashForUser(username);
+  const { salt, hash, user_id, confirmed } = await getSaltAndHashForUser(
+    username
+  );
+
+  if(!confirmed) {
+    callback(null, {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: "Unauthorized. User not yet confirmed. Please check your email.",
+      }),
+    });
+    return;
+  }
 
   const valid = await verifyPassword(hash, salt, passwordAttempt);
 

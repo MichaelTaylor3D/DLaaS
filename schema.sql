@@ -70,10 +70,11 @@ ALTER TABLE dlstorage_services.client_access_keys ADD INDEX `user_index` (`user_
 CREATE TABLE IF NOT EXISTS dlstorage_services.user_meta(
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
-  meta_key VARCHAR(100) NOT NULL UNIQUE,
+  meta_key VARCHAR(100) NOT NULL,
   meta_value VARCHAR(100) NOT NULL
 );
 
+ALTER TABLE dlstorage_services.user_meta ADD UNIQUE `unique_user_meta_index` (user_id, meta_key);
 ALTER TABLE dlstorage_services.user_meta ADD INDEX `user_index` (`user_id`);
 
 COMMIT;
