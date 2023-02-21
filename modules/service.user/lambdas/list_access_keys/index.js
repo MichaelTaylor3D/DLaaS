@@ -72,7 +72,7 @@ exports.handler = async (event, context, callback) => {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        access_keys: accessKeys,
+        access_keys: accessKeys.map((key) => key.access_key),
       }),
     });
   } catch (error) {
