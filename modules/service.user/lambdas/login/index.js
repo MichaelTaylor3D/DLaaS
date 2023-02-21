@@ -69,7 +69,7 @@ const getSaltAndHashForUser = async (username) => {
         user_meta.meta_value as salt, 
         users.id as user_id, 
         users.password_hash as hash, 
-        user.confirmed as confirmed
+        users.confirmed as confirmed
       FROM users
       INNER JOIN user_meta on users.id = user_meta.user_id
       WHERE users.username = :username
