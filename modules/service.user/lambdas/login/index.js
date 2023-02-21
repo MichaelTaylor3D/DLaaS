@@ -7,7 +7,7 @@ const { getConfigurationFile } = require("./utils");
 const PASSWORD_LENGTH = 256;
 const ITERATIONS = 10000;
 const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "base64"; // this could be base64, for instance
+const BYTE_TO_STRING_ENCODING = "base64";
 
 const verifyPassword = (passwordHash, salt, passwordAttempt) => {
   return new Promise((resolve, reject) => {
@@ -71,46 +71,6 @@ const getSaltAndHashForUser = async (username) => {
     `;
 
     const params = { username };
-
-    connection.query(sql, params, (error, results) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve(results[0]);
-    });
-  });
-};
-
-const insertJWT = async (jwt, user_id) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = function (query, values) {
-    if (!values) return query;
-    return query.replace(
-      /\:(\w+)/g,
-      function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-          return this.escape(values[key]);
-        }
-        return txt;
-      }.bind(this)
-    );
-  };
-
-  return new Promise((resolve, reject) => {
-    const sql = `CALL insert_jwt(:jwt, :user_id, )`;
-
-    const params = { jwt, user_id };
 
     connection.query(sql, params, (error, results) => {
       if (error) {

@@ -10,7 +10,7 @@ const PASSWORD_LENGTH = 256;
 const SALT_LENGTH = 8;
 const ITERATIONS = 10000;
 const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "hex"; // this could be base64, for instance
+const BYTE_TO_STRING_ENCODING = "base64";
 
 const ses = new SES({
   apiVersion: "2010-12-01",
@@ -114,13 +114,16 @@ exports.handler = async (event, context, callback) => {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data:
-              `<div>Your account has been created successfully. click on the link below to activate your account.</div>
-              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>VERIFY</a>`,
+            Data: `<div>Your account has been created successfully. Go to the following link to activate your account.\n\n
+              https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}`,
+          },
+          Html: {
+            Data: `<html><body><div>Your account has been created successfully. click on the link below to activate your account.</div>
+              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>VERIFY</a></body></html>`,
           },
         },
       },
-      Source: "admin@datalayer.storage",
+      Source: "support@datalayer.storage",
     })
     .promise();
 
