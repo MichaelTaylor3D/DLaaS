@@ -1,7 +1,6 @@
 const _ = require("lodash");
 const mysql = require("mysql");
 const crypto = require("crypto");
-const pbkdf2 = require("pbkdf2");
 const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
@@ -145,7 +144,6 @@ exports.handler = async (event, context, callback) => {
   }
 
   const accessToken = await generateAccessToken(username, user_id);
-  await insertJWT(accessToken, user_id);
 
   callback(null, {
     statusCode: 200,
