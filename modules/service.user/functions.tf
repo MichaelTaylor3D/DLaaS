@@ -154,7 +154,7 @@ resource "aws_lambda_permission" "login-api-gateway" {
 
 data "archive_file" "generate-access-key-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/generate_access_key"
+  source_dir  = "${path.module}/lambdas/generate_client_access_key"
   output_path = "${path.module}/lambdas/generate-access-key-tf-handler-${random_uuid.archive.result}.zip"
 }
 
