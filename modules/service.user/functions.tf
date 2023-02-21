@@ -252,7 +252,7 @@ resource "aws_lambda_permission" "list-access-keys-api-gateway" {
 
 ### START Delete Access Key LAMBDA ###
 
-data "archive_file" "delete-access-keys-function-source" {
+data "archive_file" "delete-access-key-function-source" {
   type        = "zip"
   source_dir  = "${path.module}/lambdas/delete_access_key"
   output_path = "${path.module}/lambdas/delete-access-key-tf-handler-${random_uuid.archive.result}.zip"
