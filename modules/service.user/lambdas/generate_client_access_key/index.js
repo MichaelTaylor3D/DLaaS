@@ -101,8 +101,11 @@ exports.handler = async (event, context, callback) => {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message:
-          "Here is your access key and secret key, if you loose your secret key, you will need to regenerate a new access key and secret key.",
+        message: `Here is your access key and secret key. 
+           It will be needed to interact with your datastores. 
+           Do NOT share this with anyone. 
+           If a key is compromised or lost, its your responsibility to delete it, you will need to regenerate a new access key and secret key
+          `,
         access_key: accessKey.toUpperCase(),
         secret_access_key: secretAccessKey,
       }),
