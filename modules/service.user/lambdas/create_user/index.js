@@ -118,8 +118,8 @@ exports.handler = async (event, context, callback) => {
               https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}`,
           },
           Html: {
-            Data: `<html><body><div>Your account has been created successfully. click on the link below to activate your account.</div>
-              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>VERIFY</a></body></html>`,
+            Data: `<html><body><div>Your account has been created successfully. Click on the link below to activate your account.</div>
+              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>Activate Account</a></body></html>`,
           },
         },
       },

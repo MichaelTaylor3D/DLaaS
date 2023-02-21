@@ -9,7 +9,15 @@ CREATE PROCEDURE create_new_user(
 	confirmationCode VARCHAR(100)
 ) 
 BEGIN	
-  INSERT INTO users (username, email, password_hash, salt, confirmation_code ) VALUES (username, email, passwordHash, salt, confirmationCode);
+  START TRANSACTION;
+	
+  DELETE FROM users WHERE confirmed = false AND created_at < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY));
+  INSERT INTO users (username, email, password_hash) VALUES (username, email, passwordHash);
+
+  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (LAST_INSERT_ID(), 'salt', salt);
+  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (LAST_INSERT_ID(), 'confirmationCode', confirmationCode);
+
+  COMMIT WORK;
 END
 $$
 
@@ -19,18 +27,5 @@ CREATE PROCEDURE confirm_account(
 ) 
 BEGIN	
   UPDATE users SET confirmed = true WHERE confirmation_code = confirmationCode;
-END
-$$
-
-DELIMITER $$
-CREATE PROCEDURE insert_jwt(
-	jwt VARCHAR(100),
-  user_id VARCHAR(100),
-) 
-BEGIN	
-  DELETE FROM users WHERE confirmed = false AND created_at < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY));
-  DELETE FROM access_tokens WHERE expires_on < UNIX_TIMESTAMP(NOW());
-
-  INSERT INTO access_tokens ( user_id, access_token, expires_on) VALUES (user_id, jwt, UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY)))
 END
 $$

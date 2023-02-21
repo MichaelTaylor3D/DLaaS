@@ -65,9 +65,10 @@ const getSaltAndHashForUser = async (username) => {
 
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT salt, id as user_id, password_hash as hash
+      SELECT user_meta.salt, users.id as user_id, users.password_hash as hash
       FROM users
-      WHERE username = :username;
+      INNER JOIN user_meta on users.id = user_meta.user_id
+      WHERE users.username = :username;
     `;
 
     const params = { username };
