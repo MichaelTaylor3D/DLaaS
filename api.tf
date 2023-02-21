@@ -58,6 +58,11 @@ resource "aws_api_gateway_base_path_mapping" "archvision-api-base-path-mapping" 
   domain_name = aws_api_gateway_domain_name.api-subdomain.domain_name
 }
 
+resource "random_password" "token_secret" {
+  length           = 128
+  special          = false
+}
+
 resource "aws_s3_bucket_object" "api-config-upload" {
   bucket       = aws_s3_bucket.storage-devops-bucket.id
   key          = "configurations/api.config.json"
@@ -65,7 +70,13 @@ resource "aws_s3_bucket_object" "api-config-upload" {
   content      = <<EOF
   {  
     "api_key": "${aws_api_gateway_api_key.app-key.value}",
-    "token_secret": "e83b52cfc8d8e09fbb97adace903715d3c191381195f48a2e12169e3601e2690d3d32f48b11a151f369419727727464baefd046050a1f2cc025ed73546b40259"
+    "token_secret": "${random_password.token_secret}"
+    "pbkdf2": {
+      "password_length": 256,
+      "iterations": 10000,
+      "digest": "sha256",
+      "byte_to_string_encoding": "base64"
+    }
   }
   EOF
 }
