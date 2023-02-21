@@ -95,6 +95,8 @@ exports.handler = async (event, context, callback) => {
 
     const { hash } = await hashSecretAccessKey(accessKey, secretAccessKey);
 
+    await insertAccessKey(user_id, accessKey, hash);
+
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -102,7 +104,7 @@ exports.handler = async (event, context, callback) => {
         message:
           "Here is your access key and secret key, if you loose your secret key, you will need to regenerate a new access key and secret key.",
         access_key: accessKey,
-        secretAccessKey: secret_access_key,
+        secret_access_key: secretAccessKey,
       }),
     });
   } catch (error) {
