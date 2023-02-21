@@ -1,29 +1,19 @@
-"use strict";
-
 const _ = require("lodash");
 const mysql = require("mysql");
 const crypto = require("crypto");
-const SES = require("aws-sdk/clients/ses");
+const pbkdf2 = require("pbkdf2");
+const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
 const PASSWORD_LENGTH = 256;
-const SALT_LENGTH = 8;
 const ITERATIONS = 10000;
 const DIGEST = "sha256";
 const BYTE_TO_STRING_ENCODING = "base64"; // this could be base64, for instance
 
-const ses = new SES({
-  apiVersion: "2010-12-01",
-  region: "us-east-1",
-});
-
-const hashPassword = (password) => {
+const verifyPassword = (passwordHash, salt, passwordAttempt) => {
   return new Promise((resolve, reject) => {
-    const salt = crypto
-      .randomBytes(SALT_LENGTH)
-      .toString(BYTE_TO_STRING_ENCODING);
     crypto.pbkdf2(
-      password,
+      passwordAttempt,
       salt,
       ITERATIONS,
       PASSWORD_LENGTH,
@@ -33,23 +23,25 @@ const hashPassword = (password) => {
           return reject(error);
         }
 
-        resolve({
-          salt,
-          hash: hash.toString(BYTE_TO_STRING_ENCODING),
-          iterations: ITERATIONS,
-        });
+        resolve(passwordHash === hash.toString(BYTE_TO_STRING_ENCODING));
       }
     );
   });
 };
 
-const insertUserIntoDb = async (
-  username,
-  email,
-  passwordHash,
-  salt,
-  confirmationCode
-) => {
+const generateAccessToken = async (username, user_id) => {
+  const apiConfig = await getConfigurationFile("api.config.json");
+  return jwt.sign(
+    {
+      user_id,
+      username,
+    },
+    apiConfig.token_secret,
+    { expiresIn: "720h" }
+  );
+};
+
+const getSaltAndHashForUser = async (username) => {
   const dbConfig = await getConfigurationFile("db.config.json");
 
   const connection = mysql.createConnection({
@@ -73,25 +65,62 @@ const insertUserIntoDb = async (
   };
 
   return new Promise((resolve, reject) => {
-    const sql = `CALL create_new_user(:username, :email, :passwordHash, :salt, :confirmationCode)`;
+    const sql = `
+      SELECT salt, id as user_id, password_hash as hash
+      FROM users
+      WHERE username = :username;
+    `;
 
-    const params = {
-      username,
-      email,
-      passwordHash,
-      salt,
-      confirmationCode,
-      createdAt: Date.now(),
-    };
+    const params = { username };
 
-    connection.query(sql, params, (error) => {
+    connection.query(sql, params, (error, results) => {
       if (error) {
         reject(error);
         connection.end();
         return;
       }
       connection.end();
-      resolve();
+      resolve(results[0]);
+    });
+  });
+};
+
+const insertJWT = async (jwt, user_id) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = function (query, values) {
+    if (!values) return query;
+    return query.replace(
+      /\:(\w+)/g,
+      function (txt, key) {
+        if (values.hasOwnProperty(key)) {
+          return this.escape(values[key]);
+        }
+        return txt;
+      }.bind(this)
+    );
+  };
+
+  return new Promise((resolve, reject) => {
+    const sql = `CALL insert_jwt(:jwt, :user_id, )`;
+
+    const params = { jwt, user_id };
+
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve(results[0]);
     });
   });
 };
@@ -99,37 +128,27 @@ const insertUserIntoDb = async (
 exports.handler = async (event, context, callback) => {
   const requestBody = JSON.parse(event.body);
   const username = _.get(requestBody, "username");
-  const email = _.get(requestBody, "email");
-  const password = _.get(requestBody, "password");
-  const { salt, hash } = await hashPassword(password);
-  const confirmationCode = crypto.randomBytes(25).toString("hex");
+  const passwordAttempt = _.get(requestBody, "password");
+  const { salt, hash, user_id } = await getSaltAndHashForUser(username);
 
-  await insertUserIntoDb(username, email, hash, salt, confirmationCode);
+  const valid = await verifyPassword(hash, salt, passwordAttempt);
 
-  await ses
-    .sendEmail({
-      Destination: { ToAddresses: [email] },
-      Message: {
-        Subject: { Charset: "UTF-8", Data: "DataLayer Storage" },
-        Body: {
-          Text: {
-            Charset: "UTF-8",
-            Data:
-              `<div>Your account has been created successfully. click on the link below to activate your account.</div>
-              <a href='https://api.datalayer.storage/v1/user/confirm?code=${confirmationCode}'>VERIFY</a>`,
-          },
-        },
-      },
-      Source: "admin@datalayer.storage",
-    })
-    .promise();
+  if (!valid) {
+    callback(null, {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: "Unauthorized.",
+      }),
+    });
+    return;
+  }
+
+  const accessToken = await generateAccessToken(username, user_id);
 
   callback(null, {
     statusCode: 200,
     headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      message:
-        "User created successfully, Check your email for the confirmation code.",
-    }),
+    body: JSON.stringify({ accessToken }),
   });
 };

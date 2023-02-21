@@ -10,11 +10,11 @@ const ITERATIONS = 10000;
 const DIGEST = "sha256";
 const BYTE_TO_STRING_ENCODING = "base64"; // this could be base64, for instance
 
-const verifyPassword = (persistedPassword, passwordAttempt) => {
+const verifyPassword = (passwordHash, salt, passwordAttempt) => {
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(
       passwordAttempt,
-      persistedPassword.salt,
+      salt,
       ITERATIONS,
       PASSWORD_LENGTH,
       DIGEST,
@@ -133,7 +133,7 @@ exports.handler = async (event, context, callback) => {
   const passwordAttempt = _.get(requestBody, "password");
   const { salt, hash, user_id } = await getSaltAndHashForUser(username);
 
-  const valid = await verifyPassword({ hash, salt }, passwordAttempt);
+  const valid = await verifyPassword(hash, salt, passwordAttempt);
 
   if (!valid) {
     callback(null, {
@@ -152,6 +152,6 @@ exports.handler = async (event, context, callback) => {
   callback(null, {
     statusCode: 200,
     headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({ access_token }),
+    body: JSON.stringify({ accessToken }),
   });
 };
