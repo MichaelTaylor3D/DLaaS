@@ -37,22 +37,29 @@ resource "aws_api_gateway_resource" "login-api-resource" {
     path_part   = "login"
 }
 
-# /user/generate_access_key
-resource "aws_api_gateway_resource" "generate-access-key-api-resource" {
+# /user/list_access_keys
+resource "aws_api_gateway_resource" "access-keys-api-resource" {
     # ID to AWS API Gateway Rest API definition above
     rest_api_id = var.api_gateway_id
     parent_id   = aws_api_gateway_resource.user-api-resource.id
 
-    path_part   = "generate_access_key"
+    path_part   = "access_keys"
 }
 
-# /user/list_access_keys
-resource "aws_api_gateway_resource" "list-access-keys-api-resource" {
+resource "aws_api_gateway_resource" "delete-access-key-api-resource" {
     # ID to AWS API Gateway Rest API definition above
     rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+    parent_id   = aws_api_gateway_resource.access-keys-api-resource.id
 
-    path_part   = "list_access_keys"
+    path_part   = "{accessKey}"
+}
+
+resource "aws_api_gateway_method" "delete-access-key-method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.delete-access-key-api-resource.id
+  http_method      = "DELETE"
+  authorization    = "NONE"
+  api_key_required = false
 }
 
 resource "aws_api_gateway_method" "create-method" {
@@ -65,7 +72,7 @@ resource "aws_api_gateway_method" "create-method" {
 
 resource "aws_api_gateway_method" "generate-access-key-method" {
   rest_api_id      = var.api_gateway_id
-  resource_id      = aws_api_gateway_resource.generate-access-key-api-resource.id
+  resource_id      = aws_api_gateway_resource.access-keys-api-resource.id
   http_method      = "POST"
   authorization    = "NONE"
   api_key_required = false
@@ -73,7 +80,7 @@ resource "aws_api_gateway_method" "generate-access-key-method" {
 
 resource "aws_api_gateway_method" "list-access-keys-method" {
   rest_api_id      = var.api_gateway_id
-  resource_id      = aws_api_gateway_resource.list-access-keys-api-resource.id
+  resource_id      = aws_api_gateway_resource.access-keys-api-resource.id
   http_method      = "GET"
   authorization    = "NONE"
   api_key_required = false
@@ -173,6 +180,22 @@ resource "aws_api_gateway_integration" "list-access-keys-lambda-api-integration"
 
     # The URI at which the API is invoked
     uri                     = aws_lambda_function.list-access-keys-function-handler.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "delete-access-keyslambda-api-integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.delete-access-key-api-resource.id
+
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.delete-access-key-method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.delete-access-key-function-handler.invoke_arn
 }
 
 
