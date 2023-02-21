@@ -183,9 +183,3 @@ resource "aws_security_group" "allow-ssh-security-group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-output "public_subnet_1_id"            { value = aws_subnet.public-1.id }
-output "public_subnet_2_id"            { value = aws_subnet.public-2.id }
-output "rdp_security_group"            { value = aws_security_group.allow-rdp-security-group.id }
-output "elastic_search_security_group" { value = aws_security_group.allow-elastic-search-security-group.id }
-output "mysql_security_group"          { value = aws_security_group.allow-mysql-security-group.id }
