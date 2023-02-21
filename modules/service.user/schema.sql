@@ -31,6 +31,6 @@ BEGIN
   DELETE FROM users WHERE confirmed = false AND created_at < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY));
   DELETE FROM access_tokens WHERE expires_on < UNIX_TIMESTAMP(NOW());
 
-  INSERT INTO users ( user_id, access_token, expires_on) VALUES (user_id, jwt, UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY)))
+  INSERT INTO access_tokens ( user_id, access_token, expires_on) VALUES (user_id, jwt, UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY)))
 END
 $$

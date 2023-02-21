@@ -7,10 +7,10 @@ const SES = require("aws-sdk/clients/ses");
 const { getConfigurationFile } = require("./utils");
 
 const PASSWORD_LENGTH = 256;
-const SALT_LENGTH = 64;
+const SALT_LENGTH = 8;
 const ITERATIONS = 10000;
 const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "hex"; // this could be base64, for instance
+const BYTE_TO_STRING_ENCODING = "base64"; // this could be base64, for instance
 
 const ses = new SES({
   apiVersion: "2010-12-01",

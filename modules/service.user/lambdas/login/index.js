@@ -6,10 +6,9 @@ const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
 const PASSWORD_LENGTH = 256;
-const SALT_LENGTH = 64;
 const ITERATIONS = 10000;
 const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "hex"; // this could be base64, for instance
+const BYTE_TO_STRING_ENCODING = "base64"; // this could be base64, for instance
 
 const verifyPassword = (persistedPassword, passwordAttempt) => {
   return new Promise((resolve, reject) => {
@@ -32,11 +31,16 @@ const verifyPassword = (persistedPassword, passwordAttempt) => {
   });
 };
 
-const generateAccessToken = async (username) => {
+const generateAccessToken = async (username, user_id) => {
   const apiConfig = await getConfigurationFile("api.config.json");
-  return jwt.sign(username, apiConfig.token_secret, {
-    expiresIn: "2592000s",
-  });
+  return jwt.sign(
+    {
+      user_id,
+      username,
+    },
+    apiConfig.token_secret,
+    { expiresIn: "1h" }
+  );
 };
 
 const getSaltAndHashForUser = async (username) => {
@@ -64,9 +68,9 @@ const getSaltAndHashForUser = async (username) => {
 
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT users.salt, users.id as user_id, users.password_hash as hash
+      SELECT salt, id as user_id, password_hash as hash
       FROM users
-      AND users.username = ':username';
+      WHERE username = :username;
     `;
 
     const params = { username };
@@ -107,7 +111,7 @@ const insertJWT = async (jwt, user_id) => {
   };
 
   return new Promise((resolve, reject) => {
-    const sql = `CALL insert_jwt(:jwt, :user_id)`;
+    const sql = `CALL insert_jwt(:jwt, :user_id, )`;
 
     const params = { jwt, user_id };
 
@@ -127,9 +131,11 @@ exports.handler = async (event, context, callback) => {
   const requestBody = JSON.parse(event.body);
   const username = _.get(requestBody, "username");
   const passwordAttempt = _.get(requestBody, "password");
-  const { salt, hash, user_id } = getSaltAndHashForUser(username);
+  const { salt, hash, user_id } = await getSaltAndHashForUser(username);
 
-  if (!verifyPassword({ hash, salt }, passwordAttempt)) {
+  const valid = await verifyPassword({ hash, salt }, passwordAttempt);
+
+  if (!valid) {
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -140,14 +146,12 @@ exports.handler = async (event, context, callback) => {
     return;
   }
 
-  const accessToken = await generateAccessToken(username);
+  const accessToken = await generateAccessToken(username, user_id);
   await insertJWT(accessToken, user_id);
 
   callback(null, {
     statusCode: 200,
     headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      access_token: jwt,
-    }),
+    body: JSON.stringify({ access_token }),
   });
 };
