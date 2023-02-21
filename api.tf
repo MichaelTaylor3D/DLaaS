@@ -70,7 +70,7 @@ resource "aws_s3_bucket_object" "api-config-upload" {
   content      = <<EOF
   {  
     "api_key": "${aws_api_gateway_api_key.app-key.value}",
-    "token_secret": "${random_password.token_secret.result}"
+    "token_secret": "${random_password.token_secret.result}",
     "pbkdf2": {
       "password_length": 256,
       "iterations": 10000,
