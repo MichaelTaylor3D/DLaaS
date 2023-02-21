@@ -58,8 +58,8 @@ ALTER TABLE dlstorage_services.access_tokens ADD INDEX `user_index` (`user_id`);
 CREATE TABLE IF NOT EXISTS dlstorage_services.client_access_keys(
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
-  access_key INT NOT NULL,
-  access_key_hash INT NOT NULL,
+  access_key VARCHAR(20) NOT NULL,
+  access_key_hash VARCHAR(40) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 

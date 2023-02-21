@@ -64,7 +64,7 @@ const insertAccessKey = async (userId, accessKey, hash) => {
   };
 
   return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO client_access_keys (user_id, access_key, hash) VALUES (:userId, :accessKey, :secretAccessKey)`;
+    const sql = `INSERT INTO client_access_keys (user_id, access_key, access_key_hash) VALUES (:userId, :accessKey, :hash)`;
 
     const params = { userId, accessKey, hash };
 
@@ -82,7 +82,7 @@ const insertAccessKey = async (userId, accessKey, hash) => {
 
 exports.handler = async (event, context, callback) => {
   try {
-    const bearerToken = event?.headers?.authorization.split(" ")[1];
+    const bearerToken = event?.headers?.Authorization.split(" ")[1];
     if (!bearerToken) {
       throw new Error("Missing bearer token");
     }
@@ -93,9 +93,9 @@ exports.handler = async (event, context, callback) => {
     const accessKey = crypto.randomBytes(10).toString("hex");
     const secretAccessKey = crypto.randomBytes(20).toString("hex");
 
-    const { hash } = await hashSecretAccessKey(accessKey, secretAccessKey);
+    const { hash } = await hashSecretAccessKey(accessKey.toUpperCase(), secretAccessKey);
 
-    await insertAccessKey(user_id, accessKey, hash);
+    await insertAccessKey(user_id, accessKey.toUpperCase(), hash);
 
     callback(null, {
       statusCode: 400,
@@ -103,7 +103,7 @@ exports.handler = async (event, context, callback) => {
       body: JSON.stringify({
         message:
           "Here is your access key and secret key, if you loose your secret key, you will need to regenerate a new access key and secret key.",
-        access_key: accessKey,
+        access_key: accessKey.toUpperCase(),
         secret_access_key: secretAccessKey,
       }),
     });
