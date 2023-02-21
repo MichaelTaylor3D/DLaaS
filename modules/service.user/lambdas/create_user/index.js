@@ -1,7 +1,6 @@
 const _ = require("lodash");
 const mysql = require("mysql");
 const crypto = require("crypto");
-const pbkdf2 = require("pbkdf2");
 const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 

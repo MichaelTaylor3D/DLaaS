@@ -11,7 +11,6 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
-    "mysql": "^2.18.1",
-    "pbkdf2": "^3.1.2"
+    "mysql": "^2.18.1"
   }
 }

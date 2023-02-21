@@ -23,9 +23,7 @@ const verifyPassword = (passwordHash, salt, passwordAttempt) => {
           return reject(error);
         }
 
-        resolve(
-          persistedPassword.hash === hash.toString(BYTE_TO_STRING_ENCODING)
-        );
+        resolve(passwordHash === hash.toString(BYTE_TO_STRING_ENCODING));
       }
     );
   });
