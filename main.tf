@@ -56,4 +56,7 @@ module "service-worker-gateway" {
 
   # Policies And Roles
   default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
+
+  # Storage
+  dev_bucket_id               = aws_s3_bucket.storage-devops-bucket.id
 }

@@ -27,9 +27,6 @@ resource "aws_apigatewayv2_integration" "demo_integration" {
     }
     template_selection_expression             = "\\$default"
     timeout_milliseconds                      = 29000
-    depends_on = [
-    aws_iam_role.apigwy_websocket_sqs_role,  
-    ]
 }
 
 resource "aws_apigatewayv2_stage" "production" {
