@@ -8,7 +8,7 @@ const s3 = new AWS.S3({
   useAccelerateEndpoint: true,
 });
 
-const queryFormat = (query, values) => {
+const queryFormat = function (query, values) {
   if (!values) return query;
   return query.replace(
     /\:(\w+)/g,
