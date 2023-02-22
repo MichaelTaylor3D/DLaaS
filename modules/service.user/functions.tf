@@ -4,7 +4,7 @@ resource "random_uuid" "archive" { }
 
 data "archive_file" "create-user-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/create_user"
+  source_dir  = "${path.module}/lambdas/create_user/build"
   output_path = "${path.module}/lambdas/create-user-tf-handler-${random_uuid.archive.result}.zip"
 }
 
@@ -54,7 +54,7 @@ resource "aws_lambda_permission" "create-user-api-gateway" {
 
 data "archive_file" "confirm-user-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/confirm_user"
+  source_dir  = "${path.module}/lambdas/confirm_user/build"
   output_path = "${path.module}/lambdas/confirm-user-tf-handler-${random_uuid.archive.result}.zip"
 }
 
@@ -104,7 +104,7 @@ resource "aws_lambda_permission" "confirm-user-api-gateway" {
 
 data "archive_file" "login-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/login"
+  source_dir  = "${path.module}/lambdas/login/build"
   output_path = "${path.module}/lambdas/login-tf-handler-${random_uuid.archive.result}.zip"
 }
 
@@ -154,7 +154,7 @@ resource "aws_lambda_permission" "login-api-gateway" {
 
 data "archive_file" "generate-access-key-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/generate_client_access_key"
+  source_dir  = "${path.module}/lambdas/generate_client_access_key/build"
   output_path = "${path.module}/lambdas/generate-access-key-tf-handler-${random_uuid.archive.result}.zip"
 }
 
@@ -204,7 +204,7 @@ resource "aws_lambda_permission" "generate-access-key-api-gateway" {
 
 data "archive_file" "list-access-keys-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/list_access_keys"
+  source_dir  = "${path.module}/lambdas/list_access_keys/build"
   output_path = "${path.module}/lambdas/list-access-keys-tf-handler-${random_uuid.archive.result}.zip"
 }
 
@@ -254,7 +254,7 @@ resource "aws_lambda_permission" "list-access-keys-api-gateway" {
 
 data "archive_file" "delete-access-key-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/delete_access_key"
+  source_dir  = "${path.module}/lambdas/delete_access_key/build"
   output_path = "${path.module}/lambdas/delete-access-key-tf-handler-${random_uuid.archive.result}.zip"
 }
 
