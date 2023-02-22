@@ -140,9 +140,9 @@ const getUserByEmailOrUsername = async (email, username) => {
   connection.config.queryFormat = queryFormat;
 
   return new Promise((resolve, reject) => {
-    const sql = `SELECT username, email FROM users WHERE username = :username OR email = :email;`;
+    const sql = `SELECT username, email FROM users WHERE username = :username OR email = :email`;
 
-    const params = { email };
+    const params = { email, username };
 
     connection.query(sql, params, (error, results) => {
       if (error) {
