@@ -9,7 +9,7 @@ resource "aws_s3_bucket_object" "crypto-config-upload" {
   content_type = "application/json"
   content      = <<EOF
   { 
-    "token_secret": "${random_password.token_secret.result}"
+    "token_secret": "${random_password.token_secret.result}",
     "password_length": 256,
     "iterations": 10000,
     "digest": "sha256",
