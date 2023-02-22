@@ -96,6 +96,74 @@ const upsertUserMeta = async (userId, metaKey, metaValue) => {
 
 module.exports.upsertUserMeta = upsertUserMeta;
 
+const getUserMeta = async (userId, metaKey) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT meta_value FROM user_meta WHERE user_id = :userId AND meta_key = :metaKey`;
+
+    const params = {
+      userId,
+      metaKey,
+    };
+
+    connection.query(sql, params, (error) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve();
+    });
+  });
+};
+
+module.exports.getUserMeta = getUserMeta;
+
+const deleteUserMeta = async (userId, metaKey) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM user_meta WHERE user_id = :userId AND meta_key = :metaKey`;
+
+    const params = {
+      userId,
+      metaKey,
+    };
+
+    connection.query(sql, params, (error) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve();
+    });
+  });
+};
+
+module.exports.deleteUserMeta = deleteUserMeta;
+
 const getUserByEmail = async (email) => {
   const dbConfig = await getConfigurationFile("db.config.json");
 
@@ -157,6 +225,37 @@ const getUserByEmailOrUsername = async (email, username) => {
 };
 
 module.exports.getUserByEmailOrUsername = getUserByEmailOrUsername;
+
+const getUserById = async (column, value) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM users WHERE :column = :value`;
+
+    const params = { column, value };
+
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve(results?.[0]);
+    });
+  });
+};
+
+module.exports.getUserById = getUserById;
 
 const sendEmail = async (email, title, message, htmlMessage) => {
   return ses
@@ -273,9 +372,6 @@ const apiResponse = (statusCode, responseBody) => {
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({ responseBody }),
   };
-}
+};
 
 module.exports.apiResponse = apiResponse;
-
-
-

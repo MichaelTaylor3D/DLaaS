@@ -55,6 +55,33 @@ resource "aws_api_gateway_resource" "confirm-new-password-api-resource" {
     path_part   = "confirm_new_password"
 }
 
+# /user/change_email
+resource "aws_api_gateway_resource" "change-email-api-resource" {
+    # ID to AWS API Gateway Rest API definition above
+    rest_api_id = var.api_gateway_id
+    parent_id   = aws_api_gateway_resource.user-api-resource.id
+
+    path_part   = "change_email"
+}
+
+# /user/confirm_change_email
+resource "aws_api_gateway_resource" "confirm-change-email-api-resource" {
+    # ID to AWS API Gateway Rest API definition above
+    rest_api_id = var.api_gateway_id
+    parent_id   = aws_api_gateway_resource.user-api-resource.id
+
+    path_part   = "confirm_change_email"
+}
+
+# /user/cancel_change_email
+resource "aws_api_gateway_resource" "cancel-change-email-api-resource" {
+    # ID to AWS API Gateway Rest API definition above
+    rest_api_id = var.api_gateway_id
+    parent_id   = aws_api_gateway_resource.user-api-resource.id
+
+    path_part   = "cancel_change_email"
+}
+
 # /user/list_access_keys
 resource "aws_api_gateway_resource" "access-keys-api-resource" {
     # ID to AWS API Gateway Rest API definition above
@@ -100,6 +127,30 @@ resource "aws_api_gateway_method" "confirm-new-password-method" {
   rest_api_id      = var.api_gateway_id
   resource_id      = aws_api_gateway_resource.confirm-new-password-api-resource.id
   http_method      = "POST"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
+resource "aws_api_gateway_method" "change-email-method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.change-email-api-resource.id
+  http_method      = "POST"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
+resource "aws_api_gateway_method" "cancel-change-email-method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.cancel-change-email-api-resource.id
+  http_method      = "GET"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
+resource "aws_api_gateway_method" "confirm-change-email-method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.confirm-change-email-api-resource.id
+  http_method      = "GET"
   authorization    = "NONE"
   api_key_required = false
 }
@@ -262,6 +313,54 @@ resource "aws_api_gateway_integration" "confirm-new-password-lambda-api-integrat
 
     # The URI at which the API is invoked
     uri                     = aws_lambda_function.confirm-new-password-function-handler.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "change-email-lambda-api-integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.change-email-api-resource.id
+
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.change-email-method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.change-email-function-handler.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "cancel-change-email-lambda-api-integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.cancel-change-email-api-resource.id
+
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.cancel-change-email-method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.cancel-change-email-function-handler.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "confirm-change-email-lambda-api-integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.confirm-change-email-api-resource.id
+
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.confirm-change-email-method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.confirm-change-email-function-handler.invoke_arn
 }
 
 
