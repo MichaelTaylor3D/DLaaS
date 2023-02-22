@@ -16,20 +16,30 @@ const getUserByEmailChangeCode = async (code) => {
 };
 
 exports.handler = async (event, context, callback) => {
-  const code = event?.queryStringParameters?.code;
+  try {
+    const code = event?.queryStringParameters?.code;
 
-  const user = await getUserByEmailChangeCode(code);
+    const user = await getUserByEmailChangeCode(code);
 
-  await Promise.all([
-    deleteUserMeta(user.id, "pendingEmail"),
-    deleteUserMeta(user.id, "changeEmailCode"),
-  ]);
+    await Promise.all([
+      deleteUserMeta(user.id, "pendingEmail"),
+      deleteUserMeta(user.id, "changeEmailCode"),
+    ]);
 
-  callback(null, {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      message: `User email change request has been cancelled. Contact the Admin if you suspect anything suspicious.`,
-    }),
-  });
+    callback(null, {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: `User email change request has been cancelled. Contact the Admin if you suspect anything suspicious.`,
+      }),
+    });
+  } catch (error) {
+    callback(null, {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: error.message,
+      }),
+    });
+  }
 };

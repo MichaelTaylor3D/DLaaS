@@ -16,25 +16,35 @@ const getUserByEmailChangeCode = async (code) => {
 };
 
 exports.handler = async (event, context, callback) => {
-  const code = event?.queryStringParameters?.code;
+  try {
+    const code = event?.queryStringParameters?.code;
 
-  const user = await getUserByEmailChangeCode(code);
-  const pendingEmail = await getUserMeta(user.id, "pendingEmail");
+    const user = await getUserByEmailChangeCode(code);
+    const pendingEmail = await getUserMeta(user.id, "pendingEmail");
 
-  await Promise.all([
-    dbQuery("UPDATE users SET email = :pendingEmail WHERE id = :userId", {
-      pendingEmail,
-      userId: user.id,
-    }),
-    deleteUserMeta(user.id, "pendingEmail"),
-    deleteUserMeta(user.id, "changeEmailCode"),
-  ]);
+    await Promise.all([
+      dbQuery("UPDATE users SET email = :pendingEmail WHERE id = :userId", {
+        pendingEmail,
+        userId: user.id,
+      }),
+      deleteUserMeta(user.id, "pendingEmail"),
+      deleteUserMeta(user.id, "changeEmailCode"),
+    ]);
 
-  callback(null, {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      message: `User email has been changed to ${pendingEmail}.`,
-    }),
-  });
+    callback(null, {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: `User email has been changed to ${pendingEmail}.`,
+      }),
+    });
+  } catch (error) {
+    callback(null, {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: error.message,
+      }),
+    });
+  }
 };

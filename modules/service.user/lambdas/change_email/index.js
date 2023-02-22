@@ -39,9 +39,9 @@ exports.handler = async (event, context, callback) => {
       ),
       sendEmail(
         email,
-        "DataLayer Storage Account Creation",
-        `An email change request has been made. Go to the following link to confirm. https://api.datalayer.storage/v1/user/confirm_email_change?code=${confirmationCode}`,
-        `<div>An email change request has been made. Click on the link below to confirm email change.</div><a href='https://api.datalayer.storage/v1/user/confirm_email_change?code=${confirmationCode}'>Activate Account</a>`
+        "DataLayer Storage Email Change",
+        `An email change request has been made. Go to the following link to confirm. https://api.datalayer.storage/v1/user/confirm_email_change?code=${changeEmailCode}`,
+        `<div>An email change request has been made. Click on the link below to confirm email change.</div><a href='https://api.datalayer.storage/v1/user/confirm_email_change?code=${changeEmailCode}'>Confirm Email</a>`
       ),
     ]);
 

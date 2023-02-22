@@ -239,7 +239,7 @@ const getUserBy = async (column, value) => {
   connection.config.queryFormat = queryFormat;
 
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM users WHERE :column = :value`;
+    const sql = `SELECT * FROM users WHERE ${column} = :value`;
 
     const params = { column, value };
 
