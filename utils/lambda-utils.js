@@ -226,7 +226,7 @@ const getUserByEmailOrUsername = async (email, username) => {
 
 module.exports.getUserByEmailOrUsername = getUserByEmailOrUsername;
 
-const getUserById = async (column, value) => {
+const getUserBy = async (column, value) => {
   const dbConfig = await getConfigurationFile("db.config.json");
 
   const connection = mysql.createConnection({
@@ -255,7 +255,7 @@ const getUserById = async (column, value) => {
   });
 };
 
-module.exports.getUserById = getUserById;
+module.exports.getUserBy = getUserBy;
 
 const sendEmail = async (email, title, message, htmlMessage) => {
   return ses
