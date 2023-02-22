@@ -2,6 +2,7 @@ const AWS = require("aws-sdk");
 const SES = require("aws-sdk/clients/ses");
 const mysql = require("mysql");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",
@@ -265,3 +266,16 @@ const dbQuery = async (sql, params) => {
 };
 
 module.exports.dbQuery = dbQuery;
+
+const apiResponse = (statusCode, responseBody) => {
+  return {
+    statusCode,
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify({ responseBody }),
+  };
+}
+
+module.exports.apiResponse = apiResponse;
+
+
+
