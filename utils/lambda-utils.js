@@ -203,7 +203,7 @@ const hashWithSalt = async (str, salt) => {
   const pbkdf2 = await getConfigurationFile("crypto.config.json");
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(
-      str,
+      `${pbkdf2.static_salt}-${str}`,
       salt,
       pbkdf2.iterations,
       pbkdf2.password_length,
