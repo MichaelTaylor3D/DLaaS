@@ -173,7 +173,7 @@ const sendEmail = async (email, title, message, htmlMessage) => {
             Data: message,
           },
           Html: {
-            Data: `<html><body>${htmlMessage}</body></html>`,
+            Data: `<html><body>${htmlMessage || message}</body></html>`,
           },
         },
       },

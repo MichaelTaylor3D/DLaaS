@@ -67,7 +67,8 @@ exports.handler = async (event, context, callback) => {
       throw new Error("Email already exists.");
     }
 
-    const { hash } = await hashWithSalt(password, await generateSalt());
+    const salt = await generateSalt();
+    const { hash } = await hashWithSalt(password, salt);
     const confirmationCode = generateConfirmationCode();
 
     await insertUserIntoDb(username, email, hash, salt, confirmationCode);

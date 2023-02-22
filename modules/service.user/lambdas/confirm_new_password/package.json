@@ -1,0 +1,16 @@
+{
+  "name": "reset_password",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cp ../../../../utils/lambda-utils.js ./utils.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "jsonwebtoken": "^9.0.0"
+  }
+}
