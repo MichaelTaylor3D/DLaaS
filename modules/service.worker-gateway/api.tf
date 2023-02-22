@@ -42,7 +42,7 @@ resource "aws_apigatewayv2_route" "default" {
 }
 
 resource "aws_s3_bucket_object" "websocket-api-config-upload" {
-  bucket       = aws_s3_bucket.storage-devops-bucket.id
+  bucket       = var.dev_bucket_id
   key          = "configurations/websocket.config.json"
   content_type = "application/json"
   content      = <<EOF
