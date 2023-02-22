@@ -150,12 +150,17 @@ exports.handler = async (event, context, callback) => {
     const password = _.get(requestBody, "password");
 
     if (passwordStrength(password).value !== "Strong") {
-      throw new Error("Password is not strong enough. Min Legnth: 10, Requires 1 of each of the followin: ['lowercase', 'uppercase', 'symbol', 'number']");
+      throw new Error("Password is not strong enough. Min Legnth: 10, Requires 1 of each of the following: ['lowercase', 'uppercase', 'symbol', 'number']");
     }
 
     const existingUser = await getExistingUsernameOrEmail(username, email);
-    if (existingUser.length) {
-      throw new Error(JSON.stringify(existingUser));
+
+    if (existingUser?.username === username) {
+      throw new Error("Username already exists.");
+    }
+
+    if (existingUser?.email === email) {
+      throw new Error("Email already exists.");
     }
 
     const { salt, hash } = await hashPassword(password);

@@ -91,42 +91,40 @@ const getSaltAndHashForUser = async (username) => {
 };
 
 exports.handler = async (event, context, callback) => {
-  const requestBody = JSON.parse(event.body);
-  const username = _.get(requestBody, "username");
-  const passwordAttempt = _.get(requestBody, "password");
-  const { salt, hash, user_id, confirmed } = await getSaltAndHashForUser(
-    username
-  );
+  try {
+    const requestBody = JSON.parse(event.body);
+    const username = _.get(requestBody, "username");
+    const passwordAttempt = _.get(requestBody, "password");
+    const { salt, hash, user_id, confirmed } = await getSaltAndHashForUser(
+      username
+    );
 
-  if(!confirmed) {
+    if (!confirmed) {
+      throw new Error(
+        "Unauthorized. User not yet confirmed. Please check your email."
+      );
+    }
+
+    const valid = await verifyPassword(hash, salt, passwordAttempt);
+
+    if (!valid) {
+      throw new Error("Unauthorized. Invalid username or password.");
+    }
+
+    const accessToken = await generateAccessToken(username, user_id);
+
+    callback(null, {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({ access_token: accessToken }),
+    });
+  } catch (error) {
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message: "Unauthorized. User not yet confirmed. Please check your email.",
+        message: error.message,
       }),
     });
-    return;
   }
-
-  const valid = await verifyPassword(hash, salt, passwordAttempt);
-
-  if (!valid) {
-    callback(null, {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({
-        message: "Unauthorized. Invalid username or password.",
-      }),
-    });
-    return;
-  }
-
-  const accessToken = await generateAccessToken(username, user_id);
-
-  callback(null, {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({ access_token: accessToken }),
-  });
 };
