@@ -1,5 +1,6 @@
 "use strict";
-//
+
+const { passwordStrength } = require("check-password-strength");
 const {
   generateSalt,
   sendEmail,
@@ -53,6 +54,12 @@ exports.handler = async (event, context, callback) => {
 
     if (!code) {
       throw new Error("Missing code in body");
+    }
+
+    if (passwordStrength(password).value !== "Strong") {
+      throw new Error(
+        "Password is not strong enough. Min Legnth: 10, Requires 1 of each of the following: ['lowercase', 'uppercase', 'symbol', 'number']"
+      );
     }
 
     const existingUser = await getUserByResetCode(code);
