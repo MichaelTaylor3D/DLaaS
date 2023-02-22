@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const crypto = require("crypto");
 const {
   upsertUserMeta,
   getUserByEmail,
