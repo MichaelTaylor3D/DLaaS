@@ -1,12 +1,19 @@
 /* it worked! */
 const AWS = require("aws-sdk");
 const mysql = require("mysql");
+const SES = require("aws-sdk/clients/ses");
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",
   signatureVersion: "v4",
   useAccelerateEndpoint: true,
 });
+
+const ses = new SES({
+  apiVersion: "2010-12-01",
+  region: "us-east-1",
+});
+
 
 const queryFormat = function (query, values) {
   if (!values) return query;
@@ -117,3 +124,29 @@ const getUserByEmail = async (email) => {
 };
 
 module.exports.getUserByEmail = getUserByEmail;
+
+const sendEmail = async (email, title, message, htmlMessage) => {
+  return ses
+    .sendEmail({
+      Destination: { ToAddresses: [email] },
+      Message: {
+        Subject: {
+          Charset: "UTF-8",
+          Data: title,
+        },
+        Body: {
+          Text: {
+            Charset: "UTF-8",
+            Data: message,
+          },
+          Html: {
+            Data: `<html><body>${htmlMessage}</body></html>`,
+          },
+        },
+      },
+      Source: "support@datalayer.storage",
+    })
+    .promise();
+};
+
+module.exports.sendEmail = sendEmail;

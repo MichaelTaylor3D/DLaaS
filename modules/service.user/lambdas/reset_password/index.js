@@ -1,9 +1,6 @@
 const _ = require("lodash");
 const crypto = require("crypto");
-const {
-  upsertUserMeta,
-  getUserByEmail,
-} = require("./utils");
+const { upsertUserMeta, getUserByEmail, sendEmail } = require("./utils");
 const SES = require("aws-sdk/clients/ses");
 
 const ses = new SES({
@@ -27,34 +24,19 @@ exports.handler = async (event, context, callback) => {
         resetPasswordCode
       );
 
-      await ses
-        .sendEmail({
-          Destination: { ToAddresses: [email] },
-          Message: {
-            Subject: {
-              Charset: "UTF-8",
-              Data: "DataLayer Storage Reset Email Request",
-            },
-            Body: {
-              Text: {
-                Charset: "UTF-8",
-                Data: `Your reset password code is: ${resetPasswordCode}.`,
-              },
-              Html: {
-                Data: `<html><body><div>Your reset password code is:</div><div>${resetPasswordCode}</div></body></html>`,
-              },
-            },
-          },
-          Source: "support@datalayer.storage",
-        })
-        .promise();
+      await sendEmail(
+        email,
+        "DataLayer Storage Reset Email Request",
+        `Your reset password code is: ${resetPasswordCode}.`,
+        `<div>Your reset password code is:</div><div>${resetPasswordCode}</div>`
+      );
     }
 
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message: "A reset password code has been emailed to you.",
+        message: "If your email was in the system, A reset password code has been emailed to you.",
       }),
     });
   } catch (error) {
