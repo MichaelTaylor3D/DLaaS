@@ -22,8 +22,8 @@ exports.handler = async (event, context, callback) => {
     const user = await getUserByEmailChangeCode(code);
 
     await Promise.all([
-      deleteUserMeta(user.id, "pendingEmail"),
-      deleteUserMeta(user.id, "changeEmailCode"),
+      deleteUserMeta(user.user_id, "pendingEmail"),
+      deleteUserMeta(user.user_id, "changeEmailCode"),
     ]);
 
     callback(null, {

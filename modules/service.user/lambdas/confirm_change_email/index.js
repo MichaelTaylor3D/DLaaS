@@ -25,10 +25,10 @@ exports.handler = async (event, context, callback) => {
     await Promise.all([
       dbQuery("UPDATE users SET email = :pendingEmail WHERE id = :userId", {
         pendingEmail,
-        userId: user.id,
+        userId: user.user_id,
       }),
-      deleteUserMeta(user.id, "pendingEmail"),
-      deleteUserMeta(user.id, "changeEmailCode"),
+      deleteUserMeta(user.user_id, "pendingEmail"),
+      deleteUserMeta(user.user_id, "changeEmailCode"),
     ]);
 
     callback(null, {
