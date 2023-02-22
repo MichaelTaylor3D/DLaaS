@@ -123,7 +123,7 @@ const getUserMeta = async (userId, metaKey) => {
         return;
       }
       connection.end();
-      resolve(results?[0]?.meta_value);
+      resolve(results?.[0]?.meta_value);
     });
   });
 };
