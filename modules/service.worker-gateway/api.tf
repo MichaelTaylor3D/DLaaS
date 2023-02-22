@@ -44,7 +44,7 @@ resource "aws_apigatewayv2_route" "default" {
     target               = "integrations/${aws_apigatewayv2_integration.demo_integration.id}"  
 }
 
-resource "aws_s3_bucket_object" "websocket=api-config-upload" {
+resource "aws_s3_bucket_object" "websocket-api-config-upload" {
   bucket       = aws_s3_bucket.storage-devops-bucket.id
   key          = "configurations/websocket.config.json"
   content_type = "application/json"
