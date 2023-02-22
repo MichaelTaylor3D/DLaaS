@@ -1,5 +1,5 @@
 {
-  "name": "login",
+  "name": "reset_password",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,12 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "mysql": "^2.18.1"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.21.0",
-    "@babel/preset-env": "^7.20.2"
   }
 }

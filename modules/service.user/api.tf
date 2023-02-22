@@ -218,17 +218,17 @@ resource "aws_api_gateway_integration" "delete-access-keyslambda-api-integration
 resource "aws_api_gateway_integration" "reset-password-lambda-api-integration" {
     # ID of the REST API and the endpoint at which to integrate a lambda function
     rest_api_id             = var.api_gateway_id
-    resource_id             = aws_api_gateway_resource.reset-password-key-api-resource.id
+    resource_id             = aws_api_gateway_resource.reset-password-api-resource.id
 
     # ID of the HTTP method at which to integrate with the lambda function
-    http_method             = aws_api_gateway_method.reset-password-key-method.http_method
+    http_method             = aws_api_gateway_method.reset-password-method.http_method
 
     # Lambdas can only be invoked via HTTP POST
     integration_http_method = "POST"
     type                    = "AWS_PROXY"
 
     # The URI at which the API is invoked
-    uri                     = aws_lambda_function.reset-password-key-function-handler.invoke_arn
+    uri                     = aws_lambda_function.reset-password-function-handler.invoke_arn
 }
 
 
