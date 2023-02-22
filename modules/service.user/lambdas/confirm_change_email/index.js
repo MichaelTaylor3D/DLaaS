@@ -20,7 +20,7 @@ exports.handler = async (event, context, callback) => {
     const code = event?.queryStringParameters?.code;
 
     const user = await getUserByEmailChangeCode(code);
-    const pendingEmail = await getUserMeta(user.id, "pendingEmail");
+    const pendingEmail = await getUserMeta(user.user_id, "pendingEmail");
 
     await Promise.all([
       dbQuery("UPDATE users SET email = :pendingEmail WHERE id = :userId", {

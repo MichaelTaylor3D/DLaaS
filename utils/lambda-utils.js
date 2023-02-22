@@ -116,14 +116,14 @@ const getUserMeta = async (userId, metaKey) => {
       metaKey,
     };
 
-    connection.query(sql, params, (error) => {
+    connection.query(sql, params, (error, results) => {
       if (error) {
         reject(error);
         connection.end();
         return;
       }
       connection.end();
-      resolve();
+      resolve(results?[0]?.meta_value);
     });
   });
 };
