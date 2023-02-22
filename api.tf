@@ -75,7 +75,8 @@ resource "aws_s3_bucket_object" "api-config-upload" {
       "password_length": 256,
       "iterations": 10000,
       "digest": "sha256",
-      "byte_to_string_encoding": "base64"
+      "byte_to_string_encoding": "base64",
+      "salt_length": 8
     }
   }
   EOF

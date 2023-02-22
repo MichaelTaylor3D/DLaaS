@@ -7,28 +7,24 @@ const SES = require("aws-sdk/clients/ses");
 const { passwordStrength } = require("check-password-strength");
 const { getConfigurationFile } = require("./utils");
 
-const PASSWORD_LENGTH = 256;
-const SALT_LENGTH = 8;
-const ITERATIONS = 10000;
-const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "base64";
-
 const ses = new SES({
   apiVersion: "2010-12-01",
   region: "us-east-1",
 });
 
-const hashPassword = (password) => {
+const hashPassword = async (password) => {
+  const { pbkdf2 } = await getConfigurationFile("api.config.json");
   return new Promise((resolve, reject) => {
     const salt = crypto
-      .randomBytes(SALT_LENGTH)
-      .toString(BYTE_TO_STRING_ENCODING);
+      .randomBytes(pbkdf2.salt_length)
+      .toString(pbkdf2.byte_to_string_encoding);
+      
     crypto.pbkdf2(
       password,
       salt,
-      ITERATIONS,
-      PASSWORD_LENGTH,
-      DIGEST,
+      pbkdf2.iterations,
+      pbkdf2.password_length,
+      pbkdf2.digest,
       (error, hash) => {
         if (error) {
           return reject(error);
@@ -36,8 +32,7 @@ const hashPassword = (password) => {
 
         resolve({
           salt,
-          hash: hash.toString(BYTE_TO_STRING_ENCODING),
-          iterations: ITERATIONS,
+          hash: hash.toString(pbkdf2.byte_to_string_encoding),
         });
       }
     );

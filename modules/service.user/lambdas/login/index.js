@@ -4,25 +4,21 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { getConfigurationFile } = require("./utils");
 
-const PASSWORD_LENGTH = 256;
-const ITERATIONS = 10000;
-const DIGEST = "sha256";
-const BYTE_TO_STRING_ENCODING = "base64";
-
-const verifyPassword = (passwordHash, salt, passwordAttempt) => {
+const verifyPassword = async (passwordHash, salt, passwordAttempt) => {
+  const { pbkdf2 } = await getConfigurationFile("api.config.json");
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(
       passwordAttempt,
       salt,
-      ITERATIONS,
-      PASSWORD_LENGTH,
-      DIGEST,
+      pbkdf2.iterations,
+      pbkdf2.password_length,
+      pbkdf2.digest,
       (error, hash) => {
         if (error) {
           return reject(error);
         }
 
-        resolve(passwordHash === hash.toString(BYTE_TO_STRING_ENCODING));
+        resolve(passwordHash === hash.toString(pbkdf2.byte_to_string_encoding));
       }
     );
   });
