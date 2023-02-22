@@ -20,7 +20,7 @@ resource "aws_s3_bucket_object" "crypto-config-upload" {
     "digest": "sha256",
     "byte_to_string_encoding": "base64",
     "salt_length": 8,
-    "static_salt": "${random_password.static_salt}"
+    "static_salt": "${random_password.static_salt.result}"
   }
   EOF
 }
