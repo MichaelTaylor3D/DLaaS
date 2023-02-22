@@ -1,40 +1,13 @@
-const _ = require("lodash");
-const mysql = require("mysql");
+"use strict";
+
 const crypto = require("crypto");
-const {
-  getConfigurationFile,
-  verifyToken,
-  queryFormat,
-  hashWithSalt,
-} = require("./utils");
+const { verifyToken, hashWithSalt, dbQuery } = require("./utils");
 
 const insertAccessKey = async (userId, accessKey, hash) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO client_access_keys (user_id, access_key, access_key_hash) VALUES (:userId, :accessKey, :hash)`;
-
-    const params = { userId, accessKey, hash };
-
-    connection.query(sql, params, (error) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve();
-    });
-  });
+  return dbQuery(
+    `INSERT INTO client_access_keys (user_id, access_key, access_key_hash) VALUES (:userId, :accessKey, :hash)`,
+    { userId, accessKey, hash }
+  );
 };
 
 exports.handler = async (event, context, callback) => {

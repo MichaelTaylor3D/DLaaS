@@ -1,7 +1,7 @@
-/* it worked! */
 const AWS = require("aws-sdk");
-const mysql = require("mysql");
 const SES = require("aws-sdk/clients/ses");
+const mysql = require("mysql");
+const jwt = require("jsonwebtoken");
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",
@@ -234,7 +234,34 @@ const generateSalt = async (hash, salt) => {
 module.exports.generateSalt = generateSalt;
 
 const generateConfirmationCode = () => {
-  return crypto.randomBytes(25).toString("hex");;
+  return crypto.randomBytes(25).toString("hex");
 };
 
 module.exports.generateConfirmationCode = generateConfirmationCode;
+
+const dbQuery = async (sql, params) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve(results);
+    });
+  });
+};
+
+module.exports.dbQuery = dbQuery;

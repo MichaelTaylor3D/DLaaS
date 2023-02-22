@@ -1,3 +1,5 @@
+"use strict";
+
 const {
   upsertUserMeta,
   getUserByEmail,
@@ -10,7 +12,7 @@ exports.handler = async (event, context, callback) => {
     const requestBody = JSON.parse(event.body);
     const email = requestBody?.email;
 
-    if(!email) {
+    if (!email) {
       throw new Error("Missing email in body");
     }
 

@@ -1,34 +1,15 @@
-const _ = require("lodash");
-const mysql = require("mysql");
-const { getConfigurationFile, verifyToken, queryFormat } = require("./utils");
+"use strict";
+
+const {
+  verifyToken,
+  dbQuery,
+} = require("./utils");
 
 const deleteAccessKey = async (userId, accessKey) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM client_access_keys WHERE user_id = :userId AND access_key = :accessKey`;
-
-    const params = { userId, accessKey };
-
-    connection.query(sql, params, (error, results) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve(results);
-    });
-  });
+  return dbQuery(
+    `DELETE FROM client_access_keys WHERE user_id = :userId AND access_key = :accessKey`,
+    { userId, accessKey }
+  );
 };
 
 exports.handler = async (event, context, callback) => {

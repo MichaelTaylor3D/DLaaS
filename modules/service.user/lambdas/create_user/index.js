@@ -1,17 +1,13 @@
 "use strict";
 
-const _ = require("lodash");
-const mysql = require("mysql");
-const crypto = require("crypto");
 const { passwordStrength } = require("check-password-strength");
 const {
-  getConfigurationFile,
   hashWithSalt,
   generateSalt,
   sendEmail,
   generateConfirmationCode,
   getUserByEmailOrUsername,
-  queryFormat,
+  dbQuery,
 } = require("./utils");
 
 const insertUserIntoDb = async (
@@ -21,47 +17,39 @@ const insertUserIntoDb = async (
   salt,
   confirmationCode
 ) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    const sql = `CALL create_new_user(:username, :email, :passwordHash, :salt, :confirmationCode)`;
-
-    const params = {
+  return dbQuery(
+    `CALL create_new_user(:username, :email, :passwordHash, :salt, :confirmationCode)`,
+    {
       username,
       email,
       passwordHash,
       salt,
       confirmationCode,
       createdAt: Date.now(),
-    };
-
-    connection.query(sql, params, (error) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve();
-    });
-  });
+    }
+  );
 };
 
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const username = _.get(requestBody, "username");
-    const email = _.get(requestBody, "email");
-    const password = _.get(requestBody, "password");
+    const username = requestBody?.username;
+
+    if (!username) {
+      throw new Error("Username is required.");
+    }
+
+    const email = requestBody?.email;
+
+    if (!email) {
+      throw new Error("Email is required.");
+    }
+
+    const password = requestBody?.password;
+
+    if (!password) {
+      throw new Error("Password is required.");
+    }
 
     if (passwordStrength(password).value !== "Strong") {
       throw new Error(

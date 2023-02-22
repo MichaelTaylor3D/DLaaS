@@ -1,7 +1,11 @@
-const _ = require("lodash");
-const mysql = require("mysql");
+"use strict";
+
 const jwt = require("jsonwebtoken");
-const { getConfigurationFile, queryFormat, hashWithSalt } = require("./utils");
+const {
+  getConfigurationFile,
+  hashWithSalt,
+  dbQuery,
+} = require("./utils");
 
 const verifyPassword = async (passwordHash, salt, passwordAttempt) => {
   const [pbkdf2, { hash }] = await Promise.all([
@@ -25,19 +29,8 @@ const generateAccessToken = async (username, user_id) => {
 };
 
 const getSaltAndHashForUser = async (username) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    const sql = `
+  const result = await dbQuery(
+    `
       SELECT 
         user_meta.meta_value as salt, 
         users.id as user_id, 
@@ -47,27 +40,29 @@ const getSaltAndHashForUser = async (username) => {
       INNER JOIN user_meta on users.id = user_meta.user_id
       WHERE users.username = :username
       AND user_meta.meta_key = 'salt';
-    `;
+    `,
+    { username }
+  );
 
-    const params = { username };
-
-    connection.query(sql, params, (error, results) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve(results[0]);
-    });
-  });
+  return result?.[0];
 };
 
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const username = _.get(requestBody, "username");
-    const passwordAttempt = _.get(requestBody, "password");
+
+    const username = requestBody?.username;
+
+    if (!username) {
+      throw new Error("No username provided.");
+    }
+
+    const passwordAttempt = requestBody?.password;
+
+    if (!passwordAttempt) {
+      throw new Error("No password provided.");
+    }
+
     const { salt, hash, user_id, confirmed } = await getSaltAndHashForUser(
       username
     );

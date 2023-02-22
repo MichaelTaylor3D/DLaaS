@@ -1,37 +1,9 @@
-const mysql = require("mysql");
-const { getConfigurationFile, queryFormat } = require("./utils");
+"use strict";
 
-const confirmAccount = async (
-  confirmationCode
-) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
+const { dbQuery } = require("./utils");
 
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    const sql = `CALL confirm_account(:confirmationCode)`;
-
-    const params = {
-      confirmationCode,
-    };
-
-    connection.query(sql, params, (error) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve();
-    });
-  });
+const confirmAccount = async (confirmationCode) => {
+  return dbQuery('CALL confirm_account(:confirmationCode)', {confirmationCode});
 };
 
 exports.handler = async (event, context, callback) => {
@@ -43,8 +15,7 @@ exports.handler = async (event, context, callback) => {
     statusCode: 200,
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({
-      message:
-        "User confirmed you may now login.",
+      message: "User confirmed you may now login.",
     }),
   });
 };
