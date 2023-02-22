@@ -1,7 +1,5 @@
 const _ = require("lodash");
-const mysql = require("mysql");
 const {
-  getConfigurationFile,
   upsertUserMeta,
   getUserByEmail,
 } = require("./utils");
@@ -11,50 +9,6 @@ const ses = new SES({
   apiVersion: "2010-12-01",
   region: "us-east-1",
 });
-
-const getExistingUsernameOrEmail = async (email) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = function (query, values) {
-    if (!values) return query;
-    return query.replace(
-      /\:(\w+)/g,
-      function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-          return this.escape(values[key]);
-        }
-        return txt;
-      }.bind(this)
-    );
-  };
-
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT COUNT(*) AS count
-      FROM users
-      WHERE email = :email;
-    `;
-
-    const params = { email };
-
-    connection.query(sql, params, (error, results) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve(results[0]);
-    });
-  });
-};
 
 exports.handler = async (event, context, callback) => {
   try {
