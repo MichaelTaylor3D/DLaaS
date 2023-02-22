@@ -47,7 +47,7 @@ resource "aws_s3_bucket_object" "websocket-api-config-upload" {
   content_type = "application/json"
   content      = <<EOF
   {  
-    "api_gateway_endpoint": "https://${aws_apigatewayv2_api.worker_gateway_ws_api.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_apigatewayv2_stage.production.name}",
+    "websocket_url": "${aws_apigatewayv2_api.worker_gateway_ws_api.api_endpoint}"
   }
   EOF
 }
