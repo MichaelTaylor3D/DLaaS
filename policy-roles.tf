@@ -71,6 +71,16 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
 					],
     			"Resource": "*"
 				}, {
+            "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:GetQueueUrl",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }, {
     			"Action": [
     				"s3:GetObject",
     				"s3:GetObjectTagging",
