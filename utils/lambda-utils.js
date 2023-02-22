@@ -224,11 +224,11 @@ const hashWithSalt = async (str, salt) => {
 
 module.exports.hashWithSalt = hashWithSalt;
 
-const generateSalt = async (hash, salt) => {
+const generateSalt = async () => {
   const pbkdf2 = await getConfigurationFile("crypto.config.json");
 
   return crypto
-    .randomBytes(pbkdf2.salt_length)
+    .randomBytes(pbkdf2.dynamic_salt_length)
     .toString(pbkdf2.byte_to_string_encoding);
 };
 
