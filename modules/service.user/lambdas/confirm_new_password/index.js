@@ -36,8 +36,8 @@ exports.handler = async (event, context, callback) => {
     const requestBody = JSON.parse(event.body);
     const password = requestBody?.password;
 
-    if (!email) {
-      throw new Error("Missing email in body");
+    if (!password) {
+      throw new Error("Missing password in body");
     }
 
     const code = requestBody?.code;
