@@ -17,8 +17,8 @@ BEGIN
 	
   SELECT LAST_INSERT_ID() INTO @id;
 
-  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (@id, 'salt', salt) ON DUPLICATE KEY UPDATE user_id = LAST_INSERT_ID(), meta_key = 'salt', meta_value = salt;
-  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (@id, 'confirmationCode', confirmationCode) ON DUPLICATE KEY UPDATE user_id = LAST_INSERT_ID(), meta_key = 'confirmationCode', meta_value = confirmationCode;
+  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (@id, 'salt', salt) ON DUPLICATE KEY UPDATE user_id = @id, meta_key = 'salt', meta_value = salt;
+  INSERT INTO user_meta (user_id, meta_key, meta_value) VALUES (@id, 'confirmationCode', confirmationCode) ON DUPLICATE KEY UPDATE user_id = @id, meta_key = 'confirmationCode', meta_value = confirmationCode;
 
   COMMIT WORK;
 END

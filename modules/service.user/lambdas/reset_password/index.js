@@ -1,22 +1,23 @@
-const _ = require("lodash");
-const crypto = require("crypto");
-const { upsertUserMeta, getUserByEmail, sendEmail } = require("./utils");
-const SES = require("aws-sdk/clients/ses");
-
-const ses = new SES({
-  apiVersion: "2010-12-01",
-  region: "us-east-1",
-});
+const {
+  upsertUserMeta,
+  getUserByEmail,
+  sendEmail,
+  generateConfirmationCode,
+} = require("./utils");
 
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const email = _.get(requestBody, "email");
+    const email = requestBody?.email;
+
+    if(!email) {
+      throw new Error("Missing email in body");
+    }
 
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
-      const resetPasswordCode = crypto.randomBytes(25).toString("hex");
+      const resetPasswordCode = generateConfirmationCode();
 
       await upsertUserMeta(
         existingUser.id,
@@ -36,7 +37,8 @@ exports.handler = async (event, context, callback) => {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message: "If your email was in the system, A reset password code has been emailed to you.",
+        message:
+          "If your email was in the system, A reset password code has been emailed to you.",
       }),
     });
   } catch (error) {

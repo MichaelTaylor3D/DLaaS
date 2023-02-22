@@ -1,20 +1,6 @@
 const _ = require("lodash");
 const mysql = require("mysql");
-const jwt = require("jsonwebtoken");
-const { getConfigurationFile } = require("./utils");
-
-const verifyToken = async (token) => {
-  const apiConfig = await getConfigurationFile("api.config.json");
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, apiConfig.token_secret, (err, decoded) => {
-      if (err) {
-        reject(err);
-      }
-
-      resolve(decoded);
-    });
-  });
-};
+const { getConfigurationFile, verifyToken, queryFormat } = require("./utils");
 
 const getAccessKeys = async (userId) => {
   const dbConfig = await getConfigurationFile("db.config.json");
@@ -26,18 +12,7 @@ const getAccessKeys = async (userId) => {
     database: dbConfig.db_name,
   });
 
-  connection.config.queryFormat = function (query, values) {
-    if (!values) return query;
-    return query.replace(
-      /\:(\w+)/g,
-      function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-          return this.escape(values[key]);
-        }
-        return txt;
-      }.bind(this)
-    );
-  };
+  connection.config.queryFormat = queryFormat;
 
   return new Promise((resolve, reject) => {
     const sql = `SELECT access_key FROM client_access_keys WHERE user_id = :userId`;

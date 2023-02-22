@@ -1,37 +1,25 @@
 const _ = require("lodash");
 const mysql = require("mysql");
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const { getConfigurationFile } = require("./utils");
+const { getConfigurationFile, queryFormat, hashWithSalt } = require("./utils");
 
 const verifyPassword = async (passwordHash, salt, passwordAttempt) => {
-  const { pbkdf2 } = await getConfigurationFile("api.config.json");
-  return new Promise((resolve, reject) => {
-    crypto.pbkdf2(
-      passwordAttempt,
-      salt,
-      pbkdf2.iterations,
-      pbkdf2.password_length,
-      pbkdf2.digest,
-      (error, hash) => {
-        if (error) {
-          return reject(error);
-        }
+  const [pbkdf2, { hash }] = await Promise.all([
+    getConfigurationFile("crypto.config.json"),
+    hashWithSalt(passwordAttempt, salt),
+  ]);
 
-        resolve(passwordHash === hash.toString(pbkdf2.byte_to_string_encoding));
-      }
-    );
-  });
+  return passwordHash === hash.toString(pbkdf2.byte_to_string_encoding);
 };
 
 const generateAccessToken = async (username, user_id) => {
-  const apiConfig = await getConfigurationFile("api.config.json");
+  const config = await getConfigurationFile("crypto.config.json");
   return jwt.sign(
     {
       user_id,
       username,
     },
-    apiConfig.token_secret,
+    config.token_secret,
     { expiresIn: "1h" }
   );
 };
@@ -46,18 +34,7 @@ const getSaltAndHashForUser = async (username) => {
     database: dbConfig.db_name,
   });
 
-  connection.config.queryFormat = function (query, values) {
-    if (!values) return query;
-    return query.replace(
-      /\:(\w+)/g,
-      function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-          return this.escape(values[key]);
-        }
-        return txt;
-      }.bind(this)
-    );
-  };
+  connection.config.queryFormat = queryFormat;
 
   return new Promise((resolve, reject) => {
     const sql = `

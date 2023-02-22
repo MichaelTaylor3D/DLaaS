@@ -1,44 +1,12 @@
 const _ = require("lodash");
 const mysql = require("mysql");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
-const { getConfigurationFile } = require("./utils");
-
-const hashSecretAccessKey = async (accessKey, secretAccessKey) => {
-  const { pbkdf2 } = await getConfigurationFile("api.config.json");
-  return new Promise((resolve, reject) => {
-    crypto.pbkdf2(
-      accessKey,
-      secretAccessKey,
-      pbkdf2.iterations,
-      pbkdf2.password_length,
-      pbkdf2.digest,
-      (error, hash) => {
-        if (error) {
-          return reject(error);
-        }
-
-        resolve({
-          accessKey,
-          hash: hash.toString(pbkdf2.byte_to_string_encoding),
-        });
-      }
-    );
-  });
-};
-
-const verifyToken = async (token) => {
-  const apiConfig = await getConfigurationFile("api.config.json");
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, apiConfig.token_secret, (err, decoded) => {
-      if (err) {
-        reject(err);
-      }
-
-      resolve(decoded);
-    });
-  });
-};
+const {
+  getConfigurationFile,
+  verifyToken,
+  queryFormat,
+  hashWithSalt,
+} = require("./utils");
 
 const insertAccessKey = async (userId, accessKey, hash) => {
   const dbConfig = await getConfigurationFile("db.config.json");
@@ -50,18 +18,7 @@ const insertAccessKey = async (userId, accessKey, hash) => {
     database: dbConfig.db_name,
   });
 
-  connection.config.queryFormat = function (query, values) {
-    if (!values) return query;
-    return query.replace(
-      /\:(\w+)/g,
-      function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-          return this.escape(values[key]);
-        }
-        return txt;
-      }.bind(this)
-    );
-  };
+  connection.config.queryFormat = queryFormat;
 
   return new Promise((resolve, reject) => {
     const sql = `INSERT INTO client_access_keys (user_id, access_key, access_key_hash) VALUES (:userId, :accessKey, :hash)`;
@@ -93,7 +50,10 @@ exports.handler = async (event, context, callback) => {
     const accessKey = crypto.randomBytes(10).toString("hex");
     const secretAccessKey = crypto.randomBytes(20).toString("hex");
 
-    const { hash } = await hashSecretAccessKey(accessKey.toUpperCase(), secretAccessKey);
+    const { hash } = await hashWithSalt(
+      accessKey.toUpperCase(),
+      secretAccessKey
+    );
 
     await insertAccessKey(user_id, accessKey.toUpperCase(), hash);
 
@@ -101,11 +61,7 @@ exports.handler = async (event, context, callback) => {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message: `Here is your access key and secret key. 
-           It will be needed to interact with your datastores. 
-           Do NOT share this with anyone. 
-           If a key is compromised or lost, its your responsibility to delete it, you will need to regenerate a new access key and secret key
-          `,
+        message: `Here is your access key and secret key. It will be needed to interact with your datastores. Do NOT share this with anyone. If a key is compromised or lost, its your responsibility to delete it, you will need to regenerate a new access key and secret key`,
         access_key: accessKey.toUpperCase(),
         secret_access_key: secretAccessKey,
       }),

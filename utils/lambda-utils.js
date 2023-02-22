@@ -14,7 +14,6 @@ const ses = new SES({
   region: "us-east-1",
 });
 
-
 const queryFormat = function (query, values) {
   if (!values) return query;
   return query.replace(
@@ -27,6 +26,8 @@ const queryFormat = function (query, values) {
     }.bind(this)
   );
 };
+
+module.exports.queryFormat = queryFormat;
 
 const getConfigurationFile = async (filename) => {
   // Create the parameters for calling getObject
@@ -125,6 +126,37 @@ const getUserByEmail = async (email) => {
 
 module.exports.getUserByEmail = getUserByEmail;
 
+const getUserByEmailOrUsername = async (email, username) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT username, email FROM users WHERE username = :username OR email = :email;`;
+
+    const params = { email };
+
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve(results?.[0]);
+    });
+  });
+};
+
+module.exports.getUserByEmailOrUsername = getUserByEmailOrUsername;
+
 const sendEmail = async (email, title, message, htmlMessage) => {
   return ses
     .sendEmail({
@@ -150,3 +182,59 @@ const sendEmail = async (email, title, message, htmlMessage) => {
 };
 
 module.exports.sendEmail = sendEmail;
+
+const verifyToken = async (token) => {
+  const config = await getConfigurationFile("crypto.config.json");
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, config.token_secret, (err, decoded) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(decoded);
+    });
+  });
+};
+
+module.exports.verifyToken = verifyToken;
+
+const hashWithSalt = async (str, salt) => {
+  const pbkdf2 = await getConfigurationFile("crypto.config.json");
+  return new Promise((resolve, reject) => {
+    crypto.pbkdf2(
+      str,
+      salt,
+      pbkdf2.iterations,
+      pbkdf2.password_length,
+      pbkdf2.digest,
+      (error, hash) => {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve({
+          str,
+          hash: hash.toString(pbkdf2.byte_to_string_encoding),
+        });
+      }
+    );
+  });
+};
+
+module.exports.hashWithSalt = hashWithSalt;
+
+const generateSalt = async (hash, salt) => {
+  const pbkdf2 = await getConfigurationFile("crypto.config.json");
+
+  return crypto
+    .randomBytes(pbkdf2.salt_length)
+    .toString(pbkdf2.byte_to_string_encoding);
+};
+
+module.exports.generateSalt = generateSalt;
+
+const generateConfirmationCode = () => {
+  return crypto.randomBytes(25).toString("hex");;
+};
+
+module.exports.generateConfirmationCode = generateConfirmationCode;
