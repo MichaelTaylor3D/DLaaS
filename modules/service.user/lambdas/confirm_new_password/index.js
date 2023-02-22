@@ -19,7 +19,7 @@ const getUserByResetCode = async (resetCode) => {
   );
 
   return results?.[0];
-}
+};
 
 const deleteUserMeta = async (resetCode) => {
   return dbQuery(`DELETE FROM user_meta WHERE meta_value = :resetCode`, {
@@ -30,6 +30,7 @@ const deleteUserMeta = async (resetCode) => {
 const resetPassword = async (newPassword, userId) => {
   const salt = await generateSalt();
   const { hash } = await hashWithSalt(newPassword, salt);
+
   return Promise.all([
     dbQuery(`UPDATE users SET password_hash = :hash WHERE id = :userId`, {
       hash,
@@ -59,12 +60,12 @@ exports.handler = async (event, context, callback) => {
     // Code is valid
     if (existingUser) {
       await deleteUserMeta(code);
-      await resetPassword(password, existingUser.id);
-      
+      await resetPassword(password, existingUser.user_id);
+
       await sendEmail(
         existingUser.email,
         "DataLayer Storage Reset Email Confirmation",
-        `The password on your account has changed. If you did not request this change, please contact the administrator immediately.`,
+        `The password on your account has changed. If you did not request this change, please contact the administrator immediately.`
       );
     }
 
