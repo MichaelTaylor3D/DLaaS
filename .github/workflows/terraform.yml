@@ -72,7 +72,7 @@ jobs:
       run: node ./utils/npm-install-all.js    
       
     - name: Build All Node Packages
-      run: node ./utils/npm-build-all.js
+      run: node ./utils/node-build-all.js
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
