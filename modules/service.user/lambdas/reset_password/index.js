@@ -13,7 +13,7 @@ const ses = new SES({
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const email = _.get(requestBody, "username");
+    const email = _.get(requestBody, "email");
 
     const existingUser = await getUserByEmail(email);
 
