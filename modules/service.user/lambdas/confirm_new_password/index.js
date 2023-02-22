@@ -1,6 +1,12 @@
 "use strict";
 
-const { generateSalt, sendEmail, dbQuery } = require("./utils");
+const {
+  generateSalt,
+  sendEmail,
+  dbQuery,
+  hashWithSalt,
+  upsertUserMeta,
+} = require("./utils");
 
 const getUserByResetCode = async (resetCode) => {
   const results = await dbQuery(
@@ -16,7 +22,9 @@ const getUserByResetCode = async (resetCode) => {
 }
 
 const deleteUserMeta = async (resetCode) => {
-  return dbQuery(`DELETE FROM user_meta WHERE meta_value = :resetCode`);
+  return dbQuery(`DELETE FROM user_meta WHERE meta_value = :resetCode`, {
+    resetCode,
+  });
 };
 
 const resetPassword = async (newPassword, userId) => {
@@ -54,7 +62,7 @@ exports.handler = async (event, context, callback) => {
       await resetPassword(password, existingUser.id);
       
       await sendEmail(
-        email,
+        existingUser.email,
         "DataLayer Storage Reset Email Confirmation",
         `The password on your account has changed. If you did not request this change, please contact the administrator immediately.`,
       );
