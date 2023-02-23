@@ -102,7 +102,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 resource "aws_lambda_event_source_mapping" "apigwy_sqs" {
     event_source_arn = aws_sqs_queue.fifo_queue.arn
-    function_name    = aws_lambda_function.lambda_sqs_websocket_response.arn
+    function_name    = "arn:aws:lambda:us-east-1:873139760123:function:test-handler"
 }
 
 // S3 for Lambda
