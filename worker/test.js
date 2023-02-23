@@ -1,18 +1,10 @@
 const WebSocket = require("ws");
 const { Consumer } = require("sqs-consumer");
 const { SQSClient } = require("@aws-sdk/client-sqs");
+const AWS = require("aws-sdk");
+var apigatewaymanagementapi = new AWS.ApiGatewayManagementApi();
 
-var request = require("request");
 
-request.post(
-  "https://jkmqb7ezf0.execute-api.us-east-1.amazonaws.com/production",
-  { json: { key: "value" } },
-  function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      console.log(body);
-    }
-  }
-);
 
 const app = Consumer.create({
   queueUrl:
