@@ -1,47 +1,112 @@
-const { Consumer } = require("sqs-consumer");
-const { SQSClient } = require("@aws-sdk/client-sqs");
-const AWS = require("aws-sdk");
-var apigatewaymanagementapi = new AWS.ApiGatewayManagementApi({
-  endpoint: "https://5ickpu83ci.execute-api.us-east-1.amazonaws.com/production",
-  region: "us-east-1",
-});
+"use strict";
 
-const app = Consumer.create({
-  queueUrl:
-    "https://sqs.us-east-1.amazonaws.com/873139760123/worker-gateway-message-handler.fifo",
-  messageAttributeNames: ["All"],
-  handleMessage: async (message) => {
-    console.log(message);
+const WebSocket = require("ws");
+const { v4: uuidv4 } = require("uuid");
+const { getConfigurationFile, hashWithSalt, dbQuery } = require("./utils");
 
-    var params = {
-      ConnectionId: message.MessageAttributes.connectionId.StringValue,
-      Data: JSON.stringify({ success: true }),
-    };
+const getSaveHashForAccessKey = async (accessKey) => {
+  return dbQuery(
+    `SELECT user_id, access_key_hash FROM access_keys WHERE access_key = ':access_key'`,
+    {
+      accessKey,
+    }
+  );
+};
 
-    apigatewaymanagementapi.postToConnection(params, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else test = 1; // successful response
+const recordMirrorToUser = async (userId, singletonId, singletonName) => {
+  return dbQuery(
+    `UPDATE user_mirrors SET user_id = :userId, singleton_id = :singletonId, name = :singletonName`,
+    {
+      userId,
+      singletonId,
+      singletonName,
+    }
+  );
+};
+
+const sendCommand = (storeId) => {
+  return new Promise(async (resolve, reject) => {
+    const [wsConfig, commands] = await Promise.all([
+      getConfigurationFile("websocket.config.json"),
+      getConfigurationFile("commands.enum.json"),
+    ]);
+
+    const socket = new WebSocket(
+      "wss://5ickpu83ci.execute-api.us-east-1.amazonaws.com/production"
+    );
+
+    socket.addEventListener("open", (event) => {
+      socket.send(
+        JSON.stringify({
+          MessageGroupId: uuidv4(),
+          data: {
+            command: commands.CREATE_MIRROR,
+            data: { storeId },
+          },
+        })
+      );
     });
-  },
-  sqs: new SQSClient({
-    region: "us-east-1",
-    credentials: {
-      accessKeyId: "AKIA4WSZPNP52LY2IJDV",
-      secretAccessKey: "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",
-    },
-  }),
-});
 
-app.on("error", (err) => {
-  console.error(err.message);
-});
+    socket.addEventListener("message", async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.success) {
+        resolve();
+      } else {
+        reject("Mirror creation failed.");
+      }
+      socket.close();
+    });
+  });
+};
 
-app.on("processing_error", (err) => {
-  console.error(err.message);
-});
+exports.handler = async (event, context, callback) => {
+  try {
+    const auth = event?.headers?.Authorization.split(" ");
+    if (auth?.[0].toLowerCase() !== "basic") {
+      throw new Error("Missing client credentials.");
+    }
 
-app.on("timeout_error", (err) => {
-  console.error(err.message);
-});
+    const [accessKey, secretAccessKey] = Buffer.from(auth[1], "base64")
+      .toString("utf-8")
+      .split(":");
 
-app.start();
+    const { hash } = await hashWithSalt(accessKey, secretAccessKey);
+    const [saveHashResult] = await getSaveHashForAccessKey(accessKey);
+
+    if (saveHashResult.access_key_hash !== hash) {
+      throw new Error("Invalid access key.");
+    }
+
+    const requestBody = JSON.parse(event.body);
+    const storeId = requestBody?.store_id;
+
+    if (!storeId) {
+      throw new Error("store_id is required.");
+    }
+
+    const mirrorName = requestBody?.name;
+
+    if (!mirrorName) {
+      throw new Error("name is required.");
+    }
+
+    await sendCommand(storeId);
+    await recordMirrorToUser(saveHashResult.user_id, storeId, mirrorName);
+
+    callback(null, {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: "Mirror has been created successfully.",
+      }),
+    });
+  } catch (error) {
+    callback(null, {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: error.message,
+      }),
+    });
+  }
+};

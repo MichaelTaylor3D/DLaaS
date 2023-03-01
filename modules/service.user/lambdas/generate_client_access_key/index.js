@@ -33,7 +33,7 @@ exports.handler = async (event, context, callback) => {
     await insertAccessKey(user_id, accessKey.toUpperCase(), hash);
 
     callback(null, {
-      statusCode: 400,
+      statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
         message: `Here is your access key and secret key. It will be needed to interact with your datastores. Do NOT share this with anyone. If a key is compromised or lost, its your responsibility to delete it, you will need to regenerate a new access key and secret key`,

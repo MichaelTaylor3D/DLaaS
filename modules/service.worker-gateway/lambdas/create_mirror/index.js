@@ -103,7 +103,7 @@ exports.handler = async (event, context, callback) => {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message: data.message,
+        message: error.message,
       }),
     });
   }
