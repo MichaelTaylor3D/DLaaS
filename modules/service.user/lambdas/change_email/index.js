@@ -36,14 +36,14 @@ exports.handler = async (event, context, callback) => {
       sendEmail(
         user.email,
         "DataLayer Storage Email Change",
-        `A Request has been made to change you email to ${email}. If this was not you, go to the following link to cancel. https://api.datalayer.storage/v1/user/cancel_change_email?code=${changeEmailCode}`,
-        `<div>A Request has been made to change you email to ${email}. If this was not you, Click on the link below to cancel the request.</div><a href='https://api.datalayer.storage/v1/user/cancel_change_email?code=${changeEmailCode}'>Cancel Email Change</a>`
+        `A Request has been made to change you email to ${email}. If this was not you, go to the following link to cancel. https://api.datalayer.storage/user/v1/cancel_change_email?code=${changeEmailCode}`,
+        `<div>A Request has been made to change you email to ${email}. If this was not you, Click on the link below to cancel the request.</div><a href='https://api.datalayer.storage/user/v1/cancel_change_email?code=${changeEmailCode}'>Cancel Email Change</a>`
       ),
       sendEmail(
         email,
         "DataLayer Storage Email Change",
-        `An email change request has been made. Go to the following link to confirm. https://api.datalayer.storage/v1/user/confirm_change_email?code=${changeEmailCode}`,
-        `<div>An email change request has been made. Click on the link below to confirm email change.</div><a href='https://api.datalayer.storage/v1/user/confirm_change_email?code=${changeEmailCode}'>Confirm Email</a>`
+        `An email change request has been made. Go to the following link to confirm. https://api.datalayer.storage/user/v1/confirm_change_email?code=${changeEmailCode}`,
+        `<div>An email change request has been made. Click on the link below to confirm email change.</div><a href='https://api.datalayer.storage/user/v1/confirm_change_email?code=${changeEmailCode}'>Confirm Email</a>`
       ),
     ]);
 

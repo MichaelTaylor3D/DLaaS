@@ -10,7 +10,7 @@ resource "aws_s3_bucket_object" "command-queue-config-upload" {
   content_type = "application/json"
   content      = <<EOF
   {  
-    "queue_url": "${aws_sqs_queue.fifo_queue.url}",
+    "queue_url": "${aws_sqs_queue.fifo_queue.url}"
   }
   EOF
 }

@@ -10,7 +10,7 @@ resource "aws_s3_bucket_object" "job_command_enum_upload" {
   content_type = "application/json"
   content = <<EOF
   {  
-    "CREATE_MIRROR": "CREATE_MIRROR",
+    "CREATE_MIRROR": "CREATE_MIRROR"
   }
   EOF
 }
