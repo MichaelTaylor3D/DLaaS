@@ -1,3 +1,5 @@
+resource "random_uuid" "archive" { }
+
 ### START Create Mirror LAMBDA ###
 
 data "archive_file" "create-mirror-function-source" {
