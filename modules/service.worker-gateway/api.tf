@@ -30,7 +30,7 @@ resource "aws_api_gateway_method" "create-mirror-method" {
 resource "aws_api_gateway_integration" "create-mirror-method-lambda-api-integration" {
     # ID of the REST API and the endpoint at which to integrate a lambda function
     rest_api_id             = var.api_gateway_id
-    resource_id             = aws_api_gateway_resource.create-api-resource.id
+    resource_id             = aws_api_gateway_resource.create-mirror-api-resource.id
 
     # ID of the HTTP method at which to integrate with the lambda function
     http_method             = aws_api_gateway_method.create-mirror-method.http_method
