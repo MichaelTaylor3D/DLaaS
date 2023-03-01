@@ -15,7 +15,7 @@ const getSaveHashForAccessKey = async (accessKey) => {
 
 const recordMirrorToUser = async (userId, singletonId, singletonName) => {
   return dbQuery(
-    `UPDATE user_mirrors SET user_id = :userId, singleton_id = :singletonId, name = :singletonName`,
+    `UPDATE user_mirrors SET user_id = :userId, singleton_id = ':singletonId', name = ':singletonName'`,
     {
       userId,
       singletonId,
