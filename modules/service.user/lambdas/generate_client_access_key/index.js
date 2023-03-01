@@ -12,10 +12,12 @@ const insertAccessKey = async (userId, accessKey, hash) => {
 
 exports.handler = async (event, context, callback) => {
   try {
-    const bearerToken = event?.headers?.Authorization.split(" ")[1];
-    if (!bearerToken) {
+    const auth = event?.headers?.Authorization.split(" ");
+    if (auth?.[0].toLowerCase() !== "bearer") {
       throw new Error("Missing bearer token");
     }
+
+    const bearerToken = auth[1];
 
     const decodedToken = await verifyToken(bearerToken);
     const { user_id } = decodedToken;

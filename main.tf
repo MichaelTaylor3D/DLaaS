@@ -38,9 +38,6 @@ module "service-user" {
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
 
-  # Security
-  allow_ssh_security_group_id = aws_security_group.allow-ssh-security-group.id
-
   # EC2 - Compute
   worker_ami                  = var.worker_ami
 }

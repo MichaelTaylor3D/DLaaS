@@ -1,53 +1,44 @@
-data "aws_caller_identity" "current" {}
-
-locals {
-  account_id = data.aws_caller_identity.current.account_id
+resource "aws_api_gateway_resource" "worker-api-resource" {
+  rest_api_id = var.api_gateway_id
+  parent_id   = var.root_resource_id
+  path_part   = "worker"
 }
 
-resource "aws_apigatewayv2_api" "worker_gateway_ws_api" {
-  name                         = "worker-gateway-ws-api"
-  description                  = "Send websocket data to SQS which is then processed by the worker"
-  protocol_type                = "WEBSOCKET"
-  route_selection_expression   = "$request.body.action"
+resource "aws_api_gateway_resource" "v1-api-resource" {
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.worker-api-resource.id
+  path_part   = "v1"
 }
 
-resource "aws_apigatewayv2_integration" "demo_integration" {
-    api_id                                    = aws_apigatewayv2_api.worker_gateway_ws_api.id
-    connection_type                           = "INTERNET"
-    credentials_arn                           = var.default_lambda_role_arn
-    integration_method                        = "POST"
-    integration_type                          = "AWS"
-    integration_uri                           = "arn:aws:apigateway:${var.aws_region}:sqs:path/${local.account_id}/${aws_sqs_queue.fifo_queue.name}"
-    passthrough_behavior                      = "NEVER"
-    request_parameters                        = {
-        "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
-    }
-    request_templates                         = {
-        "$default" = "Action=SendMessage&MessageGroupId=$input.path('$.MessageGroupId')&MessageDeduplicationId=$context.requestId&MessageAttribute.1.Name=connectionId&MessageAttribute.1.Value.StringValue=$context.connectionId&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=requestId&MessageAttribute.2.Value.StringValue=$context.requestId&MessageAttribute.2.Value.DataType=String&MessageBody=$input.json('$')"
-    }
-    template_selection_expression             = "\\$default"
-    timeout_milliseconds                      = 29000
+# /user/v1/create_mirror
+resource "aws_api_gateway_resource" "create-mirror-api-resource" {
+    # ID to AWS API Gateway Rest API definition above
+    rest_api_id = var.api_gateway_id
+    parent_id   = aws_api_gateway_resource.v1-api-resource.id
+
+    path_part   = "create_mirror"
 }
 
-resource "aws_apigatewayv2_stage" "production" {
-  api_id          = aws_apigatewayv2_api.worker_gateway_ws_api.id
-  name            = "production"
-  auto_deploy     = true
+resource "aws_api_gateway_method" "create-mirror-method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.create-mirror-api-resource.id
+  http_method      = "POST"
+  authorization    = "NONE"
+  api_key_required = false
 }
 
-resource "aws_apigatewayv2_route" "default" {
-    api_id               = aws_apigatewayv2_api.worker_gateway_ws_api.id
-    route_key            = "$default"
-    target               = "integrations/${aws_apigatewayv2_integration.demo_integration.id}"  
-}
+resource "aws_api_gateway_integration" "create-mirror-method-lambda-api-integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.create-api-resource.id
 
-resource "aws_s3_bucket_object" "websocket-api-config-upload" {
-  bucket       = var.dev_bucket_id
-  key          = "configurations/websocket.config.json"
-  content_type = "application/json"
-  content      = <<EOF
-  {  
-    "websocket_url": "${aws_apigatewayv2_api.worker_gateway_ws_api.api_endpoint}"
-  }
-  EOF
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.create-mirror-method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.create-mirror-function-handler.invoke_arn
 }

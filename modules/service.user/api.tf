@@ -1,13 +1,13 @@
 resource "aws_api_gateway_resource" "v1-api-resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = var.root_resource_id
-  path_part   = "v1"
+  path_part   = "user"
 }
 
 resource "aws_api_gateway_resource" "user-api-resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = aws_api_gateway_resource.v1-api-resource.id
-  path_part   = "user"
+  path_part   = "v1"
 }
 
 # /user/create
