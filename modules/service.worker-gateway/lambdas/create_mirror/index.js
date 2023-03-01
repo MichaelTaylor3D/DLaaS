@@ -24,37 +24,8 @@ const recordMirrorToUser = async (userId, singletonId, singletonName) => {
   );
 };
 
-exports.handler = async (event, context, callback) => {
-  try {
-    const auth = event?.headers?.Authorization.split(" ");
-    if (auth?.[0].toLowerCase() !== "basic") {
-      throw new Error("Missing client credentials.");
-    }
-
-    const [accessKey, secretAccessKey] = Buffer.from(auth[1], "base64")
-      .toString("utf-8")
-      .split(":");
-
-    const { hash } = await hashWithSalt(accessKey, secretAccessKey);
-    const [saveHashResult] = await getSaveHashForAccessKey(accessKey);
-
-    if (saveHashResult.access_key_hash !== hash) {
-      throw new Error("Invalid access key.");
-    }
-
-    const requestBody = JSON.parse(event.body);
-    const storeId = requestBody?.store_id;
-
-    if (!storeId) {
-      throw new Error("store_id is required.");
-    }
-
-    const mirrorName = requestBody?.name;
-
-    if (!mirrorName) {
-      throw new Error("name is required.");
-    }
-
+const sendCommand = () => {
+  return new Promise(async (resolve, reject) => {
     const [wsConfig, commands] = await Promise.all([
       getConfigurationFile("websocket.config.json"),
       getConfigurationFile("commands.enum.json"),
@@ -63,13 +34,13 @@ exports.handler = async (event, context, callback) => {
     const socket = new WebSocket(wsConfig.websocket_url);
 
     socket.addEventListener("open", (event) => {
-      exampleSocket.send(
+      socket.send(
         JSON.stringify({
           MessageGroupId: uuidv4(),
-          data: JSON.stringify({
+          data: {
             command: commands.CREATE_MIRROR,
             data: { storeId },
-          }),
+          },
         })
       );
     });
@@ -77,19 +48,54 @@ exports.handler = async (event, context, callback) => {
     socket.addEventListener("message", async (event) => {
       const data = JSON.parse(event.data);
       if (data.success) {
-        socket.close();
-        await recordMirrorToUser(saveHashResult.user_id, storeId, mirrorName);
-        callback(null, {
-          statusCode: 200,
-          headers: { "Content-Type": "application/json; charset=utf-8" },
-          body: JSON.stringify({
-            message:
-              "Mirror has been created successfully.",
-          }),
-        });
+        socket.close(data);
+        resolve();
       } else {
-        throw new Error("Mirror creation failed.");
+        reject("Mirror creation failed.");
       }
+    });
+  });
+};
+
+exports.handler = async (event, context, callback) => {
+  try {
+    //  const auth = event?.headers?.Authorization.split(" ");
+    //  if (auth?.[0].toLowerCase() !== "basic") {
+    //    throw new Error("Missing client credentials.");
+    //  }
+
+    //  const [accessKey, secretAccessKey] = Buffer.from(auth[1], "base64")
+    //    .toString("utf-8")
+    //     .split(":");
+
+    //  const { hash } = await hashWithSalt(accessKey, secretAccessKey);
+    //  const [saveHashResult] = await getSaveHashForAccessKey(accessKey);
+
+    //  if (saveHashResult.access_key_hash !== hash) {
+    //    throw new Error("Invalid access key.");
+    //   }
+
+    //  const requestBody = JSON.parse(event.body);
+    //  const storeId = requestBody?.store_id;
+
+    // if (!storeId) {
+    //    throw new Error("store_id is required.");
+    //  }
+
+    //  const mirrorName = requestBody?.name;
+
+    //  if (!mirrorName) {
+    //    throw new Error("name is required.");
+    // }
+
+    await sendCommand();
+
+    callback(null, {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        message: "Mirror has been created successfully.",
+      }),
     });
   } catch (error) {
     socket.close();
