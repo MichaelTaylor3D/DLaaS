@@ -5,18 +5,20 @@ const {
   getUserByEmail,
   sendEmail,
   generateConfirmationCode,
+  assertBearerTokenOrBasicAuth,
+  assertRequiredBodyParams,
+  getUserBy,
 } = require("./utils");
 
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const email = requestBody?.email;
 
-    if (!email) {
-      throw new Error("Missing email in body");
-    }
+    const decodedToken = await assertBearerTokenOrBasicAuth(event?.headers?.Authorization);
 
-    const existingUser = await getUserByEmail(email);
+    const { email } = await assertRequiredBodyParams(requestBody, ["email"]);
+
+    const existingUser = await getUserBy("id", decodedToken.user_id);
 
     if (existingUser) {
       const resetPasswordCode = generateConfirmationCode();

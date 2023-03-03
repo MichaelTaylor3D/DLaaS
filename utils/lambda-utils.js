@@ -375,3 +375,54 @@ const apiResponse = (statusCode, responseBody) => {
 };
 
 module.exports.apiResponse = apiResponse;
+
+const getSaveHashForAccessKey = async (accessKey) => {
+  return dbQuery(
+    `SELECT user_id, access_key_hash FROM access_keys WHERE access_key = :access_key`,
+    {
+      accessKey,
+    }
+  );
+};
+
+const assertBearerTokenOrBasicAuth = async (authHeader) => {
+  const auth = authHeader.split(" ");
+  if (["bearer", "basic"].includes(auth?.[0]?.toLowerCase())) {
+    throw new Error("Missing bearer or token or client credentials");
+  }
+
+  if (auth?.[0]?.toLowerCase() === "bearer") {
+    const bearerToken = auth[1];
+    return await verifyToken(bearerToken);
+  }
+
+  if (auth?.[0]?.toLowerCase() === "basic") {
+    const [accessKey, secretAccessKey] = Buffer.from(auth[1], "base64")
+      .toString("utf-8")
+      .split(":");
+
+    const { hash } = await hashWithSalt(accessKey, secretAccessKey);
+
+    const [saveHashResult] = await getSaveHashForAccessKey(accessKey);
+
+    if (saveHashResult.access_key_hash !== hash) {
+      throw new Error("Invalid access key.");
+    }
+
+    return { user_id: saveHashResult.user_id };
+  }
+};
+
+module.exports.assertBearerTokenOrBasicAuth = assertBearerTokenOrBasicAuth;
+
+const assertRequiredBodyParams = (body, required) => {
+  required.forEach((param) => {
+    if (!body[param]) {
+      throw new Error(`${param} is required`);
+    }
+  });
+
+  return Promise.resolve(body);
+};
+
+module.exports.assertRequiredBodyParams = assertRequiredBodyParams;

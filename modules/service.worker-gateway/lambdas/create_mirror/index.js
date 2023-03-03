@@ -2,16 +2,11 @@
 
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
-const { getConfigurationFile, hashWithSalt, dbQuery } = require("./utils");
-
-const getSaveHashForAccessKey = async (accessKey) => {
-  return dbQuery(
-    `SELECT user_id, access_key_hash FROM access_keys WHERE access_key = :access_key`,
-    {
-      accessKey,
-    }
-  );
-};
+const {
+  getConfigurationFile,
+  assertBearerTokenOrBasicAuth,
+  assertRequiredBodyParams
+} = require("./utils");
 
 const recordMirrorToUser = async (userId, singletonId, singletonName) => {
   return dbQuery(
@@ -59,34 +54,10 @@ const sendCommand = () => {
 
 exports.handler = async (event, context, callback) => {
   try {
-    //  const auth = event?.headers?.Authorization.split(" ");
-    //  if (auth?.[0].toLowerCase() !== "basic") {
-    //    throw new Error("Missing client credentials.");
-    //  }
+    await assertBearerTokenOrBasicAuth(event?.headers?.Authorization);
 
-    //  const [accessKey, secretAccessKey] = Buffer.from(auth[1], "base64")
-    //    .toString("utf-8")
-    //     .split(":");
-
-    //  const { hash } = await hashWithSalt(accessKey, secretAccessKey);
-    //  const [saveHashResult] = await getSaveHashForAccessKey(accessKey);
-
-    //  if (saveHashResult.access_key_hash !== hash) {
-    //    throw new Error("Invalid access key.");
-    //   }
-
-    //  const requestBody = JSON.parse(event.body);
-    //  const storeId = requestBody?.store_id;
-
-    // if (!storeId) {
-    //    throw new Error("store_id is required.");
-    //  }
-
-    //  const mirrorName = requestBody?.name;
-
-    //  if (!mirrorName) {
-    //    throw new Error("name is required.");
-    // }
+    const requestBody = JSON.parse(event.body);
+    const {store_id: storeId, name: mirrorName} = await assertRequiredBodyParams(requestBody, ['store_id', 'name']);
 
     await sendCommand();
 

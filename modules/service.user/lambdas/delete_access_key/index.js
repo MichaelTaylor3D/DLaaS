@@ -1,9 +1,6 @@
 "use strict";
 
-const {
-  verifyToken,
-  dbQuery,
-} = require("./utils");
+const { assertBearerTokenOrBasicAuth, dbQuery } = require("./utils");
 
 const deleteAccessKey = async (userId, accessKey) => {
   return dbQuery(
@@ -14,14 +11,10 @@ const deleteAccessKey = async (userId, accessKey) => {
 
 exports.handler = async (event, context, callback) => {
   try {
-    const auth = event?.headers?.Authorization.split(" ");
-    if (auth?.[0].toLowerCase() !== "bearer") {
-      throw new Error("Missing bearer token");
-    }
+    const decodedToken = await assertBearerTokenOrBasicAuth(
+      event?.headers?.Authorization
+    );
 
-    const bearerToken = auth[1];
-
-    const decodedToken = await verifyToken(bearerToken);
     const { user_id } = decodedToken;
     const accessKey = event.pathParameters.accessKey;
 

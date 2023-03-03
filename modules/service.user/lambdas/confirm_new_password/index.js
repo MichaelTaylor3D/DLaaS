@@ -7,6 +7,7 @@ const {
   dbQuery,
   hashWithSalt,
   upsertUserMeta,
+  assertRequiredBodyParams,
 } = require("./utils");
 
 const getUserByResetCode = async (resetCode) => {
@@ -44,17 +45,10 @@ const resetPassword = async (newPassword, userId) => {
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const password = requestBody?.password;
-
-    if (!password) {
-      throw new Error("Missing password in body");
-    }
-
-    const code = requestBody?.code;
-
-    if (!code) {
-      throw new Error("Missing code in body");
-    }
+    const { password, code } = await assertRequiredBodyParams(requestBody, [
+      "password",
+      "code",
+    ]);
 
     if (passwordStrength(password).value !== "Strong") {
       throw new Error(

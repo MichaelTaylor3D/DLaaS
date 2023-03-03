@@ -5,29 +5,22 @@ const {
   getUserBy,
   sendEmail,
   generateConfirmationCode,
-  verifyToken,
+  assertBearerTokenOrBasicAuth,
+  assertRequiredBodyParams,
 } = require("./utils");
 
 exports.handler = async (event, context, callback) => {
   try {
-    const auth = event?.headers?.Authorization.split(" ");
-    if (auth?.[0].toLowerCase() !== "bearer") {
-      throw new Error("Missing bearer token");
-    }
+    const decodedToken = await assertBearerTokenOrBasicAuth(
+      event?.headers?.Authorization
+    );
 
-    const bearerToken = auth[1];
-
-    const decodedToken = await verifyToken(bearerToken);
     const { user_id } = decodedToken;
 
     const requestBody = JSON.parse(event.body);
-    const email = requestBody?.email;
+    const { email } = await assertRequiredBodyParams(requestBody, ["email"]);
 
-    if (!email) {
-      throw new Error("Missing email in body");
-    }
-
-    const user = await getUserBy('id', user_id);
+    const user = await getUserBy("id", user_id);
     const changeEmailCode = generateConfirmationCode();
 
     await Promise.all([
@@ -51,8 +44,7 @@ exports.handler = async (event, context, callback) => {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        message:
-          "Email change request processed. Check you email to confirm.",
+        message: "Email change request processed. Check you email to confirm.",
       }),
     });
   } catch (error) {

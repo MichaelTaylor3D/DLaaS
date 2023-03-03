@@ -1,7 +1,11 @@
 "use strict";
 
 const crypto = require("crypto");
-const { verifyToken, hashWithSalt, dbQuery } = require("./utils");
+const {
+  assertBearerTokenOrBasicAuth,
+  hashWithSalt,
+  dbQuery,
+} = require("./utils");
 
 const insertAccessKey = async (userId, accessKey, hash) => {
   return dbQuery(
@@ -12,14 +16,10 @@ const insertAccessKey = async (userId, accessKey, hash) => {
 
 exports.handler = async (event, context, callback) => {
   try {
-    const auth = event?.headers?.Authorization.split(" ");
-    if (auth?.[0].toLowerCase() !== "bearer") {
-      throw new Error("Missing bearer token");
-    }
+    const decodedToken = await assertBearerTokenOrBasicAuth(
+      event?.headers?.Authorization
+    );
 
-    const bearerToken = auth[1];
-
-    const decodedToken = await verifyToken(bearerToken);
     const { user_id } = decodedToken;
 
     const accessKey = crypto.randomBytes(10).toString("hex");

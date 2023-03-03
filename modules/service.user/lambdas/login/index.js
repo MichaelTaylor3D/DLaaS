@@ -5,6 +5,7 @@ const {
   getConfigurationFile,
   hashWithSalt,
   dbQuery,
+  assertRequiredBodyParams,
 } = require("./utils");
 
 const verifyPassword = async (passwordHash, salt, passwordAttempt) => {
@@ -50,18 +51,8 @@ const getSaltAndHashForUser = async (username) => {
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-
-    const username = requestBody?.username;
-
-    if (!username) {
-      throw new Error("No username provided.");
-    }
-
-    const passwordAttempt = requestBody?.password;
-
-    if (!passwordAttempt) {
-      throw new Error("No password provided.");
-    }
+    const { username, password: passwordAttempt } =
+      await assertRequiredBodyParams(requestBody, ["username", "password"]);
 
     const { salt, hash, user_id, confirmed } = await getSaltAndHashForUser(
       username

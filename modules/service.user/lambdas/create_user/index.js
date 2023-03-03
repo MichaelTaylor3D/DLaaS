@@ -8,6 +8,7 @@ const {
   generateConfirmationCode,
   getUserByEmailOrUsername,
   dbQuery,
+  assertRequiredBodyParams,
 } = require("./utils");
 
 const insertUserIntoDb = async (
@@ -33,23 +34,10 @@ const insertUserIntoDb = async (
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
-    const username = requestBody?.username;
-
-    if (!username) {
-      throw new Error("Username is required.");
-    }
-
-    const email = requestBody?.email;
-
-    if (!email) {
-      throw new Error("Email is required.");
-    }
-
-    const password = requestBody?.password;
-
-    if (!password) {
-      throw new Error("Password is required.");
-    }
+    const { username, email, password } = await assertRequiredBodyParams(
+      requestBody,
+      ["username", "email", "password"]
+    );
 
     if (passwordStrength(password).value !== "Strong") {
       throw new Error(
