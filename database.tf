@@ -103,7 +103,7 @@ resource "aws_s3_bucket_object" "database-config-upload" {
     "address": "${aws_db_instance.default.address}",
     "arn": "${aws_db_instance.default.arn}",
     "endpoint": "${aws_db_instance.default.endpoint}",
-    "db_name": "${aws_db_instance.default.name}",
+    "db_name": "${mysql_database.application-db.name}",
     "db_port": "${aws_db_instance.default.port}",
     "username": "${aws_db_instance.default.username}",
     "password": "${aws_db_instance.default.password}"

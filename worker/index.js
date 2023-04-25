@@ -3,33 +3,46 @@ const { SQSClient } = require("@aws-sdk/client-sqs");
 const AWS = require("aws-sdk");
 
 const { getConfigurationFile } = require("../utils/lambda-utils");
+const jobs = require("./jobs");
 
-const runWorker = async () => {
-  const [{postback_url, aws_region}, {queue_url}] = await Promise.all([
+const concurrentJobs = process.env.CONCURRENT_JOBS;
+const consumers = {};
+
+let globalConfigs;
+
+const processJob = async (jobKey, options) => {
+  const apigatewaymanagementapi = new AWS.ApiGatewayManagementApi({
+    endpoint: options.postback_url,
+    region: options.aws_region,
+  });
+
+  var params = {
+    ConnectionId: message.MessageAttributes.connectionId.StringValue,
+    Data: JSON.stringify({ success: true }),
+  };
+
+  apigatewaymanagementapi.postToConnection(params, function (err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else test = 1; // successful response
+  });
+};
+
+const fetchGlobalConfigs = async () => {
+  return Promise.all([
     getConfigurationFile("websocket.config.json"),
     getConfigurationFile("command-queue.config.json"),
   ]);
+};
 
-  const apigatewaymanagementapi = new AWS.ApiGatewayManagementApi({
-    endpoint: postback_url,
-    region: aws_region,
-  });
+const runWorker = async (workerIdentifier) => {
+  const [{ postback_url, aws_region }, { queue_url }] = globalConfigs;
 
-  const app = Consumer.create({
+  consumers[workerIdentifier] = Consumer.create({
     queueUrl: queue_url,
     messageAttributeNames: ["All"],
     handleMessage: async (message) => {
       console.log(message);
-
-      var params = {
-        ConnectionId: message.MessageAttributes.connectionId.StringValue,
-        Data: JSON.stringify({ success: true }),
-      };
-
-      apigatewaymanagementapi.postToConnection(params, function (err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else test = 1; // successful response
-      });
+      await processJob(message.Body, { postback_url, aws_region });
     },
     sqs: new SQSClient({
       region: aws_region,
@@ -40,19 +53,25 @@ const runWorker = async () => {
     }),
   });
 
-  app.on("error", (err) => {
+  consumers[workerIdentifier].on("error", (err) => {
     console.error(err.message);
   });
 
-  app.on("processing_error", (err) => {
+  consumers[workerIdentifier].on("processing_error", (err) => {
     console.error(err.message);
   });
 
-  app.on("timeout_error", (err) => {
+  consumers[workerIdentifier].on("timeout_error", (err) => {
     console.error(err.message);
   });
 
-  app.start();
+  consumers[workerIdentifier].start();
 };
 
-runWorker();
+(async () => {
+  globalConfigs = await fetchGlobalConfigs();
+
+  for (let i = 0; i < concurrentJobs; i++) {
+    runWorker(`worker-${i}`);
+  }
+})();
