@@ -1,5 +1,6 @@
 "use strict";
 
+// Import required modules
 const { passwordStrength } = require("check-password-strength");
 const {
   hashWithSalt,
@@ -11,6 +12,16 @@ const {
   assertRequiredBodyParams,
 } = require("./utils");
 
+/**
+ * Inserts a new user into the database.
+ * @async
+ * @param {string} username - The user's username.
+ * @param {string} email - The user's email.
+ * @param {string} passwordHash - The hashed user password.
+ * @param {string} salt - The salt used for hashing the password.
+ * @param {string} confirmationCode - The confirmation code for account activation.
+ * @returns {Promise} A promise that resolves when the user is inserted into the database.
+ */
 const insertUserIntoDb = async (
   username,
   email,
@@ -31,20 +42,30 @@ const insertUserIntoDb = async (
   );
 };
 
+/**
+ * Handles the user registration event.
+ * @async
+ * @param {Object} event - The AWS Lambda event object.
+ * @param {Object} context - The AWS Lambda context object.
+ * @param {Function} callback - The AWS Lambda callback function.
+ */
 exports.handler = async (event, context, callback) => {
   try {
+    // Parse and validate required body parameters
     const requestBody = JSON.parse(event.body);
     const { username, email, password } = await assertRequiredBodyParams(
       requestBody,
       ["username", "email", "password"]
     );
 
+    // Check password strength
     if (passwordStrength(password).value !== "Strong") {
       throw new Error(
-        "Password is not strong enough. Min Legnth: 10, Requires 1 of each of the following: ['lowercase', 'uppercase', 'symbol', 'number']"
+        "Password is not strong enough. Min Length: 10, Requires 1 of each of the following: ['lowercase', 'uppercase', 'symbol', 'number']"
       );
     }
 
+    // Check for existing users with the same username or email
     const existingUser = await getUserByEmailOrUsername(email, username);
 
     if (existingUser?.username === username) {
@@ -55,12 +76,14 @@ exports.handler = async (event, context, callback) => {
       throw new Error("Email already exists.");
     }
 
+    // Create a new user in the database
     const salt = await generateSalt();
     const { hash } = await hashWithSalt(password, salt);
     const confirmationCode = generateConfirmationCode();
 
     await insertUserIntoDb(username, email, hash, salt, confirmationCode);
 
+    // Send confirmation email
     await sendEmail(
       email,
       "DataLayer Storage Account Creation",
@@ -68,6 +91,7 @@ exports.handler = async (event, context, callback) => {
       `<div>Your account has been created successfully. Click on the link below to activate your account.</div><a href='https://api.datalayer.storage/user/v1/confirm?code=${confirmationCode}'>Activate Account</a>`
     );
 
+    // Send a success response
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -77,6 +101,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Handle errors and send an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },

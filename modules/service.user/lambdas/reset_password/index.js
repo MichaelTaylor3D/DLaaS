@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This Lambda function handles user password reset requests by generating a reset password code and sending it to the user's email.
+ */
+
 "use strict";
 
 const {
@@ -10,25 +14,43 @@ const {
   getUserBy,
 } = require("./utils");
 
+/**
+ * AWS Lambda function handler that generates a reset password code and sends it to the user's email address.
+ *
+ * @async
+ * @function
+ * @param {Object} event - AWS Lambda event object
+ * @param {Object} context - AWS Lambda context object
+ * @param {Function} callback - AWS Lambda callback function
+ */
 exports.handler = async (event, context, callback) => {
   try {
+    // Parse the request body
     const requestBody = JSON.parse(event.body);
 
-    const decodedToken = await assertBearerTokenOrBasicAuth(event?.headers?.Authorization);
+    // Validate the token or authorization header
+    const decodedToken = await assertBearerTokenOrBasicAuth(
+      event?.headers?.Authorization
+    );
 
+    // Ensure that the email field is present in the request body
     const { email } = await assertRequiredBodyParams(requestBody, ["email"]);
 
+    // Retrieve the user by their user ID
     const existingUser = await getUserBy("id", decodedToken.user_id);
 
     if (existingUser) {
+      // Generate a reset password code
       const resetPasswordCode = generateConfirmationCode();
 
+      // Save the reset password code to the user's metadata
       await upsertUserMeta(
         existingUser.id,
         "resetPasswordCode",
         resetPasswordCode
       );
 
+      // Send the reset password code to the user's email
       await sendEmail(
         email,
         "DataLayer Storage Reset Email Request",
@@ -37,6 +59,7 @@ exports.handler = async (event, context, callback) => {
       );
     }
 
+    // Send a success response
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -46,6 +69,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Handle errors by sending an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },

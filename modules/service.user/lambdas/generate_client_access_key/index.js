@@ -7,6 +7,13 @@ const {
   dbQuery,
 } = require("./utils");
 
+/**
+ * Inserts the access key and its hash into the database.
+ * @param {number} userId - The ID of the user.
+ * @param {string} accessKey - The access key to be inserted.
+ * @param {string} hash - The hash of the access key.
+ * @returns {Promise} A promise that resolves when the access key is inserted.
+ */
 const insertAccessKey = async (userId, accessKey, hash) => {
   return dbQuery(
     `INSERT INTO client_access_keys (user_id, access_key, access_key_hash) VALUES (:userId, :accessKey, :hash)`,
@@ -14,24 +21,36 @@ const insertAccessKey = async (userId, accessKey, hash) => {
   );
 };
 
+/**
+ * AWS Lambda function handler for generating an access key and secret key.
+ * @async
+ * @param {Object} event - AWS Lambda event object.
+ * @param {Object} context - AWS Lambda context object.
+ * @param {Function} callback - AWS Lambda callback function.
+ */
 exports.handler = async (event, context, callback) => {
   try {
+    // Authenticate the user and retrieve their ID from the token
     const decodedToken = await assertBearerTokenOrBasicAuth(
       event?.headers?.Authorization
     );
 
     const { user_id } = decodedToken;
 
+    // Generate access key and secret access key
     const accessKey = crypto.randomBytes(10).toString("hex");
     const secretAccessKey = crypto.randomBytes(20).toString("hex");
 
+    // Calculate the hash with salt
     const { hash } = await hashWithSalt(
       accessKey.toUpperCase(),
       secretAccessKey
     );
 
+    // Insert the access key and hash into the database
     await insertAccessKey(user_id, accessKey.toUpperCase(), hash);
 
+    // Send a success response with the generated keys
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -42,6 +61,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Handle errors and send an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },

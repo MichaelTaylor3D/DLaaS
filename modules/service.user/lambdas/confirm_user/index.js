@@ -1,19 +1,36 @@
 "use strict";
 
+// Import required modules
 const { dbQuery } = require("./utils");
 
+/**
+ * Confirms a user's account using the given confirmation code.
+ * @async
+ * @param {string} confirmationCode - The account confirmation code.
+ * @returns {Promise} A promise that resolves when the account is confirmed.
+ */
 const confirmAccount = async (confirmationCode) => {
   return dbQuery("CALL confirm_account(:confirmationCode)", {
     confirmationCode,
   });
 };
 
+/**
+ * Handles the account confirmation event.
+ * @async
+ * @param {Object} event - The AWS Lambda event object.
+ * @param {Object} context - The AWS Lambda context object.
+ * @param {Function} callback - The AWS Lambda callback function.
+ */
 exports.handler = async (event, context, callback) => {
   try {
+    // Get the confirmation code from the query string parameters
     const confirmationCode = event?.queryStringParameters?.code;
 
+    // Confirm the account using the provided confirmation code
     await confirmAccount(confirmationCode);
 
+    // Send a success response
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -22,6 +39,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Handle errors and send an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },

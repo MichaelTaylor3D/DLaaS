@@ -1,5 +1,6 @@
 "use strict";
 
+// Import utility functions
 const {
   upsertUserMeta,
   getUserBy,
@@ -9,29 +10,46 @@ const {
   assertRequiredBodyParams,
 } = require("./utils");
 
+/**
+ * Handles the email change request event.
+ * @async
+ * @param {Object} event - The AWS Lambda event object.
+ * @param {Object} context - The AWS Lambda context object.
+ * @param {Function} callback - The AWS Lambda callback function.
+ */
 exports.handler = async (event, context, callback) => {
   try {
+    // Authenticate the user and get their user ID from the token
     const decodedToken = await assertBearerTokenOrBasicAuth(
       event?.headers?.Authorization
     );
-
     const { user_id } = decodedToken;
 
+    // Parse the request body and extract the email
     const requestBody = JSON.parse(event.body);
     const { email } = await assertRequiredBodyParams(requestBody, ["email"]);
 
+    // Get the user object by user ID
     const user = await getUserBy("id", user_id);
+
+    // Generate an email change confirmation code
     const changeEmailCode = generateConfirmationCode();
 
+    // Perform necessary actions to process the email change request
     await Promise.all([
+      // Upsert user meta for change email code and pending email
       upsertUserMeta(user_id, "changeEmailCode", changeEmailCode),
       upsertUserMeta(user_id, "pendingEmail", email),
+
+      // Send an email to the old email address to cancel the change
       sendEmail(
         user.email,
         "DataLayer Storage Email Change",
         `A Request has been made to change you email to ${email}. If this was not you, go to the following link to cancel. https://api.datalayer.storage/user/v1/cancel_change_email?code=${changeEmailCode}`,
         `<div>A Request has been made to change you email to ${email}. If this was not you, Click on the link below to cancel the request.</div><a href='https://api.datalayer.storage/user/v1/cancel_change_email?code=${changeEmailCode}'>Cancel Email Change</a>`
       ),
+
+      // Send an email to the new email address to confirm the change
       sendEmail(
         email,
         "DataLayer Storage Email Change",
@@ -40,6 +58,7 @@ exports.handler = async (event, context, callback) => {
       ),
     ]);
 
+    // Send a success response
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -48,6 +67,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Send an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },

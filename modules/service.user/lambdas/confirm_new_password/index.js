@@ -1,5 +1,6 @@
 "use strict";
 
+// Import required modules
 const { passwordStrength } = require("check-password-strength");
 const {
   generateSalt,
@@ -10,6 +11,12 @@ const {
   assertRequiredBodyParams,
 } = require("./utils");
 
+/**
+ * Retrieves a user object by their password reset code.
+ * @async
+ * @param {string} resetCode - The password reset code.
+ * @returns {Promise<Object>} The user object if found, otherwise undefined.
+ */
 const getUserByResetCode = async (resetCode) => {
   const results = await dbQuery(
     `
@@ -23,12 +30,25 @@ const getUserByResetCode = async (resetCode) => {
   return results?.[0];
 };
 
+/**
+ * Deletes user_meta entry with the given reset code.
+ * @async
+ * @param {string} resetCode - The password reset code.
+ * @returns {Promise}
+ */
 const deleteUserMeta = async (resetCode) => {
   return dbQuery(`DELETE FROM user_meta WHERE meta_value = :resetCode`, {
     resetCode,
   });
 };
 
+/**
+ * Resets the user's password.
+ * @async
+ * @param {string} newPassword - The new password.
+ * @param {number} userId - The user ID.
+ * @returns {Promise}
+ */
 const resetPassword = async (newPassword, userId) => {
   const salt = await generateSalt();
   const { hash } = await hashWithSalt(newPassword, salt);
@@ -42,6 +62,13 @@ const resetPassword = async (newPassword, userId) => {
   ]);
 };
 
+/**
+ * Handles the password reset event.
+ * @async
+ * @param {Object} event - The AWS Lambda event object.
+ * @param {Object} context - The AWS Lambda context object.
+ * @param {Function} callback - The AWS Lambda callback function.
+ */
 exports.handler = async (event, context, callback) => {
   try {
     const requestBody = JSON.parse(event.body);
@@ -50,19 +77,22 @@ exports.handler = async (event, context, callback) => {
       "code",
     ]);
 
+    // Check if the password is strong enough
     if (passwordStrength(password).value !== "Strong") {
       throw new Error(
         "Password is not strong enough. Min Legnth: 10, Requires 1 of each of the following: ['lowercase', 'uppercase', 'symbol', 'number']"
       );
     }
 
+    // Get the user associated with the reset code
     const existingUser = await getUserByResetCode(code);
 
-    // Code is valid
+    // If the code is valid, reset the password
     if (existingUser) {
       await deleteUserMeta(code);
       await resetPassword(password, existingUser.user_id);
 
+      // Send a confirmation email to the user
       await sendEmail(
         existingUser.email,
         "DataLayer Storage Reset Email Confirmation",
@@ -70,6 +100,7 @@ exports.handler = async (event, context, callback) => {
       );
     }
 
+    // Send a success response
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -79,6 +110,7 @@ exports.handler = async (event, context, callback) => {
       }),
     });
   } catch (error) {
+    // Handle errors and send an error response
     callback(null, {
       statusCode: 400,
       headers: { "Content-Type": "application/json; charset=utf-8" },
