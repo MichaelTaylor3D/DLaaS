@@ -3,8 +3,8 @@ resource "aws_api_gateway_authorizer" "custom_authorizer" {
   type                   = "REQUEST"
   authorizer_uri         = "${aws_lambda_function.authorizer-function-handler.invoke_arn}"
   authorizer_result_ttl_in_seconds = 300
-  identity_validation_expression = "/^Bearer\s(\S+)$|^Basic\s(\S+)$/"
-  authorizer_credentials = "${aws_iam_role.custom_authorizer_role.arn}"
+  identity_validation_expression = "^(Bearer|Basic)\s+([^\s]+)$"
+  authorizer_credentials = "${aws_iam_role.example_authorizer_role.arn}"
 }
 
 resource "aws_api_gateway_resource" "v1-api-resource" {
