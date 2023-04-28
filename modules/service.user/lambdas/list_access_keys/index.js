@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that retrieves the access
+ * keys of a user. It authenticates the user, retrieves their ID from the token,
+ * and fetches the access keys associated with the user ID. The function sends
+ * a success response with the access keys.
+ */
+
 "use strict";
 
 const { assertBearerTokenOrBasicAuth, dbQuery } = require("./utils");

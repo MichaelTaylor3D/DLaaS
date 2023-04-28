@@ -1,3 +1,11 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles user
+ * authentication. It verifies the user's password, checks if the user is
+ * confirmed, and generates an access token for the user upon successful
+ * authentication. The function sends a success response with the access token
+ * or an error response if the authentication fails.
+ */
+
 "use strict";
 
 const jwt = require("jsonwebtoken");

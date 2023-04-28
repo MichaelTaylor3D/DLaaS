@@ -1,5 +1,8 @@
 /**
- * @fileoverview This Lambda function handles user password reset requests by generating a reset password code and sending it to the user's email.
+ * @fileoverview This module exports a Lambda function that handles reset password
+ * requests. It generates a reset password code, saves it to the user's metadata,
+ * and sends the code to the user's email address. The function sends a success
+ * response or an error response if the reset password request fails.
  */
 
 "use strict";

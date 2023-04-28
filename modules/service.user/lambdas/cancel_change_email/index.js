@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles canceling
+ * email change requests. It retrieves the user object associated with the
+ * provided email change code, deletes the pendingEmail and changeEmailCode
+ * metadata for the user, and sends a response with the status of the operation.
+ */
+
 "use strict";
 
 // Import utility functions

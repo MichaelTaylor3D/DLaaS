@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles account
+ * confirmation events. It confirms the user's account using the provided
+ * confirmation code and sends a response with the status of the operation.
+ */
+
 "use strict";
 
 // Import required modules

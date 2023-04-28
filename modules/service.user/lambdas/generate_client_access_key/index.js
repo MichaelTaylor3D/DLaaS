@@ -1,3 +1,11 @@
+/**
+ * @fileoverview This module exports a Lambda function that generates an access
+ * key and secret key for a user. It authenticates the user, retrieves their ID
+ * from the token, and generates a new access key and secret key. The function
+ * calculates the hash of the access key and secret key, inserts them into the
+ * database, and sends a success response with the generated keys.
+ */
+
 "use strict";
 
 const crypto = require("crypto");

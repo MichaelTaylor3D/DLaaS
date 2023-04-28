@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles deleting an
+ * access key for a user. It authenticates the user, retrieves their ID from the
+ * token, and deletes the specified access key. The function sends a success
+ * response upon successful deletion of the access key.
+ */
+
 "use strict";
 
 const { assertBearerTokenOrBasicAuth, dbQuery } = require("./utils");

@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles user
+ * registration events. It validates user input, checks for existing users with
+ * the same username or email, and creates a new user in the database. It also
+ * sends a confirmation email to the user with a link to activate their account.
+ */
+
 "use strict";
 
 // Import required modules

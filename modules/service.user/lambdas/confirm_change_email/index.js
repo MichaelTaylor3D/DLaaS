@@ -1,3 +1,11 @@
+/**
+ * @fileoverview This module exports a Lambda function that retrieves a user
+ * object by their email change code and handles confirming the email change
+ * request. It updates the user's email in the database and removes the
+ * pendingEmail and changeEmailCode metadata for the user. Finally, it sends a
+ * response with the status of the operation.
+ */
+
 "use strict";
 
 // Import utility functions

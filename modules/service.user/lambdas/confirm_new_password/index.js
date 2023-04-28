@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles password
+ * reset events. It checks the password strength, validates the reset code,
+ * resets the password, and sends a confirmation email to the user. The function
+ * sends a response with the status of the operation.
+ */
+
 "use strict";
 
 // Import required modules

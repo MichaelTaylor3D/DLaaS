@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This module exports a Lambda function that handles email change
+ * requests. It processes the email change request, generates an email change
+ * confirmation code, upserts user metadata, and sends emails to the old and new
+ * email addresses to confirm or cancel the email change request.
+ */
+
 "use strict";
 
 // Import utility functions
