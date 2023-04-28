@@ -1,6 +1,9 @@
 {
   "AWS_REGION": "us-east-1",
-  "SERVICE_NAME": "dlass",
+  "AWS_PROFILE": "dlaas",
+  "SERVICE_NAME": "dlaas",
   "SERVICE_DOMAIN": "datalayer.storage",
-  "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7"
+  "DEFAULT_STORAGE_BUCKET": "dlaas",
+  "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7",
+  "DB_INSTANCE_CLASS": "db.t3.micro"
 }

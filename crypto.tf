@@ -9,7 +9,7 @@ resource "random_password" "static_salt" {
 }
 
 resource "aws_s3_bucket_object" "crypto-config-upload" {
-  bucket       = aws_s3_bucket.storage-devops-bucket.id
+  bucket       = aws_s3_bucket.storage_devops_bucket.id
   key          = "configurations/crypto.config.json"
   content_type = "application/json"
   content      = <<EOF

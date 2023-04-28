@@ -1,5 +1,5 @@
 # resource "aws_acm_certificate" "primary-domain" {
-#   domain_name       = var.service_domain
+#   domain_name       = local.config.SERVICE_DOMAIN
 #   validation_method = "DNS"
 
 #   tags = {
@@ -34,7 +34,7 @@
 # }
 
 resource "aws_acm_certificate" "wildcard-domain" {
-  domain_name       = "*.${var.service_domain}"
+  domain_name       = "*.${local.config.SERVICE_DOMAIN}"
   validation_method = "DNS"
 
   tags = {

@@ -7,8 +7,8 @@ resource "aws_db_instance" "default" {
   engine_version              = "8.0.28"
   allow_major_version_upgrade = true
   apply_immediately           = true
-  instance_class              = "db.t3.micro"
-  name                        = var.aws_profile
+  instance_class              = local.config.DB_INSTANCE_CLASS
+  name                        = local.config.SERVICE_NAME
   username                    = random_password.username.result
   password                    = random_password.password.result
   parameter_group_name        = aws_db_parameter_group.default.name
@@ -34,21 +34,17 @@ resource "aws_db_instance" "default" {
   #  bucket_prefix         = "backups/db"
   #  ingestion_role        = aws_iam_role.s3_import.arn
   #}
-
-  #provisioner "local-exec" {
-  #  command = "mysql --host=${self.address} --port=${self.port} --user=${self.username} --password=${self.password} < ./schema.sql"
-  #}
 }
 
-#resource "aws_db_parameter_group" "default" {
-#  name   = "rds-pg"
-#  family = "mysql8.0"
+resource "aws_db_parameter_group" "default" {
+  name   = "rds-pg"
+  family = "mysql8.0"
 
-#  parameter {
-#    name  = "log_bin_trust_function_creators"
-#    value = "1"
-#  }
-#}
+  parameter {
+    name  = "log_bin_trust_function_creators"
+    value = "1"
+  }
+}
 
 data "aws_iam_policy_document" "s3_import_assume" {
   statement {
@@ -72,7 +68,7 @@ resource "aws_db_subnet_group" "default_db_subnet_group" {
   ]
 
   tags = {
-    Name = "${var.aws_profile} DB Subnet Group"
+    Name = "${local.config.AWS_PROFILE} DB Subnet Group"
   }
 }
 
@@ -95,7 +91,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_s3_bucket_object" "database-config-upload" {
-  bucket       = aws_s3_bucket.storage-devops-bucket.id
+  bucket       = aws_s3_bucket.storage_devops_bucket.id
   key          = "configurations/db.config.json"
   content_type = "application/json"
   content      = <<EOF
@@ -103,7 +99,7 @@ resource "aws_s3_bucket_object" "database-config-upload" {
     "address": "${aws_db_instance.default.address}",
     "arn": "${aws_db_instance.default.arn}",
     "endpoint": "${aws_db_instance.default.endpoint}",
-    "db_name": "${mysql_database.application-db.name}",
+    "db_name": "${local.config.SERVICE_NAME}",
     "db_port": "${aws_db_instance.default.port}",
     "username": "${aws_db_instance.default.username}",
     "password": "${aws_db_instance.default.password}"

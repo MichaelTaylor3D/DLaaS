@@ -6,7 +6,7 @@ resource "aws_vpc" "main-services-vpc" {
   enable_classiclink   = "false"
 
   tags = {
-    Name = "${var.aws_profile} Main VPC"
+    Name = "${local.config.AWS_PROFILE} Main VPC"
   }
 }
 

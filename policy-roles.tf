@@ -1,6 +1,6 @@
 resource "aws_iam_role" "default-lambda-role" {
     name               = "default-lambda-role"
-    description        = "${var.aws_profile}: IAM Role for the Lambdas."
+    description        = "${local.config.AWS_PROFILE}: IAM Role for the Lambdas."
     assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [{

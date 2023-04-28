@@ -11,7 +11,7 @@ terraform {
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
-  region     = var.aws_region
+  region     = local.config.AWS_REGION 
 }
 
 module "service-system-utils" {
@@ -20,11 +20,11 @@ module "service-system-utils" {
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
-  aws_region                  = var.aws_region
-  aws_profile                 = var.aws_profile
+  aws_region                  = local.config.AWS_REGION 
+  aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  dev_bucket_id               = aws_s3_bucket.storage-devops-bucket.id
+  dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Policies And Roles
   default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
@@ -36,15 +36,15 @@ module "service-user" {
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
-  aws_region                  = var.aws_region
-  aws_profile                 = var.aws_profile
+  aws_region                  = local.config.AWS_REGION 
+  aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
-  dev_bucket_id               = aws_s3_bucket.storage-devops-bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
-  db_name                     = mysql_database.application-db.name
+  db_name                     = local.config.SERVICE_NAME
 
   # System Utils
   create_schema_utility       = module.service-system-utils.create_schema_utility
@@ -67,15 +67,15 @@ module "service-subscriptions" {
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
-  aws_region                  = var.aws_region
-  aws_profile                 = var.aws_profile
+  aws_region                  = local.config.AWS_REGION 
+  aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
-  dev_bucket_id               = aws_s3_bucket.storage-devops-bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
-  db_name                     = mysql_database.application-db.name
+  db_name                     = local.config.SERVICE_NAME
 
   # System Utils
   create_schema_utility       = module.service-system-utils.create_schema_utility
@@ -98,12 +98,12 @@ module "service-worker-gateway" {
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
-  aws_region                  = var.aws_region
-  aws_profile                 = var.aws_profile
+  aws_region                  = local.config.AWS_REGION 
+  aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
-  dev_bucket_id               = aws_s3_bucket.storage-devops-bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Network
   public_subnet_id            = aws_subnet.public-2.id

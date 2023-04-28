@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "service-zone" {
-  name = var.service_domain
+  name = local.config.SERVICE_DOMAIN
 }
 
 resource "aws_route53_record" "www-api-subdomain" {

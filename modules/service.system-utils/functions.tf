@@ -16,7 +16,7 @@ resource "aws_s3_bucket_object" "create-schema-function-storage-upload" {
 
 # Lambda Initialization
 resource "aws_lambda_function" "create-schema-function-handler" {
-  function_name     = "create-user-schema-handler"
+  function_name     = "create-schema-handler"
   description       = "${var.aws_profile}: Create db schema"
   s3_bucket         = var.dev_bucket_id
   s3_key            = aws_s3_bucket_object.create-schema-function-storage-upload.key

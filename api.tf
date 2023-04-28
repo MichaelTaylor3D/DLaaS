@@ -1,7 +1,7 @@
 # API Gateway REST API definition
 resource "aws_api_gateway_rest_api" "main" {
   name        = "datalayer-storage-services-api"
-  description = "${var.aws_profile} services API [Deployed: ${timestamp()}]"
+  description = "${local.config.AWS_PROFILE} services API [Deployed: ${timestamp()}]"
 }
 
 resource "aws_api_gateway_stage" "production" {
@@ -12,7 +12,7 @@ resource "aws_api_gateway_stage" "production" {
 
 resource "aws_api_gateway_deployment" "production-deployment" {
   rest_api_id = aws_api_gateway_rest_api.main.id
-  description = "${var.aws_profile}:: API Gateway deployment for job queue lambdas"
+  description = "${local.config.AWS_PROFILE}:: API Gateway deployment for job queue lambdas"
 
   triggers = {
     redeployment = sha1(jsonencode([
@@ -28,7 +28,7 @@ resource "aws_api_gateway_deployment" "production-deployment" {
 }
 
 resource "aws_api_gateway_usage_plan" "api-usage-plan" {
-  name = "${var.aws_profile}-api-usage-plan"
+  name = "${local.config.AWS_PROFILE}-api-usage-plan"
 
   api_stages {
     api_id = aws_api_gateway_rest_api.main.id
@@ -48,7 +48,7 @@ resource "aws_api_gateway_usage_plan_key" "usage-plan-key" {
 }
 
 resource "aws_api_gateway_domain_name" "api-subdomain" {
-  domain_name = "api.${var.service_domain}"
+  domain_name = "api.${local.config.SERVICE_DOMAIN}"
   certificate_arn = aws_acm_certificate.wildcard-domain.arn
 }
 
@@ -59,7 +59,7 @@ resource "aws_api_gateway_base_path_mapping" "archvision-api-base-path-mapping" 
 }
 
 resource "aws_s3_bucket_object" "api-config-upload" {
-  bucket       = aws_s3_bucket.storage-devops-bucket.id
+  bucket       = aws_s3_bucket.storage_devops_bucket.id
   key          = "configurations/api.config.json"
   content_type = "application/json"
   content      = <<EOF
