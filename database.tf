@@ -40,15 +40,15 @@ resource "aws_db_instance" "default" {
   #}
 }
 
-resource "aws_db_parameter_group" "default" {
-  name   = "rds-pg"
-  family = "mysql8.0"
+#resource "aws_db_parameter_group" "default" {
+#  name   = "rds-pg"
+#  family = "mysql8.0"
 
-  parameter {
-    name  = "log_bin_trust_function_creators"
-    value = "1"
-  }
-}
+#  parameter {
+#    name  = "log_bin_trust_function_creators"
+#    value = "1"
+#  }
+#}
 
 data "aws_iam_policy_document" "s3_import_assume" {
   statement {

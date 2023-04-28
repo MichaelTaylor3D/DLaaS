@@ -17,7 +17,7 @@ const s3 = new AWS.S3({
 const getConfigurationFile = async (filename) => {
   // Create the parameters for calling getObject
   const bucketParams = {
-    Bucket: "dlstorage-services.dev",
+    Bucket: "dlaas.dev",
     Key: `configurations/${filename}`,
   };
 

@@ -1,0 +1,6 @@
+{
+  "AWS_REGION": "us-east-1",
+  "SERVICE_NAME": "dlass",
+  "SERVICE_DOMAIN": "datalayer.storage",
+  "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7"
+}

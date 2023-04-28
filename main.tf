@@ -59,9 +59,6 @@ module "service-user" {
   api_gateway_id              = aws_api_gateway_rest_api.main.id
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
-
-  # EC2 - Compute
-  worker_ami                  = var.worker_ami
 }
 
 module "service-subscriptions" {
@@ -93,9 +90,6 @@ module "service-subscriptions" {
   api_gateway_id              = aws_api_gateway_rest_api.main.id
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
-
-  # EC2 - Compute
-  worker_ami                  = var.worker_ami
 }
 
 module "service-worker-gateway" {
@@ -121,7 +115,4 @@ module "service-worker-gateway" {
   api_gateway_id              = aws_api_gateway_rest_api.main.id
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
-
-  # EC2 - Compute
-  worker_ami                  = var.worker_ami
 }

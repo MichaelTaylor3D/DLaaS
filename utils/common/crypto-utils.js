@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { getConfigurationFile } = require("./config-utils");
 
 /**
  * Verifies a JWT token.

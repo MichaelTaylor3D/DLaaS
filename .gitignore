@@ -2,3 +2,4 @@
 .terraform
 .credentials
 credentials.csv
+node_modules
