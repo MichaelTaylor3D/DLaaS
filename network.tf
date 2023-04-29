@@ -1,3 +1,18 @@
+/**
+ * @fileoverview This Terraform file sets up the network infrastructure for an AWS-based application. It creates a VPC,
+ * public and private subnets, an Internet gateway, route tables, route table associations, and security groups.
+ *
+ * The main components of this file include:
+ * 1. AWS VPC: Creates the main Virtual Private Cloud (VPC) for the application.
+ * 2. AWS Subnets: Configures public and private subnets in different availability zones within the VPC.
+ * 3. AWS Internet Gateway: Sets up an Internet gateway and attaches it to the VPC.
+ * 4. AWS Route Tables: Creates a route table for public subnets with a route to the Internet gateway.
+ * 5. AWS Route Table Associations: Associates the public subnets with the public route table.
+ * 6. AWS Security Groups: Defines security groups for different services (RDP, Elasticsearch, MySQL, HTTP, and SSH),
+ *    allowing specific ingress traffic and all egress traffic.
+ */
+
+
 resource "aws_vpc" "main-services-vpc" {
   cidr_block           = "10.0.0.0/16"
   instance_tenancy     = "default"

@@ -40,7 +40,7 @@ module "service-user" {
   aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
@@ -71,7 +71,7 @@ module "service-subscriptions" {
   aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
@@ -102,7 +102,7 @@ module "service-worker-gateway" {
   aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
-  storage_bucket_id           = aws_s3_bucket.storage_bucket.id
+  storage_bucket_id           = aws_s3_bucket.storage-bucket.id
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Network

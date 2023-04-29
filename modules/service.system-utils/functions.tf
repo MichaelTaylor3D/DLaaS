@@ -1,3 +1,14 @@
+/**
+ * @fileoverview This Terraform configuration file manages the creation and deployment of
+ * an AWS Lambda function responsible for creating a database schema. The configuration
+ * includes the following steps:
+ * 1. Create a ZIP archive of the Lambda function source code.
+ * 2. Upload the ZIP archive to an S3 bucket.
+ * 3. Create and configure the Lambda function, specifying the S3 bucket and key
+ *    for the source code, the handler, runtime, timeout, IAM role, and publish settings.
+ */
+
+
 ### START Create user Schema LAMBDA ###
 
 data "archive_file" "create-schema-function-source" {

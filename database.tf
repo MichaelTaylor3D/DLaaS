@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This Terraform file configures an AWS RDS MySQL database instance along with its associated resources,
+ * settings, and parameters for the "dlstorage-db" service. It includes the creation of a database instance, parameter
+ * group, IAM role, subnet group, random password generation, and uploading a JSON configuration file to an S3 bucket.
+ * The output provides the database endpoint for other services to connect to the database.
+ */
+
 resource "aws_db_instance" "default" {
   identifier                  = "dlstorage-db"
   allocated_storage           = 20

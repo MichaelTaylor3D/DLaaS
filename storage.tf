@@ -1,6 +1,28 @@
+/**
+ * @fileoverview This Terraform file creates two Amazon S3 buckets: a private 'devops' bucket for storing
+ * programmatic configurations describing various infrastructure parameters, and a production bucket with a public folder.
+ *
+ * The main components of this file include:
+ * 1. AWS S3 Bucket (DevOps): Creates a private 'devops' bucket to store programmatic configurations accessible
+ *    by both Lambda execution environments and worker scripts.
+ * 2. AWS S3 Bucket (Production): Creates a production storage bucket with acceleration status enabled, a public folder,
+ *    and a CORS configuration.
+ * 3. AWS S3 Bucket Object: Creates a 'public/' folder in the production storage bucket and sets its ACL to 'public-read'.
+ *
+ * Both buckets are tagged with the AWS_PROFILE and the respective environment (Dev or Prod).
+ *
+ * The 'devops' bucket is private and reserved for storing programmatic configurations that describe different
+ * parameters of the infrastructure so that it's accessible by both Lambda execution environments and worker scripts.
+ *
+ * The production storage bucket has the following configurations:
+ * - Bucket Policy: Allows public read access to the 'public/' folder.
+ * - CORS Rule: Configures CORS for the bucket, allowing all origins and headers, and exposing the ETag header.
+ */
+
+
 resource "aws_s3_bucket" "storage_devops_bucket" {
   # Bucket name must be unique across all AWS users!
-  bucket = "${local.config.DEFAULT_STORAGE_BUCKET}.dev"
+  bucket = "${local.config.DEFAULT_S3_BUCKET}.devops"
 
   tags = {
     Name        = "${local.config.AWS_PROFILE} Configuration Bucket"
@@ -8,11 +30,23 @@ resource "aws_s3_bucket" "storage_devops_bucket" {
   }
 }
 
-resource "aws_s3_bucket" "storage_bucket" {
-  # Bucket name must be unique across all AWS users!
-  bucket              = local.config.DEFAULT_STORAGE_BUCKET
+resource "aws_s3_bucket" "storage-bucket" {
+  bucket              = local.config.DEFAULT_S3_BUCKET
   acceleration_status = "Enabled"
-  policy              = jsonencode({
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.storage-bucket.id
+
+  policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -22,28 +56,18 @@ resource "aws_s3_bucket" "storage_bucket" {
           "AWS": "*"
         },
         "Action": "s3:GetObject",
-        "Resource": "arn:aws:s3:::${local.config.DEFAULT_STORAGE_BUCKET}/public/*"
+        "Resource": "arn:aws:s3:::${local.config.DEFAULT_S3_BUCKET}/public/*"
       }
     ]
   })
-  
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET"]
-    allowed_origins = ["*"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
-  }
 
-  tags = {
-    Name        = "${local.config.AWS_PROFILE} Storage Bucket"
-    Environment = "Prod"
-  }
+  depends_on = [
+    aws_s3_bucket_object.public-folder
+  ]
 }
 
 resource "aws_s3_bucket_object" "public-folder" {
-    bucket = aws_s3_bucket.storage_bucket.id
-    acl    = "public-read"
-    key    = "public/"
-    source = "/dev/null"
-}#
+  bucket = aws_s3_bucket.storage-bucket.id
+  key    = "public/"
+  source = "/dev/null"
+}

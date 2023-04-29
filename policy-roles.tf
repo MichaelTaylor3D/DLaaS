@@ -1,3 +1,20 @@
+/**
+ * @fileoverview This Terraform file creates an AWS IAM role and policy to be used by Lambda functions and API Gateway. 
+ * The IAM role has permissions to access various AWS services and resources.
+ *
+ * The main components of this file include:
+ * 1. AWS IAM Role: Creates a default IAM role for Lambda functions and API Gateway.
+ * 2. AWS IAM Role Policy: Defines a policy with the necessary permissions for the IAM role.
+ * 3. Output: Exports the ARN of the created IAM role.
+ *
+ * The policy provides permissions for the following services and resources:
+ * - Lambda: Invocation of Lambda functions.
+ * - CloudWatch Logs: Creating log streams, log deliveries, and putting log events.
+ * - Amazon SES: Sending emails.
+ * - Amazon SQS: Sending and receiving messages, managing message visibility, getting queue URLs, and deleting messages.
+ * - Amazon S3: Getting, tagging, listing, deleting, and putting objects.
+ */
+
 resource "aws_iam_role" "default-lambda-role" {
     name               = "default-lambda-role"
     description        = "${local.config.AWS_PROFILE}: IAM Role for the Lambdas."
@@ -8,8 +25,7 @@ resource "aws_iam_role" "default-lambda-role" {
       "Principal": {
         "Service": [
           "lambda.amazonaws.com",
-          "apigateway.amazonaws.com",
-					"autoscaling.amazonaws.com"
+          "apigateway.amazonaws.com"
         ]
       },
       "Effect": "Allow",
@@ -39,23 +55,6 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
 					"Effect": "Allow",
 					"Resource": "*"
 				}, {
-					"Effect": "Allow",
-					"Action": [
-						"ecr:DescribeImages",
-						"ecr:DescribeRepositories"
-					],
-					"Resource": "*"
-				}, {
-					"Effect": "Allow",
-					"Action": [
-						"ec2:DescribeNetworkInterfaces",
-						"ec2:CreateNetworkInterface",
-						"ec2:DeleteNetworkInterface",
-						"ec2:DescribeInstances",
-						"ec2:AttachNetworkInterface"
-					],
-					"Resource": "*"
-				}, {
     			"Effect": "Allow",
     			"Action": "ses:SendEmail",
     			"Resource": "*"
@@ -64,13 +63,6 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
     			"Action": "sqs:SendMessage",
     			"Resource": "*"
     		}, {
-				  "Effect": "Allow",
-    			"Action": [
-						"autoscaling:StartInstanceRefresh",
-						"autoscaling:ExecutePolicy"
-					],
-    			"Resource": "*"
-				}, {
             "Action": [
                 "sqs:ReceiveMessage",
                 "sqs:ChangeMessageVisibility",

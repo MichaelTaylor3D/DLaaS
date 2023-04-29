@@ -1,7 +1,7 @@
 # API Gateway REST API definition
 resource "aws_api_gateway_rest_api" "main" {
   name        = "datalayer-storage-services-api"
-  description = "${local.config.AWS_PROFILE} services API [Deployed: ${timestamp()}]"
+  description = "${local.config.AWS_PROFILE} services API"
 }
 
 resource "aws_api_gateway_stage" "production" {
@@ -12,12 +12,10 @@ resource "aws_api_gateway_stage" "production" {
 
 resource "aws_api_gateway_deployment" "production-deployment" {
   rest_api_id = aws_api_gateway_rest_api.main.id
-  description = "${local.config.AWS_PROFILE}:: API Gateway deployment for job queue lambdas"
+  description = "${local.config.AWS_PROFILE}:: API Gateway deployment"
 
   triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.main
-    ]))
+    redeployment = sha1(timestamp())
   }
 
   lifecycle {

@@ -1,3 +1,18 @@
+/**
+ * @fileoverview This Terraform configuration sets up AWS API Gateway resources for the user management API.
+ * It defines the following API endpoints:
+ * 1. /user/v1/create
+ * 2. /user/v1/confirm
+ * 3. /user/v1/login
+ * 4. /user/v1/reset_password
+ * 5. /user/v1/confirm_new_password
+ * 6. /user/v1/change_email
+ * 7. /user/v1/confirm_change_email
+ * 8. /user/v1/cancel_change_email
+ * 9. /user/v1/access_keys
+ * 10. /user/v1/access_keys/{accessKey} (for deleting an access key)
+ */
+
 resource "aws_api_gateway_resource" "v1-api-resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = var.root_resource_id

@@ -1,3 +1,11 @@
+/**
+ * @fileoverview This Terraform configuration file manages the creation of an AWS Route53
+ * hosted zone and a corresponding Route53 record for the API Gateway subdomain. The hosted
+ * zone is created using the SERVICE_DOMAIN from the local configuration. The Route53 record
+ * is an "A" type record for the API Gateway subdomain, pointing to the CloudFront distribution
+ * associated with the API Gateway using an alias.
+ */
+
 resource "aws_route53_zone" "service-zone" {
   name = local.config.SERVICE_DOMAIN
 }
