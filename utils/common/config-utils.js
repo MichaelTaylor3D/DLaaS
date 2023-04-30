@@ -6,6 +6,8 @@ const s3 = new AWS.S3({
   useAccelerateEndpoint: true,
 });
 
+const appConfig = require("../config.json");
+
 /**
  * Retrieves a configuration file from an S3 bucket.
  * @async
@@ -17,7 +19,7 @@ const s3 = new AWS.S3({
 const getConfigurationFile = async (filename) => {
   // Create the parameters for calling getObject
   const bucketParams = {
-    Bucket: "dlaas.dev",
+    Bucket: `${appConfig.DEFAULT_S3_BUCKET}.devops`,
     Key: `configurations/${filename}`,
   };
 

@@ -5,12 +5,10 @@
  * 2. /user/v1/confirm
  * 3. /user/v1/login
  * 4. /user/v1/reset_password
- * 5. /user/v1/confirm_new_password
- * 6. /user/v1/change_email
- * 7. /user/v1/confirm_change_email
- * 8. /user/v1/cancel_change_email
- * 9. /user/v1/access_keys
- * 10. /user/v1/access_keys/{accessKey} (for deleting an access key)
+ * 5. /user/v1/change_email
+ * 6. /user/v1/cancel_change_email
+ * 7. /user/v1/access_keys
+ * 8. /user/v1/access_keys/{accessKey} (for deleting an access key)
  */
 
 resource "aws_api_gateway_resource" "v1-api-resource" {

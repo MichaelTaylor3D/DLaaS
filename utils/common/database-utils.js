@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const { getConfigurationFile } = require("./config-utils");
 
 /**
  * Formats a query string with values to be escaped.
@@ -21,6 +22,39 @@ const queryFormat = function (query, values) {
 };
 
 /**
+ * Executes a database query.
+ * @async
+ * @function
+ * @param {string} sql - The SQL query.
+ * @param {Object} params - The query parameters.
+ * @returns {Promise<Array>} - The query results.
+ */
+const dbQuery = async (sql, params) => {
+  const dbConfig = await getConfigurationFile("db.config.json");
+
+  const connection = mysql.createConnection({
+    host: dbConfig.address,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
+  });
+
+  connection.config.queryFormat = queryFormat;
+
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        reject(error);
+        connection.end();
+        return;
+      }
+      connection.end();
+      resolve(results);
+    });
+  });
+};
+
+/**
  * Retrieves the saved hash for the given access key.
  * @async
  * @function
@@ -29,7 +63,7 @@ const queryFormat = function (query, values) {
  */
 const getSaveHashForAccessKey = async (accessKey) => {
   return dbQuery(
-    `SELECT user_id, access_key_hash FROM access_keys WHERE access_key = :access_key`,
+    `SELECT user_id, access_key_hash FROM access_keys WHERE access_key = :accessKey`,
     {
       accessKey,
     }
@@ -304,39 +338,6 @@ const getUserBy = async (column, value) => {
       }
       connection.end();
       resolve(results?.[0]);
-    });
-  });
-};
-
-/**
- * Executes a database query.
- * @async
- * @function
- * @param {string} sql - The SQL query.
- * @param {Object} params - The query parameters.
- * @returns {Promise<Array>} - The query results.
- */
-const dbQuery = async (sql, params) => {
-  const dbConfig = await getConfigurationFile("db.config.json");
-
-  const connection = mysql.createConnection({
-    host: dbConfig.address,
-    user: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.db_name,
-  });
-
-  connection.config.queryFormat = queryFormat;
-
-  return new Promise((resolve, reject) => {
-    connection.query(sql, params, (error, results) => {
-      if (error) {
-        reject(error);
-        connection.end();
-        return;
-      }
-      connection.end();
-      resolve(results);
     });
   });
 };

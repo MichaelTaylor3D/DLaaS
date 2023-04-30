@@ -6,7 +6,7 @@
  */
 
 resource "aws_db_instance" "default" {
-  identifier                  = "dlstorage-db"
+  identifier                  = "${local.config.SERVICE_NAME}-db"
   allocated_storage           = 20
   max_allocated_storage       = 500
   storage_type                = "gp2"

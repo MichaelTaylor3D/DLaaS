@@ -1,5 +1,5 @@
 data "external" "config_json" {
-  program = ["cat", "config.json"]
+  program = ["cat", "./utils/config.json"]
 }
 
 locals {
@@ -14,6 +14,6 @@ resource "aws_s3_bucket_object" "app-config-upload" {
   content      = jsonencode(data.external.config_json.result)
 }
 
+# Add these variables to your tfvars file or the variables tab in Terraform Cloud Workspace
 variable "aws_access_key"         {}
 variable "aws_secret_key"         {}
-variable "aws_account_id"         {}

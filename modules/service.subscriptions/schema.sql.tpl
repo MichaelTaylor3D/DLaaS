@@ -1,3 +1,5 @@
+ALTER TABLE ${db_name}.datastores ADD subscription_id datatype;
+
 CREATE TABLE IF NOT EXISTS ${db_name}.subscriptions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,

@@ -1,7 +1,7 @@
 # API Gateway REST API definition
 resource "aws_api_gateway_rest_api" "main" {
-  name        = "datalayer-storage-services-api"
-  description = "${local.config.AWS_PROFILE} services API"
+  name        = "datalayer-storage-app-pages"
+  description = "${local.config.AWS_PROFILE} app pages"
 }
 
 resource "aws_api_gateway_stage" "production" {

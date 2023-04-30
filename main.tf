@@ -62,7 +62,7 @@ module "service-user" {
 
   # APP Root
   app_gateway_id              = aws_api_gateway_rest_api.www.id
-  app_root_resource_id            = aws_api_gateway_rest_api.www.root_resource_id
+  app_root_resource_id        = aws_api_gateway_rest_api.www.root_resource_id
   app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
 }
 
