@@ -50,7 +50,7 @@ resource "aws_api_gateway_domain_name" "api-subdomain" {
   certificate_arn = aws_acm_certificate.wildcard-domain.arn
 }
 
-resource "aws_api_gateway_base_path_mapping" "archvision-api-base-path-mapping" {
+resource "aws_api_gateway_base_path_mapping" "api-base-path-mapping" {
   api_id      = aws_api_gateway_rest_api.main.id
   stage_name  = aws_api_gateway_stage.production.stage_name
   domain_name = aws_api_gateway_domain_name.api-subdomain.domain_name

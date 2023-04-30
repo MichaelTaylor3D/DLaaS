@@ -59,6 +59,11 @@ module "service-user" {
   api_gateway_id              = aws_api_gateway_rest_api.main.id
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
+
+  # APP Root
+  app_gateway_id              = aws_api_gateway_rest_api.www.id
+  app_root_resource_id            = aws_api_gateway_rest_api.www.root_resource_id
+  app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
 }
 
 module "service-subscriptions" {
@@ -90,6 +95,11 @@ module "service-subscriptions" {
   api_gateway_id              = aws_api_gateway_rest_api.main.id
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
+
+  # APP Root
+  app_gateway_id              = aws_api_gateway_rest_api.www.id
+  app_root_resource_id        = aws_api_gateway_rest_api.www.root_resource_id
+  app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
 }
 
 module "service-worker-gateway" {

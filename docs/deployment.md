@@ -34,8 +34,12 @@ cd terraform-project
 
 Before deploying the Terraform project, ensure that the AWS user associated with your `aws_access_key` and `aws_secret_key` has the necessary permissions to create and manage resources. The user must have at least the following IAM policies attached:
 
-- `AdministratorAccess`: This policy grants full access to AWS services and resources.
-- `AmazonS3FullAccess`: This policy grants full access to all S3 buckets and objects within your AWS account.
+- `AmazonRDSFullAccess`: This policy allows Terraform to create and manage RDS instances and associated resources such as parameter groups and subnet groups.
+- `AmazonS3FullAccess`: This policy allows Terraform to create and manage S3 buckets and objects, which are used in this file to upload a JSON configuration file to an S3 bucket.
+- `AmazonEC2ReadOnlyAccess`: This policy allows Terraform to read information about the subnets used in the subnet group created in this file.
+- `IAMFullAccess`: This policy allows Terraform to create and manage IAM roles, which are used in this file to create an IAM role for RDS to import MySQL backups from S3.
+
+Note that the exact policies required may depend on your specific environment and use case, and it is recommended to review and limit the permissions granted by each policy to the minimum required for Terraform to function properly.
 
 To attach these policies to an existing AWS user or to create a new user with these permissions, follow the [AWS Identity and Access Management (IAM) documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-started_create-admin-group.html).
 

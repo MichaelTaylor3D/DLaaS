@@ -11,3 +11,6 @@ variable "api_gateway_arn"             {}
 variable "default_lambda_role_arn"     {}
 variable "db_name"                     {}
 variable "create_schema_utility"       {}
+variable "app_gateway_id"              {}
+variable "app_root_resource_id"        {}
+variable "app_gateway_arn"             {}

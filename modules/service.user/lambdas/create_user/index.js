@@ -17,7 +17,9 @@ const {
   getUserByEmailOrUsername,
   dbQuery,
   assertRequiredBodyParams,
+  getConfigurationFile,
 } = require("./utils");
+
 
 /**
  * Inserts a new user into the database.
@@ -90,12 +92,14 @@ exports.handler = async (event, context, callback) => {
 
     await insertUserIntoDb(username, email, hash, salt, confirmationCode);
 
+    const appConfig = await getConfigurationFile("app.config.json");
+
     // Send confirmation email
     await sendEmail(
       email,
       "DataLayer Storage Account Creation",
-      `Your account has been created successfully. Go to the following link to activate your account. https://api.datalayer.storage/user/v1/confirm?code=${confirmationCode}`,
-      `<div>Your account has been created successfully. Click on the link below to activate your account.</div><a href='https://api.datalayer.storage/user/v1/confirm?code=${confirmationCode}'>Activate Account</a>`
+      `Your account has been created successfully. Go to the following link to activate your account. https://app.${appConfig.SERVICE_DOMAIN}/user/v1/confirm?code=${confirmationCode}`,
+      `<div>Your account has been created successfully. Click on the link below to activate your account.</div><a href='https://app.${appConfig.SERVICE_DOMAIN}/user/v1/confirm?code=${confirmationCode}'>Activate Account</a>`
     );
 
     // Send a success response
