@@ -5,8 +5,8 @@ const { v4: uuidv4 } = require("uuid");
 const {
   getConfigurationFile,
   assertBearerTokenOrBasicAuth,
-  assertRequiredBodyParams
-} = require("./utils");
+  assertRequiredBodyParams,
+} = require("./common");
 
 const recordMirrorToUser = async (userId, singletonId, singletonName) => {
   return dbQuery(

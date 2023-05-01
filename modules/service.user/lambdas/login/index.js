@@ -14,7 +14,7 @@ const {
   hashWithSalt,
   dbQuery,
   assertRequiredBodyParams,
-} = require("./utils");
+} = require("./common");
 
 /**
  * Verifies the user's password.

@@ -1,5 +1,5 @@
 data "external" "config_json" {
-  program = ["cat", "./utils/config.json"]
+  program = ["cat", "./common/config.json"]
 }
 
 locals {

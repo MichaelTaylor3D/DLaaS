@@ -9,13 +9,12 @@
 
 const {
   upsertUserMeta,
-  getUserByEmail,
   sendEmail,
   generateConfirmationCode,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
   getUserBy,
-} = require("./utils");
+} = require("./common");
 
 /**
  * AWS Lambda function handler that generates a reset password code and sends it to the user's email address.

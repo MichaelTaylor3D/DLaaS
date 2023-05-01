@@ -33,6 +33,10 @@ module "service-system-utils" {
 module "service-user" {
   source                     = "./modules/service.user"
 
+  providers = {
+    aws = aws
+  }
+
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
@@ -64,11 +68,20 @@ module "service-user" {
   app_gateway_id              = aws_api_gateway_rest_api.www.id
   app_root_resource_id        = aws_api_gateway_rest_api.www.root_resource_id
   app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
+
+  depends_on = [
+    aws_db_instance.default,
+    aws_lambda_invocation.init-db
+  ]
 }
 
 module "service-subscriptions" {
   source                     = "./modules/service.subscriptions"
 
+  providers = {
+    aws = aws
+  }
+
   # AWS Profile
   aws_access_key              = var.aws_access_key
   aws_secret_key              = var.aws_secret_key
@@ -100,6 +113,12 @@ module "service-subscriptions" {
   app_gateway_id              = aws_api_gateway_rest_api.www.id
   app_root_resource_id        = aws_api_gateway_rest_api.www.root_resource_id
   app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
+
+  depends_on = [
+    module.service-user,
+    aws_db_instance.default,
+    aws_lambda_invocation.init-db
+  ]
 }
 
 module "service-worker-gateway" {

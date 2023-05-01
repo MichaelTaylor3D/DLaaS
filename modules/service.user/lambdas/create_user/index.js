@@ -18,7 +18,7 @@ const {
   dbQuery,
   assertRequiredBodyParams,
   getConfigurationFile,
-} = require("./utils");
+} = require("./common");
 
 
 /**

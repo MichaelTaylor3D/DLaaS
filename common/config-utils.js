@@ -6,7 +6,7 @@ const s3 = new AWS.S3({
   useAccelerateEndpoint: true,
 });
 
-const appConfig = require("../config.json");
+const appConfig = require("./config.json");
 
 /**
  * Retrieves a configuration file from an S3 bucket.

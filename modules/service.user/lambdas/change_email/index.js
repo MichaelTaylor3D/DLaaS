@@ -16,7 +16,7 @@ const {
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
   getConfigurationFile,
-} = require("./utils");
+} = require("./common");
 
 /**
  * Handles the email change request event.

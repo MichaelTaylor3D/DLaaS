@@ -13,7 +13,7 @@ const {
   assertBearerTokenOrBasicAuth,
   hashWithSalt,
   dbQuery,
-} = require("./utils");
+} = require("./common");
 
 /**
  * Inserts the access key and its hash into the database.

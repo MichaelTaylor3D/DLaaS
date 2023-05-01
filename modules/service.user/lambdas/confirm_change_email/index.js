@@ -9,7 +9,7 @@
 "use strict";
 
 // Import utility functions
-const { dbQuery, getUserMeta, deleteUserMeta } = require("./utils");
+const { dbQuery, getUserMeta, deleteUserMeta } = require("./common");
 
 /**
  * Retrieves a user object by their email change code.

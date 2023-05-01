@@ -2,7 +2,7 @@
 
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
-const { getConfigurationFile, hashWithSalt, dbQuery } = require("./utils");
+const { getConfigurationFile, hashWithSalt, dbQuery } = require("./common");
 
 const getSaveHashForAccessKey = async (accessKey) => {
   return dbQuery(
