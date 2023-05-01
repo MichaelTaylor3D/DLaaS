@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS ${db_name}.invoices (
   subscription_id INT NOT NULL,
   issue_date DATETIME NOT NULL,
   due_date DATETIME NOT NULL,
-  amount DECIMAL(10, 2) NOT NULL,
+  total_amount_due DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  amount_paid DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
   xch_payment_address VARCHAR(42) NOT NULL,
   status ENUM('unpaid', 'paid', 'overdue') NOT NULL,
   FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)

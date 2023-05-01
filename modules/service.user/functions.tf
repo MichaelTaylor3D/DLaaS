@@ -50,28 +50,28 @@ resource "aws_lambda_permission" "authorizer-api-gateway" {
 
 ### END Authorizer LAMBDA ###
 
-### START Create User LAMBDA ###
+### START register User LAMBDA ###
 
-data "archive_file" "create-user-function-source" {
+data "archive_file" "register-user-function-source" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdas/create_user"
-  output_path = "${path.module}/lambdas/create-user-tf-handler-${random_uuid.archive.result}.zip"
+  source_dir  = "${path.module}/lambdas/register_user"
+  output_path = "${path.module}/lambdas/register-user-tf-handler-${random_uuid.archive.result}.zip"
 }
 
 # Upload Lamda function to S3
-resource "aws_s3_bucket_object" "create-user-function-storage-upload" {
+resource "aws_s3_bucket_object" "register-user-function-storage-upload" {
   bucket = var.dev_bucket_id
-  key    = "lambdas/create-user-tf-handler.zip"
-  source = data.archive_file.create-user-function-source.output_path
-  etag   = filemd5(data.archive_file.create-user-function-source.output_path)
+  key    = "lambdas/register-user-tf-handler.zip"
+  source = data.archive_file.register-user-function-source.output_path
+  etag   = filemd5(data.archive_file.register-user-function-source.output_path)
 }
 
 # Lamda Initialization
-resource "aws_lambda_function" "create-user-function-handler" {
-  function_name     = "create-user-handler"
-  description       = "${var.aws_profile}: Create new user function"
+resource "aws_lambda_function" "register-user-function-handler" {
+  function_name     = "register-user-handler"
+  description       = "${var.aws_profile}: register new user function"
   s3_bucket         = var.dev_bucket_id
-  s3_key            = aws_s3_bucket_object.create-user-function-storage-upload.key
+  s3_key            = aws_s3_bucket_object.register-user-function-storage-upload.key
 
   # Entrypoint to lambda function. Format is <file-name>.<property-name>
   handler           = "index.handler"
@@ -81,15 +81,15 @@ resource "aws_lambda_function" "create-user-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.create-user-function-source.output_path)
+  source_code_hash  = filebase64sha256(data.archive_file.register-user-function-source.output_path)
 }
 
 # Give permission to the API gateway to access this lambda
-resource "aws_lambda_permission" "create-user-api-gateway" {
+resource "aws_lambda_permission" "register-user-api-gateway" {
   statement_id  = "AllowAPIGatewayInvoke"
 
   # Name of lambda from above
-  function_name = aws_lambda_function.create-user-function-handler.arn
+  function_name = aws_lambda_function.register-user-function-handler.arn
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
 
@@ -98,7 +98,7 @@ resource "aws_lambda_permission" "create-user-api-gateway" {
   source_arn    = "${var.api_gateway_arn}/*/*"
 }
 
-### END Create User  LAMBDA ###
+### END register User  LAMBDA ###
 
 ### START Confirm Account LAMBDA ###
 
