@@ -5,8 +5,8 @@
 
 # API Gateway REST API definition
 resource "aws_api_gateway_rest_api" "www" {
-  name        = "datalayer-storage-services-api"
-  description = "${local.config.AWS_PROFILE} services API"
+  name        = "datalayer-storage-app-pages"
+  description = "${local.config.AWS_PROFILE} app pages"
 }
 
 resource "aws_api_gateway_stage" "production_www" {
@@ -17,7 +17,7 @@ resource "aws_api_gateway_stage" "production_www" {
 
 resource "aws_api_gateway_deployment" "production_www_deployment" {
   rest_api_id = aws_api_gateway_rest_api.www.id
-  description = "${local.config.AWS_PROFILE}:: API Gateway deployment"
+  description = "${local.config.AWS_PROFILE}:: API Gateway deployment WWW"
 
   triggers = {
     redeployment = sha1(timestamp())
