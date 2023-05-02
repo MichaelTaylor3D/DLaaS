@@ -13,7 +13,7 @@ resource "aws_s3_bucket_object" "create_subscription_function_storage_upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/create-subscription-tf-handler.zip"
   source = data.archive_file.create_subscription_function_source.output_path
-  etag   = filemd5(data.archive_file.create_subscription_function_source.output_path)
+  etag   = data.archive_file.create_subscription_function_source.output_md5
 }
 
 # Lamda Initialization
@@ -63,7 +63,7 @@ resource "aws_s3_bucket_object" "view_invoice_function_storage_upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/view-invoice-tf-handler.zip"
   source = data.archive_file.view_invoice_function_source.output_path
-  etag   = filemd5(data.archive_file.view_invoice_function_source.output_path)
+  etag   = data.archive_file.view_invoice_function_source.output_md5
 }
 
 # Lamda Initialization

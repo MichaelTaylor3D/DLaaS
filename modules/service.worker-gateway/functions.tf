@@ -13,7 +13,7 @@ resource "aws_s3_bucket_object" "create-mirror-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/create-mirror-tf-handler.zip"
   source = data.archive_file.create-mirror-function-source.output_path
-  etag   = filemd5(data.archive_file.create-mirror-function-source.output_path)
+  etag   = data.archive_file.create-mirror-function-source.output_md5
 }
 
 # Lamda Initialization

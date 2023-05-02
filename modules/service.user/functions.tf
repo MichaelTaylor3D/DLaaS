@@ -13,7 +13,7 @@ resource "aws_s3_bucket_object" "authorizer-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/authorizer-tf-handler.zip"
   source = data.archive_file.authorizer-function-source.output_path
-  etag   = filemd5(data.archive_file.authorizer-function-source.output_path)
+  etag   = data.archive_file.authorizer-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -63,7 +63,7 @@ resource "aws_s3_bucket_object" "register-user-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/register-user-tf-handler.zip"
   source = data.archive_file.register-user-function-source.output_path
-  etag   = filemd5(data.archive_file.register-user-function-source.output_path)
+  etag   = data.archive_file.register-user-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -113,7 +113,7 @@ resource "aws_s3_bucket_object" "confirm-user-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/confirm-user-tf-handler.zip"
   source = data.archive_file.confirm-user-function-source.output_path
-  etag   = filemd5(data.archive_file.confirm-user-function-source.output_path)
+  etag   = data.archive_file.confirm-user-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -163,7 +163,7 @@ resource "aws_s3_bucket_object" "login-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/login-tf-handler.zip"
   source = data.archive_file.login-function-source.output_path
-  etag   = filemd5(data.archive_file.login-function-source.output_path)
+  etag   = data.archive_file.login-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -213,7 +213,7 @@ resource "aws_s3_bucket_object" "generate-access-key-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/generate-access-key-tf-handler.zip"
   source = data.archive_file.generate-access-key-function-source.output_path
-  etag   = filemd5(data.archive_file.generate-access-key-function-source.output_path)
+  etag   = data.archive_file.generate-access-key-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -263,7 +263,7 @@ resource "aws_s3_bucket_object" "list-access-keys-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/list-access-keys-tf-handler.zip"
   source = data.archive_file.list-access-keys-function-source.output_path
-  etag   = filemd5(data.archive_file.list-access-keys-function-source.output_path)
+  etag   = data.archive_file.list-access-keys-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -313,7 +313,7 @@ resource "aws_s3_bucket_object" "delete-access-key-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/delete-access-key-tf-handler.zip"
   source = data.archive_file.delete-access-key-function-source.output_path
-  etag   = filemd5(data.archive_file.delete-access-key-function-source.output_path)
+  etag   = data.archive_file.delete-access-key-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -363,7 +363,7 @@ resource "aws_s3_bucket_object" "reset-password-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/reset-password-tf-handler.zip"
   source = data.archive_file.reset-password-function-source.output_path
-  etag   = filemd5(data.archive_file.reset-password-function-source.output_path)
+  etag   = data.archive_file.reset-password-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -413,7 +413,7 @@ resource "aws_s3_bucket_object" "confirm-new-password-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/confirm-new-password-tf-handler.zip"
   source = data.archive_file.confirm-new-password-function-source.output_path
-  etag   = filemd5(data.archive_file.confirm-new-password-function-source.output_path)
+  etag   = data.archive_file.confirm-new-password-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -463,7 +463,7 @@ resource "aws_s3_bucket_object" "change-email-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/change-email-tf-handler.zip"
   source = data.archive_file.change-email-function-source.output_path
-  etag   = filemd5(data.archive_file.change-email-function-source.output_path)
+  etag   = data.archive_file.change-email-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -513,7 +513,7 @@ resource "aws_s3_bucket_object" "cancel-change-email-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/cancel-change-email-tf-handler.zip"
   source = data.archive_file.cancel-change-email-function-source.output_path
-  etag   = filemd5(data.archive_file.cancel-change-email-function-source.output_path)
+  etag   = data.archive_file.cancel-change-email-function-source.output_md5
 }
 
 # Lamda Initialization
@@ -563,7 +563,7 @@ resource "aws_s3_bucket_object" "confirm-change-email-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/confirm-change-email-tf-handler.zip"
   source = data.archive_file.confirm-change-email-function-source.output_path
-  etag   = filemd5(data.archive_file.confirm-change-email-function-source.output_path)
+  etag   = data.archive_file.confirm-change-email-function-source.output_md5
 }
 
 # Lamda Initialization

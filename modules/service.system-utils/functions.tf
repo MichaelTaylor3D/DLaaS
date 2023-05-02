@@ -22,7 +22,7 @@ resource "aws_s3_bucket_object" "create-schema-function-storage-upload" {
   bucket = var.dev_bucket_id
   key    = "lambdas/create-schema-tf-handler.zip"
   source = data.archive_file.create-schema-function-source.output_path
-  etag   = filemd5(data.archive_file.create-schema-function-source.output_path)
+  etag   = data.archive_file.create-schema-function-source.output_md5
 }
 
 # Lambda Initialization
