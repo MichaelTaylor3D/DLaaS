@@ -1,0 +1,8 @@
+{ 
+  "DL_MIRROR": {
+    "id": "1",
+    "name": "DataLayer Mirror",
+    "description": "Create a mirror of an existing datastore",
+    "cost": 1
+  }
+}

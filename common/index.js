@@ -3,5 +3,7 @@ module.exports = {
   ...require("./config-utils"),
   ...require("./database-utils"),
   ...require("./crypto-utils"),
-  ...require("./email-utils")
+  ...require("./email-utils"),
+  ...require("./subscriptions"),
+  ...require("./worker-bridge"),
 };

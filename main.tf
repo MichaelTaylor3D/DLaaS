@@ -75,6 +75,7 @@ module "service-user" {
   ]
 }
 
+/*
 module "service-subscriptions" {
   source                     = "./modules/service.subscriptions"
 
@@ -120,6 +121,7 @@ module "service-subscriptions" {
     aws_lambda_invocation.init-db
   ]
 }
+*/
 
 module "service-worker-gateway" {
   source                      = "./modules/service.worker-gateway"
