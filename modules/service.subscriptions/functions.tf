@@ -31,7 +31,7 @@ resource "aws_lambda_function" "create_subscription_function_handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.create_subscription_function_source.output_path)
+  source_code_hash  = data.archive_file.create_subscription_function_source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -81,7 +81,7 @@ resource "aws_lambda_function" "view_invoice_function_handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.view_invoice_function_source.output_path)
+  source_code_hash  = data.archive_file.view_invoice_function_source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -95,7 +95,8 @@ resource "aws_lambda_permission" "view_invoice_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${var.app_gateway_arn}/*/*"
 }
+
 
 ### END view_invoice LAMBDA ###

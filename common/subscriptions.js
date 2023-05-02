@@ -3,10 +3,13 @@
  * and terminate subscriptions, create invoices, confirm payments, and check subscription expiration.
  * The module also sends emails to users for various events, such as subscription expiration or invoice creation.
  */
-
-const { dbQuery } = require("./database-utils");
-const { getConfigurationFile } = require("./config");
-const { sendChiaRPCCommand } = require("./worker-bridge");
+const {
+  dbQuery,
+  getConfigurationFile,
+  sendChiaRPCCommand,
+  sendEmail,
+  getUserBy,
+} = require("./");
 const rpc = require("./rpc");
 
 /**
@@ -17,8 +20,6 @@ const rpc = require("./rpc");
  * @param {string} productKey - The product key associated with the subscription.
  * @returns {Promise<number>} A promise that resolves with the subscription ID or rejects with an error.
  */
-const { getConfigurationFile } = require("./common");
-
 async function createSubscription(userId, productKey) {
   return new Promise(async (resolve, reject) => {
     // Set the subscription start and end dates
@@ -306,47 +307,39 @@ async function renewSubscription(subscriptionId) {
 }
 
 async function terminateSubscription(subscriptionId) {
-  return new Promise(async (resolve, reject) => {
+  try {
     const getSubscriptionQueryString = `
       SELECT * FROM subscriptions
-      WHERE id = ?;
+      WHERE id = :subscriptionId;
     `;
-    db.query(getSubscriptionQueryString, [subscriptionId], (error, rows) => {
-      if (error || rows.length === 0) {
-        console.error("Error fetching subscription:", error);
-        reject(error);
-        return;
-      }
+    const rows = await dbQuery(getSubscriptionQueryString, { subscriptionId });
 
-      const subscription = rows[0];
+    if (rows.length === 0) {
+      console.error("Error fetching subscription: not found");
+      throw new Error("Subscription not found");
+    }
 
-      const updateSubscriptionQueryString = `
-        UPDATE subscriptions
-        SET status = 'terminated'
-        WHERE id = ?;
-      `;
-      const updateSubscriptionQueryValues = [subscriptionId];
+    const subscription = rows[0];
 
-      db.query(
-        updateSubscriptionQueryString,
-        updateSubscriptionQueryValues,
-        (error, result) => {
-          if (error) {
-            console.error("Error terminating subscription:", error);
-            reject(error);
-            return;
-          }
+    const updateSubscriptionQueryString = `
+      UPDATE subscriptions
+      SET status = 'terminated'
+      WHERE id = :subscriptionId;
+    `;
 
-          console.log(`Subscription ID: ${subscriptionId} terminated.`);
-          resolve({
-            ...subscription,
-            status: "terminated",
-          });
-        }
-      );
-    });
-  });
+    await dbQuery(updateSubscriptionQueryString, { subscriptionId });
+
+    console.log(`Subscription ID: ${subscriptionId} terminated.`);
+    return {
+      ...subscription,
+      status: "terminated",
+    };
+  } catch (error) {
+    console.error("Error in terminateSubscription:", error);
+    throw error;
+  }
 }
+
 
 async function setSubscriptionsToGracePeriod() {
   return new Promise(async (resolve, reject) => {

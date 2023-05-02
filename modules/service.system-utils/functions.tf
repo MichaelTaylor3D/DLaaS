@@ -40,7 +40,7 @@ resource "aws_lambda_function" "create-schema-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.create-schema-function-source.output_path)
+  source_code_hash  = data.archive_file.create-schema-function-source.output_base64sha256
 }
 
 ### END Create User Schema LAMBDA ###

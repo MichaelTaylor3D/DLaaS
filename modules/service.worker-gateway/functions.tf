@@ -31,7 +31,7 @@ resource "aws_lambda_function" "create-mirror-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.create-mirror-function-source.output_path)
+  source_code_hash  = data.archive_file.create-mirror-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda

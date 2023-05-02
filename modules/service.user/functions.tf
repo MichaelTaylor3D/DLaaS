@@ -31,7 +31,7 @@ resource "aws_lambda_function" "authorizer-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.authorizer-function-source.output_path)
+  source_code_hash  = data.archive_file.authorizer-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -81,7 +81,7 @@ resource "aws_lambda_function" "register-user-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.register-user-function-source.output_path)
+  source_code_hash  = data.archive_file.register-user-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -131,7 +131,7 @@ resource "aws_lambda_function" "confirm-user-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.confirm-user-function-source.output_path)
+  source_code_hash  = data.archive_file.confirm-user-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -181,7 +181,7 @@ resource "aws_lambda_function" "login-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.login-function-source.output_path)
+  source_code_hash  = data.archive_file.login-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -231,7 +231,7 @@ resource "aws_lambda_function" "generate-access-key-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.generate-access-key-function-source.output_path)
+  source_code_hash  = data.archive_file.generate-access-key-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -281,7 +281,7 @@ resource "aws_lambda_function" "list-access-keys-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.list-access-keys-function-source.output_path)
+  source_code_hash  = data.archive_file.list-access-keys-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -331,7 +331,7 @@ resource "aws_lambda_function" "delete-access-key-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.delete-access-key-function-source.output_path)
+  source_code_hash  = data.archive_file.delete-access-key-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -381,7 +381,7 @@ resource "aws_lambda_function" "reset-password-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.reset-password-function-source.output_path)
+  source_code_hash  = data.archive_file.reset-password-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -431,7 +431,7 @@ resource "aws_lambda_function" "confirm-new-password-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.confirm-new-password-function-source.output_path)
+  source_code_hash  = data.archive_file.confirm-new-password-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -481,7 +481,7 @@ resource "aws_lambda_function" "change-email-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.change-email-function-source.output_path)
+  source_code_hash  = data.archive_file.change-email-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -531,7 +531,7 @@ resource "aws_lambda_function" "cancel-change-email-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.cancel-change-email-function-source.output_path)
+  source_code_hash  = data.archive_file.cancel-change-email-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda
@@ -581,7 +581,7 @@ resource "aws_lambda_function" "confirm-change-email-function-handler" {
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
-  source_code_hash  = filebase64sha256(data.archive_file.confirm-change-email-function-source.output_path)
+  source_code_hash  = data.archive_file.confirm-change-email-function-source.output_base64sha256
 }
 
 # Give permission to the API gateway to access this lambda

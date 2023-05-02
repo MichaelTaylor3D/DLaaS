@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS ${db_name}.subscriptions (
   product_key VARCHAR(25) NOT NULL,
   start_date DATETIME NOT NULL,
   end_date DATETIME NOT NULL,
-  status ENUM('pending', 'active', 'expired', 'grace_period', 'cancelled', 'terminated') NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  status ENUM('pending', 'active', 'expired', 'grace_period', 'cancelled', 'terminated') NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ${db_name}.invoices (

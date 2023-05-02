@@ -8,8 +8,9 @@
     "build": "mkdir common && cp ../../../../common/*.* common/"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
-    "jsonwebtoken": "^9.0.0"
+    "ws": "^8.13.0"
   },
   "author": "",
   "license": "ISC"

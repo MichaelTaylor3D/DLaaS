@@ -10,7 +10,7 @@ resource "aws_api_gateway_resource" "invoice_resource" {
 resource "aws_api_gateway_resource" "view_invoice_api_resource" {
   rest_api_id = var.app_gateway_id
   parent_id   = aws_api_gateway_resource.invoice_resource.id
-  path_part   = "{invoiceId}}"
+  path_part   = "{invoiceId}"
 }
 
 ## Method

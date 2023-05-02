@@ -1,4 +1,4 @@
-const { getConfigurationFile } = require("./common");
+const { getConfigurationFile } = require("./");
 const WebSocket = require("ws");
 
 /**
