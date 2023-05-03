@@ -7,10 +7,10 @@ const { Consumer } = require("sqs-consumer");
 const { SQSClient } = require("@aws-sdk/client-sqs");
 const AWS = require("aws-sdk");
 
-const { getConfigurationFile } = require("../utils/lambda-utils");
+const { getConfigurationFile } = require("../common");
 const rpc = require("../common/rpc");
 const jobs = require("./jobs");
-const utils = require("../utils");
+const utils = require("./utils");
 
 const concurrentJobs = process.env.CONCURRENT_JOBS;
 const consumers = {};

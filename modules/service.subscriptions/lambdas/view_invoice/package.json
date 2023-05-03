@@ -8,6 +8,7 @@
     "build": "mkdir common && cp ../../../../common/*.* common/"
   },
   "dependencies": {
+    "htm": "^3.1.1",
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
     "qrcode": "^1.5.3",
