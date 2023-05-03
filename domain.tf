@@ -20,3 +20,25 @@ resource "aws_route53_record" "www-api-subdomain" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "www-app-subdomain" {
+  zone_id = aws_route53_zone.service-zone.zone_id
+  name    = aws_api_gateway_domain_name.app-subdomain.domain_name
+  type    = "A"
+  alias {
+    name                   = aws_api_gateway_domain_name.app-subdomain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.app-subdomain.cloudfront_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "cdn-subdomain-a-record" {
+  zone_id = aws_route53_zone.service-zone.zone_id
+  name    = "cdn.${local.config.SERVICE_DOMAIN}"
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.cdn_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cdn_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+}

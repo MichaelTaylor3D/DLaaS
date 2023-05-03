@@ -11,9 +11,11 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.278.0",
     "aws-sdk": "^2.1322.0",
+    "lodash": "^4.17.21",
     "node-fetch": "^3.3.0",
     "request": "^2.88.2",
     "sqs-consumer": "^7.0.1",
+    "superagent": "^8.0.9",
     "ws": "^8.12.1"
   }
 }

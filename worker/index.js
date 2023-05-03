@@ -25,7 +25,7 @@ let globalConfigs;
  * @param {Object} options - The options for sending the result back to the client.
  */
 const processJob = async (jobKey, connectionId, options) => {
-  const result = jobs[jobKey](connectionId);
+  const result = jobs[jobKey]();
 
   const apigatewaymanagementapi = new AWS.ApiGatewayManagementApi({
     endpoint: options.postback_url,
