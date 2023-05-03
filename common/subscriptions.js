@@ -3,14 +3,11 @@
  * and terminate subscriptions, create invoices, confirm payments, and check subscription expiration.
  * The module also sends emails to users for various events, such as subscription expiration or invoice creation.
  */
-const {
-  dbQuery,
-  getConfigurationFile,
-  sendChiaRPCCommand,
-  sendEmail,
-  getUserBy,
-} = require("./");
-const rpc = require("./rpc");
+const { getConfigurationFile } = require("./config-utils");
+const { sendEmail } = require("./email-utils");
+const { getUserBy, dbQuery } = require("./database-utils");
+const { sendChiaRPCCommand } = require("./worker-bridge");
+const rpc = require("./rpc.json");
 
 /**
  * Creates a new subscription for a user and sends an email with the invoice.

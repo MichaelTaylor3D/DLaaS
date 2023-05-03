@@ -1,5 +1,8 @@
 const superagent = require("superagent");
 const path = require("path");
+const fs = require("fs");
+
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 const { getChiaRoot } = require("../../utils");
 
@@ -19,8 +22,8 @@ const getNewPaymentAddress = async () => {
       )
       .send({ wallet_id: 1, new_address: true })
       .set("Content-Type", "application/json")
-      .key(keyFile)
-      .cert(certFile);
+      .key(fs.readFileSync(keyFile))
+      .cert(fs.readFileSync(certFile));
 
     console.log('response.body: ', response.body);
 

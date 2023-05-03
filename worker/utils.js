@@ -16,8 +16,7 @@ const getChiaRoot = _.memoize(() => {
 });
 
 const matchKey = (json, string) => {
-  const data = JSON.parse(json);
-  for (const key in data) {
+  for (const key in json) {
     if (string === key) {
       return true;
     }

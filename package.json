@@ -23,5 +23,9 @@
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
     "sinon": "^15.0.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.326.0",
+    "ws": "^8.13.0"
   }
 }

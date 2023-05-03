@@ -2,12 +2,15 @@
  * @fileoverview A worker process that handles RPC jobs from an SQS queue and
  * sends the results back to the client through a WebSocket connection.
  */
-
+require("dotenv").config();
 const { Consumer } = require("sqs-consumer");
 const { SQSClient } = require("@aws-sdk/client-sqs");
-const AWS = require("aws-sdk");
+const {
+  ApiGatewayManagementApiClient,
+  PostToConnectionCommand,
+} = require("@aws-sdk/client-apigatewaymanagementapi");
 
-const { getConfigurationFile } = require("../common");
+const { getConfigurationFile } = require("../common/config-utils");
 const rpc = require("../common/rpc");
 const jobs = require("./jobs");
 const utils = require("./utils");
@@ -25,22 +28,21 @@ let globalConfigs;
  * @param {Object} options - The options for sending the result back to the client.
  */
 const processJob = async (jobKey, connectionId, options) => {
+  console.log("processing job", jobKey);
   const result = jobs[jobKey]();
 
-  const apigatewaymanagementapi = new AWS.ApiGatewayManagementApi({
+  const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
+    apiVersion: "2018-11-29",
     endpoint: options.postback_url,
     region: options.aws_region,
   });
 
-  const params = {
+  const command = new PostToConnectionCommand({
     ConnectionId: connectionId,
     Data: JSON.stringify({ success: true, result }),
-  };
-
-  apigatewaymanagementapi.postToConnection(params, function (err, data) {
-    if (err) console.log(err, err.stack);
-    else test = 1;
   });
+
+  await apiGatewayManagementApi.send(command);
 };
 
 /**
@@ -60,52 +62,59 @@ const fetchGlobalConfigs = async () => {
  * @async
  * @param {string} workerIdentifier - The identifier for the worker process.
  */
-const runWorker = async (workerIdentifier) => {
-  const [{ postback_url, aws_region }, { queue_url }] = globalConfigs;
+const runWorker = async () => {
+  try {
+    console.log("running worker");
+    const [{ postback_url, aws_region }, { queue_url }] = globalConfigs;
 
-  consumers[workerIdentifier] = Consumer.create({
-    queueUrl: queue_url,
-    messageAttributeNames: ["All"],
-    handleMessage: async (message) => {
-      console.log(message);
-      const connectionId = message.MessageAttributes.connectionId.StringValue;
-      if (utils.matchKey(rpc, message.Body)) {
-        await processJob(message.Body, connectionId, {
-          postback_url,
-          aws_region,
-        });
-      } else {
-        console.log("Invalid message key");
-      }
-    },
-    sqs: new SQSClient({
-      region: aws_region,
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    const consumer = Consumer.create({
+      queueUrl: queue_url,
+      messageAttributeNames: ["All"],
+      handleMessage: async (message) => {
+        console.log("received message", message);
+        const data = JSON.parse(message.Body);
+        const connectionId =
+          message?.MessageAttributes?.connectionId?.StringValue || 1;
+        console.log(data, connectionId);
+        if (utils.matchKey(rpc, data.cmd)) {
+          await processJob(data.cmd, connectionId, {
+            postback_url,
+            aws_region,
+          });
+        } else {
+          console.log("Invalid message key");
+        }
       },
-    }),
-  });
+      sqs: new SQSClient({
+        region: aws_region,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+      }),
+    });
 
-  consumers[workerIdentifier].on("error", (err) => {
-    console.error(err.message);
-  });
+    consumer.on("error", (err) => {
+      console.error(err.message);
+    });
 
-  consumers[workerIdentifier].on("processing_error", (err) => {
-    console.error(err.message);
-  });
+    consumer.on("processing_error", (err) => {
+      console.error(err.message);
+    });
 
-  consumers[workerIdentifier].on("timeout_error", (err) => {
-    console.error(err.message);
-  });
+    consumer.on("timeout_error", (err) => {
+      console.error(err.message);
+    });
 
-  consumers[workerIdentifier].start();
+    consumer.start();
+  } catch (error) {
+    console.trace(error.message);
+  }
 };
 
-(async () => {
+const start = async () => {
   globalConfigs = await fetchGlobalConfigs();
+  await runWorker();
+};
 
-  for (let i = 0; i < concurrentJobs; i++) {
-    runWorker(`worker-${i}`);
-  }
-})();
+start();

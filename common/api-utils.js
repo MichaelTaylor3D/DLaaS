@@ -11,7 +11,7 @@ const dbUtils = require("./database-utils");
  */
 const assertBearerTokenOrBasicAuth = async (authHeader) => {
   const auth = authHeader.split(" ");
-  if (["bearer", "basic"].includes(auth?.[0]?.toLowerCase())) {
+  if (!["bearer", "basic"].includes(auth?.[0]?.toLowerCase())) {
     throw new Error("Missing bearer or token or client credentials");
   }
 
