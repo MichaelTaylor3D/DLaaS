@@ -26,12 +26,12 @@ exports.handler = async (event, context, callback) => {
 
     // Parse the request body and assert the presence of the productKey
     const requestBody = JSON.parse(event.body);
-    const { productKey } = await assertRequiredBodyParams(requestBody, [
+    const { productKey, data } = await assertRequiredBodyParams(requestBody, [
       "productKey",
     ]);
 
     // Create a subscription for the user
-    const subscriptionId = await createSubscription(user_id, productKey);
+    const subscriptionId = await createSubscription(user_id, productKey, data);
 
     // Send a success response with the subscription ID
     callback(null, {

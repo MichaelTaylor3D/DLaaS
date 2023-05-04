@@ -18,10 +18,12 @@ CREATE TABLE IF NOT EXISTS ${db_name}.user_mirrors(
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   singleton_id VARCHAR(100) NOT NULL UNIQUE,
-  name VARCHAR(100)
+  name VARCHAR(100),
+  active BOOLEAN DEFAULT false
 );
 
 ALTER TABLE ${db_name}.user_mirrors ADD INDEX `user_index` (`user_id`);
+ALTER TABLE ${db_name}.user_mirrors ADD INDEX `active_index` (`user_id`, `active`);
 ALTER TABLE ${db_name}.user_mirrors ADD UNIQUE `unique_user_meta_index` (user_id, singleton_id);
 
 -- User Transactions Table

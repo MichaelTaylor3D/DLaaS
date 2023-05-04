@@ -27,7 +27,7 @@ const getNewPaymentAddress = async () => {
 
     console.log('response.body: ', response.body);
 
-    return response.body;
+    return response.body.address;
   } catch (error) {
     console.error("Error:", error.message);
     throw error;

@@ -198,3 +198,9 @@ resource "aws_security_group" "allow-ssh-security-group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "lambda_sg" {
+  name        = "lambda_sg"
+  description = "Security group for Lambda function"
+  vpc_id      = aws_vpc.main-services-vpc.id
+}

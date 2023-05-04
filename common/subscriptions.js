@@ -8,6 +8,7 @@ const { sendEmail } = require("./email-utils");
 const { getUserBy, dbQuery } = require("./database-utils");
 const { sendChiaRPCCommand } = require("./worker-bridge");
 const rpc = require("./rpc.json");
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * Creates a new subscription for a user and sends an email with the invoice.
@@ -17,7 +18,7 @@ const rpc = require("./rpc.json");
  * @param {string} productKey - The product key associated with the subscription.
  * @returns {Promise<number>} A promise that resolves with the subscription ID or rejects with an error.
  */
-async function createSubscription(userId, productKey) {
+async function createSubscription(userId, productKey, data) {
   return new Promise(async (resolve, reject) => {
     // Set the subscription start and end dates
     const startDate = new Date();
@@ -35,14 +36,15 @@ async function createSubscription(userId, productKey) {
 
     // Insert the new subscription into the database
     const queryString = `
-      INSERT INTO subscriptions (user_id, product_key, start_date, end_date, status)
-      VALUES (:userId, :productKey, :startDate, :endDate, 'pending');
+      INSERT INTO subscriptions (user_id, product_key, start_date, end_date, status, data)
+      VALUES (:userId, :productKey, :startDate, :endDate, 'pending', :data);
     `;
     const queryValues = {
       userId,
       productKey,
       startDate,
       endDate,
+      data: JSON.stringify(data),
     };
 
     try {
@@ -52,7 +54,7 @@ async function createSubscription(userId, productKey) {
 
       try {
         // Create the invoice for the new subscription
-        const invoice = await createInvoice(subscriptionId, product);
+        await createInvoice(userId, subscriptionId, product, data);
 
         console.log(`Invoice email sent to user ID: ${userId}`);
         resolve(subscriptionId);
@@ -72,6 +74,7 @@ async function createSubscription(userId, productKey) {
  * Creates a new invoice for a subscription and sends an email with the invoice.
  *
  * @async
+ * @param {number} userId - The user ID for which the subscription is being created.
  * @param {number} subscriptionId - The subscription ID for which the invoice is being created.
  * @param {Object} product - The product object containing the product's details.
  * @param {string} product.id - The product ID.
@@ -80,7 +83,7 @@ async function createSubscription(userId, productKey) {
  * @param {number} product.cost - The product cost.
  * @returns {Promise<Object>} A promise that resolves with the invoice object or rejects with an error.
  */
-async function createInvoice(subscriptionId, product) {
+async function createInvoice(userId, subscriptionId, product) {
   return new Promise(async (resolve, reject) => {
     // Set the invoice issue date
     const issueDate = new Date();
@@ -93,16 +96,21 @@ async function createInvoice(subscriptionId, product) {
     const amount = product.cost;
 
     // Send a command to your Chia node to retrieve a new payment address
-    const xchPaymentAddress = await sendChiaRPCCommand({
-      cmd: rpc.GET_NEW_PAYMENT_ADDRESS,
-    });
+    const xchPaymentAddress = (await sendChiaRPCCommand(rpc.GET_NEW_PAYMENT_ADDRESS))?.result;
+
+    if (!xchPaymentAddress) {
+      throw new Error("Error retrieving payment address from Chia node.");
+    }
+
+    const invoiceId = uuidv4();
 
     // Insert the new invoice into the database
     const queryString = `
-      INSERT INTO invoices (subscription_id, issue_date, due_date, total_amount_due, xch_payment_address, status)
-      VALUES (:subscriptionId, :issueDate, :dueDate, :amount, :xchPaymentAddress, 'unpaid');
+      INSERT INTO invoices (guid, subscription_id, issue_date, due_date, total_amount_due, xch_payment_address, status)
+      VALUES (:guid, :subscriptionId, :issueDate, :dueDate, :amount, :xchPaymentAddress, 'unpaid');
     `;
     const queryValues = {
+      guid: invoiceId,
       subscriptionId,
       issueDate,
       dueDate,
@@ -111,12 +119,11 @@ async function createInvoice(subscriptionId, product) {
     };
 
     try {
-      const result = await dbQuery(queryString, queryValues);
-      const invoiceId = result.insertId;
+      await dbQuery(queryString, queryValues);
       console.log(`Invoice created with ID: ${invoiceId}`);
 
       // Get the user's email address from the subscription
-      const user = await getUserBy("id", subscriptionId);
+      const user = await getUserBy("id", userId);
 
       // Get the service domain from the app.config.json file
       const appConfig = await getConfigurationFile("app.config.json");

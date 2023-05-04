@@ -96,8 +96,17 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
           "execute-api:Invoke",
           "execute-api:ManageConnections"
         ],
-        "Resource": "arn:aws:execute-api:*:*:*/*/*/*"
-      }
+        "Resource": "*"
+      },
+			{
+				"Effect": "Allow",
+				"Action": [
+					"ec2:CreateNetworkInterface",
+					"ec2:DescribeNetworkInterfaces",
+					"ec2:DeleteNetworkInterface"
+				],
+				"Resource": "*"
+			}
     ]
   })
 }

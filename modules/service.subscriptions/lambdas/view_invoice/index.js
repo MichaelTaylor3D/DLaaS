@@ -9,6 +9,9 @@
 const { dbQuery, getConfigurationFile } = require("./common");
 const QRCode = require("qrcode");
 
+// NOTE: Not a big fan of this file and I would like to rewrite it using React
+// However since its working as needed, ill refactor it later.
+
 // CSS for the HTML document
 const css = `
   body {

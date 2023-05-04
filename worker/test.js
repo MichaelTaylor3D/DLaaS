@@ -1,6 +1,6 @@
-const { getConfigurationFile } = require("./config-utils");
+const { getConfigurationFile } = require("../common/config-utils");
 const WebSocket = require("ws");
-const { v4: uuidv4 } = require("uuid");
+
 /**
  * Loads WebSocket configuration, sends a payload with the specified command, and returns the result.
  * @async
@@ -9,22 +9,21 @@ const { v4: uuidv4 } = require("uuid");
  * @returns {Promise<Object>} A promise that resolves with the received result from the WebSocket.
  */
 async function sendChiaRPCCommand(command, payload = {}) {
+  console.log('sendChiaRPCCommand')
   const config = await getConfigurationFile("websocket.config.json");
+  console.log(config.websocket_url);
 
   return new Promise((resolve, reject) => {
+    console.log('new WebSocket')
     const ws = new WebSocket(config.websocket_url);
 
     ws.on("open", () => {
-      ws.send(
-        JSON.stringify({
-          MessageGroupId: uuidv4(),
-          requestId: uuidv4(),
-          message: JSON.stringify({ cmd: command, payload }),
-        })
-      );
+      console.log('open');
+      ws.send(JSON.stringify({ cmd: command, payload }));
     });
 
     ws.on("message", (message) => {
+      console.log('message');
       const result = JSON.parse(message);
       resolve(result);
       ws.close();
@@ -36,6 +35,9 @@ async function sendChiaRPCCommand(command, payload = {}) {
   });
 }
 
-module.exports = {
-  sendChiaRPCCommand,
-};
+const send = async (command) => {
+  const result = await sendChiaRPCCommand("getNewPaymentAddress");
+  console.log(result);
+}
+
+send();

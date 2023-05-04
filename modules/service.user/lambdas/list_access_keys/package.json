@@ -10,7 +10,8 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "uuid": "^8.0.0"
   },
   "author": "",
   "license": "ISC"

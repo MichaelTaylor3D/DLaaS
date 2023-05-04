@@ -48,7 +48,6 @@ resource "aws_cloudfront_distribution" "cdn_distribution" {
   }
 }
 
-# Upload db-metadata-config.json configuration to S3
 resource "aws_s3_bucket_object" "configurations-cdn-config-file-upload" {
   bucket       = aws_s3_bucket.storage_devops_bucket.id
   key          = "configurations/cdn.config.json"

@@ -354,63 +354,6 @@ resource "aws_api_gateway_documentation_part" "delete_access_key" {
   })
 }
 
-resource "aws_api_gateway_documentation_part" "confirm_user" {
-  location {
-    type        = "METHOD"
-    method      = aws_api_gateway_method.confirm-method.http_method
-    path        = aws_api_gateway_resource.confirm-api-resource.path
-  }
-
-  rest_api_id = var.api_gateway_id
-  properties = jsonencode({
-    "tags"        : ["User", "Account Confirmation"],
-    "summary"     : "Confirm user account",
-    "description" : "This endpoint confirms a user's account using the provided confirmation code.",
-    "operationId" : "confirmUserAccount",
-    "parameters"  : [
-      {
-        "name"        : "code",
-        "in"          : "query",
-        "description" : "The account confirmation code.",
-        "required"    : true,
-        "schema"      : {
-          "type" : "string"
-        }
-      }
-    ],
-    "responses"   : {
-      "200" : {
-        "description" : "Successful account confirmation",
-        "content"     : {
-          "application/json" : {
-            "schema" : {
-              "type"       : "object",
-              "properties" : {
-                "message" : { "type" : "string" }
-              }
-            }
-          }
-        }
-      },
-      "400" : {
-        "description" : "Bad request (e.g. invalid input, missing required parameters, unauthorized)",
-        "content"     : {
-          "application/json" : {
-            "schema" : {
-              "type"       : "object",
-              "properties" : {
-                "message" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  })
-}
-
 resource "aws_api_gateway_documentation_part" "confirm_new_password" {
   location {
     type        = "METHOD"
