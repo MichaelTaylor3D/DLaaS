@@ -99,7 +99,7 @@ async function createInvoice(subscriptionId, product) {
 
     // Insert the new invoice into the database
     const queryString = `
-      INSERT INTO invoices (subscription_id, issue_date, due_date, amount, xch_payment_address, status)
+      INSERT INTO invoices (subscription_id, issue_date, due_date, total_amount_due, xch_payment_address, status)
       VALUES (:subscriptionId, :issueDate, :dueDate, :amount, :xchPaymentAddress, 'unpaid');
     `;
     const queryValues = {
@@ -123,7 +123,7 @@ async function createInvoice(subscriptionId, product) {
       const serviceDomain = appConfig.SERVICE_DOMAIN;
 
       // Send the invoice email to the user
-      const invoiceUrl = `https://${serviceDomain}/invoices/${invoiceId}`;
+      const invoiceUrl = `https://app.${serviceDomain}/invoices/${invoiceId}`;
       await sendEmail(
         user.email,
         "Your Invoice",
