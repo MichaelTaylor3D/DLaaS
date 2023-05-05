@@ -169,7 +169,7 @@ async function insertTransactionsAndCalculateSum(transactions, invoiceId) {
       confirmedSum += transaction.amount / 1000000000000;
 
       const query = `
-        INSERT INTO payments (invoice_guid, coin_name, amount, confirmed_at_height, fee)
+        INSERT OR IGNORE INTO payments (invoice_guid, coin_name, amount, confirmed_at_height, fee)
         VALUES (:invoice_guid, :coinName, :amount, :confirmedAtHeight, :fee)
       `;
 

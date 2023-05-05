@@ -38,9 +38,15 @@ const verifyPassword = async (passwordHash, salt, passwordAttempt) => {
  * @param {number} user_id - The user's id.
  * @returns {Promise<string>} - The access token.
  */
-const generateAccessToken = async (username, user_id) => {
+/**
+ * Generates an access token and a refresh token for the user.
+ * @param {string} username - The user's username.
+ * @param {number} user_id - The user's id.
+ * @returns {Promise<Object>} - An object containing the access token and refresh token.
+ */
+const generateTokens = async (username, user_id) => {
   const config = await getConfigurationFile("crypto.config.json");
-  return jwt.sign(
+  const accessToken = jwt.sign(
     {
       user_id,
       username,
@@ -48,6 +54,17 @@ const generateAccessToken = async (username, user_id) => {
     config.token_secret,
     { expiresIn: "1h" }
   );
+
+  const refreshToken = jwt.sign(
+    {
+      user_id,
+      username,
+    },
+    config.refresh_token_secret,
+    { expiresIn: "7d" }
+  );
+
+  return { accessToken, refreshToken };
 };
 
 /**
@@ -100,13 +117,19 @@ exports.handler = async (event, context, callback) => {
       throw new Error("Unauthorized. Invalid username or password.");
     }
 
-    // Generate an access token for the user
-    const accessToken = await generateAccessToken(username, user_id);
+    // Generate access and refresh tokens for the user
+    const { accessToken, refreshToken } = await generateTokens(
+      username,
+      user_id
+    );
 
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({ access_token: accessToken }),
+      body: JSON.stringify({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      }),
     });
   } catch (error) {
     callback(null, {

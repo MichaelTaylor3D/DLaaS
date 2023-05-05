@@ -4,7 +4,8 @@ const fs = require("fs");
 const {
   getConfigurationFile,
   dbQuery,
-} = require("../../../common/config-utils");
+  sendEmail
+} = require("../../../common");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -27,7 +28,7 @@ const createMirror = async (payload) => {
       urls: `https://${cdnConfig.public}`,
       amount: 1,
       fee: 300000000,
-    }, payload);
+    });
 
     const response = await superagent
       .post(
@@ -57,6 +58,17 @@ const createMirror = async (payload) => {
           subscriptionId: payload.subscriptionId || "",
         }
       );
+
+      const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {userId: payload.userId});
+      
+      if (user[0].email) {
+        sendEmail(
+          user[0].email,
+          "Mirror Created",
+          `Your mirror is now active. It is being served from https://${cdnConfig.public}/${payload.id}. <br /> Thank you for your business.`
+        );
+      }
+      
     }
 
     return response.body.success;

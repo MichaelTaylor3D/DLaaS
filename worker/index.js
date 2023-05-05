@@ -24,7 +24,14 @@ let globalConfigs;
  */
 const processJob = async (jobKey, payload, connectionId, options) => {
   console.log("processing job", { jobKey, payload });
-  const result = await jobs[jobKey](payload);
+
+  let result;
+
+  try {
+    result = await jobs[jobKey](payload);
+  } catch (error) {
+    console.log(error.message);
+  }
 
   const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
     apiVersion: "2018-11-29",
@@ -67,25 +74,20 @@ const runWorker = async () => {
         "https://sqs.us-east-1.amazonaws.com/873139760123/worker-gateway-message-handler.fifo",
       messageAttributeNames: ["All"],
       handleMessage: async (message) => {
-        try {
-          console.log("received message", message);
-          const body = JSON.parse(message.Body);
-          const data = JSON.parse(body.message);
-          const connectionId =
-            message?.MessageAttributes?.connectionId?.StringValue || 1;
-          console.log(data, connectionId);
-          // if (utils.matchKey(rpc, data.cmd)) {
-          await processJob(data.cmd, data.payload, connectionId, {
-            postback_url,
-            aws_region,
-          });
-          //  } else {
-          //   console.log("Invalid message key");
-          // }
-        } catch (error) {
-          console.log("Error processing message");
-        }
-        
+        console.log("received message", message);
+        const body = JSON.parse(message.Body);
+        const data = JSON.parse(body.message);
+        const connectionId =
+          message?.MessageAttributes?.connectionId?.StringValue || 1;
+        console.log(data, connectionId);
+        // if (utils.matchKey(rpc, data.cmd)) {
+        await processJob(data.cmd, data.payload, connectionId, {
+          postback_url,
+          aws_region,
+        });
+        //  } else {
+        //   console.log("Invalid message key");
+        // }
       },
       sqs: new SQSClient({
         region: aws_region,

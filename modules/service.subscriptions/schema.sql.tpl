@@ -32,3 +32,6 @@ CREATE TABLE IF NOT EXISTS ${db_name}.payments (
   fee VARCHAR(300) NOT NULL,
   FOREIGN KEY (invoice_guid) REFERENCES invoices(guid)
 );
+
+ALTER TABLE ${db_name}.payments ADD UNIQUE `unique_payment` (invoice_guid, coin_name, confirmed_at_height);
+

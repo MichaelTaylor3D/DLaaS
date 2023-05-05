@@ -23,31 +23,50 @@ resource "aws_api_gateway_resource" "user-api-resource" {
   path_part   = "v1"
 }
 
+resource "aws_api_gateway_resource" "token_api_resource" {
+  rest_api_id = var.api_gateway_id
+  parent_id   = var.root_resource_id
+  path_part   = "token"
+}
+
+resource "aws_api_gateway_resource" "token_v1_api_resource" {
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.token_api_resource.id
+  path_part   = "v1"
+}
+
+# /token/refresh
+resource "aws_api_gateway_resource" "token_refresh_api_resource" {
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.token_v1_api_resource.id
+
+  path_part   = "refresh"
+}
+
 # /user/register
 resource "aws_api_gateway_resource" "register-api-resource" {
-    # ID to AWS API Gateway Rest API definition above
-    rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.user-api-resource.id
 
-    path_part   = "register"
+  path_part   = "register"
 }
 
 # /user/login
 resource "aws_api_gateway_resource" "login-api-resource" {
-    # ID to AWS API Gateway Rest API definition above
-    rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+  # ID to AWS API Gateway Rest API definition above
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.user-api-resource.id
 
-    path_part   = "login"
+  path_part   = "login"
 }
 
 # /user/reset_password
 resource "aws_api_gateway_resource" "reset-password-api-resource" {
-    # ID to AWS API Gateway Rest API definition above
-    rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+  # ID to AWS API Gateway Rest API definition above
+  rest_api_id = var.api_gateway_id
+  parent_id   = aws_api_gateway_resource.user-api-resource.id
 
-    path_part   = "reset_password"
+  path_part   = "reset_password"
 }
 
 # /user/confirm_new_password
@@ -89,6 +108,14 @@ resource "aws_api_gateway_method" "delete-access-key-method" {
   rest_api_id      = var.api_gateway_id
   resource_id      = aws_api_gateway_resource.delete-access-key-api-resource.id
   http_method      = "DELETE"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
+resource "aws_api_gateway_method" "token_refresh_method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.token_refresh_api_resource.id
+  http_method      = "POST"
   authorization    = "NONE"
   api_key_required = false
 }
@@ -166,7 +193,21 @@ resource "aws_api_gateway_integration" "register-method-lambda-api-integration" 
     uri                     = aws_lambda_function.register-user-function-handler.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "token_refresh_method_lambda_api_integration" {
+    # ID of the REST API and the endpoint at which to integrate a lambda function
+    rest_api_id             = var.api_gateway_id
+    resource_id             = aws_api_gateway_resource.token_refresh_api_resource.id
 
+    # ID of the HTTP method at which to integrate with the lambda function
+    http_method             = aws_api_gateway_method.token_refresh_method.http_method
+
+    # Lambdas can only be invoked via HTTP POST
+    integration_http_method = "POST"
+    type                    = "AWS_PROXY"
+
+    # The URI at which the API is invoked
+    uri                     = aws_lambda_function.token_refresh_function_handler.invoke_arn
+}
 
 resource "aws_api_gateway_integration" "login-method-lambda-api-integration" {
     # ID of the REST API and the endpoint at which to integrate a lambda function

@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_event_rule" "cron_check_for_payment_function_schedule" {
   name                = "cron-check-for-payment-schedule"
   description         = "${var.aws_profile}: Fires cron check for payment function every 30 minutes"
-  schedule_expression = "rate(10 minutes)"
+  schedule_expression = "rate(24 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "cron_check_for_payment_function_event" {

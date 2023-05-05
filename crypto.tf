@@ -25,6 +25,11 @@ resource "random_password" "token_secret" {
   special          = false
 }
 
+resource "random_password" "refresh_token_secret" {
+  length           = 128
+  special          = false
+}
+
 resource "random_password" "static_salt" {
   length           = 10
   special          = false
@@ -37,6 +42,7 @@ resource "aws_s3_bucket_object" "crypto-config-upload" {
   content      = <<EOF
   { 
     "token_secret": "${random_password.token_secret.result}",
+    "refresh_token_secret": "${random_password.refresh_token_secret.result}",
     "password_length": 256,
     "iterations": 10000,
     "digest": "sha256",
