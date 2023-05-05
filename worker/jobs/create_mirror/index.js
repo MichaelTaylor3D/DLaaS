@@ -1,7 +1,10 @@
 const superagent = require("superagent");
 const path = require("path");
 const fs = require("fs");
-const { getConfigurationFile } = require("../../../common/config-utils");
+const {
+  getConfigurationFile,
+  dbQuery,
+} = require("../../../common/config-utils");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -10,7 +13,7 @@ const { getChiaRoot } = require("../../utils");
 const createMirror = async (payload) => {
   try {
     const cdnConfig = await getConfigurationFile("cdn.config.json");
-    
+
     const chiaRoot = getChiaRoot();
     const certFile = path.resolve(
       `${chiaRoot}/config/ssl/data_layer/private_data_layer.crt`
@@ -40,7 +43,19 @@ const createMirror = async (payload) => {
       .key(fs.readFileSync(keyFile))
       .cert(fs.readFileSync(certFile));
 
-    console.log("response.body: ", response.body);
+    if (response.body.success) {
+      await dbQuery(`
+        INSERT INTO user_mirrors (user_id, singleton_id, name, active)
+        VALUES (:userId, :singletonId, :name, true)
+        ON DUPLICATE KEY UPDATE active = true;
+      `,
+        {
+          userId: payload.userId,
+          singletonId: payload.id,
+          name: payload.name || "",
+        }
+      );
+    }
 
     return response.body.success;
   } catch (error) {

@@ -46,7 +46,10 @@ async function createSubscription(userId, productKey, data) {
       endDate,
       data: JSON.stringify({
         cmd: product.cmd,
-        ...data
+        data: {
+          userId,
+          ...data,
+        },
       }),
     };
 
@@ -71,7 +74,6 @@ async function createSubscription(userId, productKey, data) {
     }
   });
 }
-
 
 /**
  * Creates a new invoice for a subscription and sends an email with the invoice.
@@ -99,7 +101,9 @@ async function createInvoice(userId, subscriptionId, product) {
     const amount = product.cost;
 
     // Send a command to your Chia node to retrieve a new payment address
-    const xchPaymentAddress = (await sendChiaRPCCommand(rpc.GET_NEW_PAYMENT_ADDRESS))?.result;
+    const xchPaymentAddress = (
+      await sendChiaRPCCommand(rpc.GET_NEW_PAYMENT_ADDRESS)
+    )?.result;
 
     if (!xchPaymentAddress) {
       throw new Error("Error retrieving payment address from Chia node.");
@@ -229,17 +233,25 @@ async function checkForPayment(invoiceId) {
         );
       }
 
-      const xchBalance = await insertTransactionsAndCalculateSum(
+      const totalXchPaid = await insertTransactionsAndCalculateSum(
         addressTransactions,
         invoiceId
       );
 
-      if (!xchBalance) {
+      if (!totalXchPaid) {
         throw new Error("Error retrieving balance from Chia node.");
       }
 
+      await dbQuery(
+        `UPDATE invoices SET amount_paid = :amount_paid WHERE guid = :invoiceId`,
+        {
+          amount_paid: totalXchPaid,
+          invoiceId,
+        }
+      );
+
       // Check if the balance is greater than or equal to the invoice amount
-      if (xchBalance >= invoice.total_amount_due) {
+      if (totalXchPaid >= invoice.total_amount_due) {
         try {
           // Mark the invoice as paid
           await confirmPayment(invoiceId);
@@ -309,9 +321,10 @@ async function confirmPayment(guid) {
 
         const subscriptionData = JSON.parse(subscription.data);
 
-        await sendChiaRPCCommand(rpc[subscriptionData.cmd], {
-          ...subscriptionData,
-        });
+        await sendChiaRPCCommand(
+          rpc[subscriptionData.cmd],
+          subscriptionData.data
+        );
 
         console.log(`Subscription ID: ${subscription.id} marked as active.`);
         resolve(subscription.id);
@@ -452,7 +465,6 @@ async function terminateSubscription(subscriptionId) {
     throw error;
   }
 }
-
 
 async function setSubscriptionsToGracePeriod() {
   return new Promise(async (resolve, reject) => {

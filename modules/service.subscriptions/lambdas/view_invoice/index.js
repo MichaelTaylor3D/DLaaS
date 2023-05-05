@@ -252,11 +252,15 @@ exports.handler = async (event, context, callback) => {
         </script>
       </head>
       <body>
+      <div>
+          Invoice #${invoiceData.guid}
+      </div>
       <div id="container">
         <h1>Invoice for subscription: ${product.name}</h1>
-        <h3>Please send ${
+        <h3>Please send exactly${
           invoiceData.total_amount_due - invoiceData.amount_paid
         } XCH to activate this subscription.</h3>
+        <h5>All sales are final.</h5>
         status: ${invoiceData.status}<br /><br />
         <div id="qrcode-container">
           ${
