@@ -44,7 +44,10 @@ async function createSubscription(userId, productKey, data) {
       productKey,
       startDate,
       endDate,
-      data: JSON.stringify(data),
+      data: JSON.stringify({
+        cmd: product.cmd,
+        ...data
+      }),
     };
 
     try {
@@ -54,7 +57,7 @@ async function createSubscription(userId, productKey, data) {
 
       try {
         // Create the invoice for the new subscription
-        await createInvoice(userId, subscriptionId, product, data);
+        await createInvoice(userId, subscriptionId, product);
 
         console.log(`Invoice email sent to user ID: ${userId}`);
         resolve(subscriptionId);
@@ -154,17 +157,117 @@ async function createInvoice(userId, subscriptionId, product) {
   });
 }
 
+async function insertTransactionsAndCalculateSum(transactions, invoiceId) {
+  let confirmedSum = 0;
+
+  for (const transaction of transactions) {
+    if (transaction.confirmed) {
+      confirmedSum += transaction.amount / 1000000000000;
+
+      const query = `
+        INSERT INTO payments (invoice_guid, coin_name, amount, confirmed_at_height, fee)
+        VALUES (:invoice_guid, :coinName, :amount, :confirmedAtHeight, :fee)
+      `;
+
+      const values = {
+        invoice_guid: invoiceId,
+        coinName: transaction.name,
+        amount: transaction.amount / 1000000000000,
+        confirmedAtHeight: transaction.confirmed_at_height,
+        fee: transaction.fee_amount,
+      };
+
+      await dbQuery(query, values);
+    }
+  }
+
+  return confirmedSum;
+}
+
+async function checkForPayment(invoiceId) {
+  return new Promise(async (resolve, reject) => {
+    const getInvoiceQueryString = `
+      SELECT * FROM invoices
+      WHERE guid = :invoiceId;
+    `;
+    const getInvoiceQueryValues = {
+      invoiceId,
+    };
+
+    try {
+      const result = await dbQuery(
+        getInvoiceQueryString,
+        getInvoiceQueryValues
+      );
+
+      if (result.length === 0) {
+        console.error("No invoice found with the provided GUID");
+        reject(new Error("No invoice found with the provided GUID"));
+        return;
+      }
+
+      const invoice = result[0];
+
+      if (invoice.status === "paid") {
+        console.log(`Invoice with GUID: ${invoiceId} is already paid.`);
+        resolve(invoice);
+        return;
+      }
+
+      const xchPaymentAddress = invoice.xch_payment_address;
+
+      // Send a command to your Chia node to check for payments to the address
+      const addressTransactions = (
+        await sendChiaRPCCommand(rpc.GET_TRANSACTIONS, {
+          address: xchPaymentAddress,
+        })
+      )?.result;
+
+      if (!addressTransactions) {
+        throw new Error(
+          `Error retrieving transactions from Chia node. For ${xchPaymentAddress}`
+        );
+      }
+
+      const xchBalance = await insertTransactionsAndCalculateSum(
+        addressTransactions,
+        invoiceId
+      );
+
+      if (!xchBalance) {
+        throw new Error("Error retrieving balance from Chia node.");
+      }
+
+      // Check if the balance is greater than or equal to the invoice amount
+      if (xchBalance >= invoice.total_amount_due) {
+        try {
+          // Mark the invoice as paid
+          await confirmPayment(invoiceId);
+          resolve(invoice);
+        } catch (error) {
+          reject(error);
+        }
+      } else {
+        console.log(`Invoice with GUID: ${invoiceId} is not paid yet.`);
+        resolve(invoice);
+      }
+    } catch (error) {
+      console.error("Error fetching invoice:", error);
+      reject(error);
+    }
+  });
+}
+
 // assumes that the payment
 // verification with the Chia blockchain is done outside of this function.
-async function confirmPayment(guid, transactionHash) {
+async function confirmPayment(guid) {
   return new Promise(async (resolve, reject) => {
     const updateInvoiceQueryString = `
       UPDATE invoices
-      SET status = 'paid', transaction_hash = :transactionHash
+      SET status = 'paid'
       WHERE guid = :guid;
     `;
     const updateInvoiceQueryValues = {
-      transactionHash,
       guid,
     };
 
@@ -202,6 +305,12 @@ async function confirmPayment(guid, transactionHash) {
         `;
         await dbQuery(updateSubscriptionQueryString, {
           subscriptionId: subscription.id,
+        });
+
+        const subscriptionData = JSON.parse(subscription.data);
+
+        await sendChiaRPCCommand(rpc[subscriptionData.cmd], {
+          ...subscriptionData,
         });
 
         console.log(`Subscription ID: ${subscription.id} marked as active.`);
@@ -413,4 +522,5 @@ module.exports = {
   renewSubscription,
   terminateSubscription,
   setSubscriptionsToGracePeriod,
+  checkForPayment,
 };

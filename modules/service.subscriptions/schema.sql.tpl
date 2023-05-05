@@ -25,8 +25,9 @@ CREATE TABLE IF NOT EXISTS ${db_name}.invoices (
 CREATE TABLE IF NOT EXISTS ${db_name}.payments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   invoice_guid CHAR(36) NOT NULL,
-  transaction_hash VARCHAR(66) UNIQUE NOT NULL,
+  coin_name VARCHAR(66) UNIQUE NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
-  payment_date DATETIME NOT NULL,
+  confirmed_at_height DATETIME NOT NULL,
+  fee VARCHAR(300) NOT NULL,
   FOREIGN KEY (invoice_guid) REFERENCES invoices(guid)
 );

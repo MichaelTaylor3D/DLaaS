@@ -1,4 +1,5 @@
 {
   "GET_NEW_PAYMENT_ADDRESS": "getNewPaymentAddress",
-  "CREATE_MIRROR": "createMirror"
+  "CREATE_MIRROR": "createMirror",
+  "GET_TRANSACTIONS": "getTransactions"
 }

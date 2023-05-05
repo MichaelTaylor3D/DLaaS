@@ -10,7 +10,7 @@ resource "aws_api_gateway_resource" "v1_api_resource" {
   path_part   = "v1"
 }
 
-# /user/create_subscription
+# /product/create_subscription
 resource "aws_api_gateway_resource" "create_subscription_api_resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = aws_api_gateway_resource.v1_api_resource.id

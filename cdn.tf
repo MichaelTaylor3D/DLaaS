@@ -55,7 +55,7 @@ resource "aws_s3_bucket_object" "configurations-cdn-config-file-upload" {
   content      = <<EOF
   {  
     "public": "${aws_route53_record.cdn-subdomain-a-record.name}/public",
-    "id": "${local.config.DEFAULT_S3_BUCKET}": "${aws_cloudfront_distribution.cdn_distribution.id}"
+    "id": "${aws_cloudfront_distribution.cdn_distribution.id}"
   }
   EOF
 }

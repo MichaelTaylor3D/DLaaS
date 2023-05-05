@@ -11,12 +11,7 @@ const {
 } = require("@aws-sdk/client-apigatewaymanagementapi");
 
 const { getConfigurationFile } = require("../common/config-utils");
-const rpc = require("../common/rpc");
 const jobs = require("./jobs");
-const utils = require("./utils");
-
-const concurrentJobs = process.env.CONCURRENT_JOBS;
-const consumers = {};
 
 let globalConfigs;
 
@@ -27,9 +22,9 @@ let globalConfigs;
  * @param {string} connectionId - The connection ID from the message object.
  * @param {Object} options - The options for sending the result back to the client.
  */
-const processJob = async (jobKey, connectionId, options) => {
-  console.log("processing job", jobKey);
-  const result = await jobs[jobKey]();
+const processJob = async (jobKey, payload, connectionId, options) => {
+  console.log("processing job", { jobKey, payload });
+  const result = await jobs[jobKey](payload);
 
   const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
     apiVersion: "2018-11-29",
@@ -77,15 +72,15 @@ const runWorker = async () => {
         const data = JSON.parse(body.message);
         const connectionId =
           message?.MessageAttributes?.connectionId?.StringValue || 1;
-          console.log(data, connectionId);
-       // if (utils.matchKey(rpc, data.cmd)) {
-          await processJob(data.cmd, connectionId, {
-            postback_url,
-            aws_region,
-          });
-      //  } else {
-       //   console.log("Invalid message key");
-       // }
+        console.log(data, connectionId);
+        // if (utils.matchKey(rpc, data.cmd)) {
+        await processJob(data.cmd, data.payload, connectionId, {
+          postback_url,
+          aws_region,
+        });
+        //  } else {
+        //   console.log("Invalid message key");
+        // }
       },
       sqs: new SQSClient({
         region: aws_region,

@@ -3,6 +3,7 @@
     "id": "1",
     "name": "DataLayer Mirror",
     "description": "Create a mirror of an existing datastore",
+    "cmd": "CREATE_MIRROR",
     "cost": 1
   }
 }

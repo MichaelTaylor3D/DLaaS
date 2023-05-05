@@ -123,6 +123,13 @@ const css = `
     justify-content: center;
     align-items: center;
   }
+
+  #payment-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
 `;
 
 exports.handler = async (event, context, callback) => {
@@ -197,14 +204,15 @@ exports.handler = async (event, context, callback) => {
             showCountdownModal();
           }
 
-          function checkPayment() {
-            fetch('/check-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ invoiceId: '${invoiceId}' }),
-            });
-            showCountdownModal();
-          }
+        function checkPayment() {
+          const currentUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+          fetch(currentUrl + '/check-for-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ invoiceId: '${invoiceId}' }),
+          });
+          showCountdownModal();
+        }
 
           function showCountdownModal() {
             const countdownModal = document.createElement('div');
@@ -283,9 +291,7 @@ exports.handler = async (event, context, callback) => {
         <br />
         <br />
         <div id="payment-container">
-          <label for="transaction-hash">Payment can take up to 24 hours to be detected. To detect it sooner, You can insert your Transaction hash here or if you dont know it you can try "check for payment" button.</label>
-          <input type="text" id="transaction-hash" placeholder="Transaction hash" />
-          <button id="submit-payment" onclick="submitTransactionHash()">Submit payment</button>
+          <div>Payment can take up to 24 hours to be detected. To detect it sooner, you can try "check for payment" button.</div>
           <button id="check-payment" onclick="checkPayment()">Check for payment</button>
         </div>
 
