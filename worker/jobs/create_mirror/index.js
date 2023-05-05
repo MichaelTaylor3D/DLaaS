@@ -44,15 +44,17 @@ const createMirror = async (payload) => {
       .cert(fs.readFileSync(certFile));
 
     if (response.body.success) {
-      await dbQuery(`
-        INSERT INTO user_mirrors (user_id, singleton_id, name, active)
-        VALUES (:userId, :singletonId, :name, true)
+      await dbQuery(
+        `
+        INSERT INTO user_mirrors (user_id, singleton_id, name, subscription_id, active)
+        VALUES (:userId, :singletonId, :name, :subscriptionId, true)
         ON DUPLICATE KEY UPDATE active = true;
       `,
         {
-          userId: payload.userId,
-          singletonId: payload.id,
-          name: payload.name || "",
+          userId: payload.data.userId,
+          singletonId: payload.data.id,
+          name: payload.data.name || "",
+          subscriptionId: payload.subscriptionId || "",
         }
       );
     }

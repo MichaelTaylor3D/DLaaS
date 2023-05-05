@@ -1,4 +1,5 @@
 ALTER TABLE ${db_name}.datastores ADD subscription_id INT;
+ALTER TABLE ${db_name}.user_mirrors ADD subscription_id INT;
 
 CREATE TABLE IF NOT EXISTS ${db_name}.subscriptions (
   id INT AUTO_INCREMENT PRIMARY KEY,

@@ -150,5 +150,42 @@ resource "aws_lambda_permission" "check_for_payment_api_gateway" {
 
 ### END check_for_payment LAMBDA ###
 
+### START cron_check_for_payment LAMBDA ###
+
+data "archive_file" "cron_check_for_payment_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/cron_check_for_payment"
+  output_path = "${path.module}/lambdas/cron-check-for-payment-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lamda function to S3
+resource "aws_s3_bucket_object" "cron_check_for_payment_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/cron-check-for-payment-tf-handler.zip"
+  source = data.archive_file.cron_check_for_payment_function_source.output_path
+  etag   = data.archive_file.cron_check_for_payment_function_source.output_md5
+}
+
+# Lamda Initialization
+resource "aws_lambda_function" "cron_check_for_payment_function_handler" {
+  function_name     = "cron-check-for-payment-handler"
+  description       = "${var.aws_profile}: cron check for payment function"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.cron_check_for_payment_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.cron_check_for_payment_function_source.output_base64sha256
+}
+
+### END cron_check_for_payment LAMBDA ###
+
+
 
 

@@ -323,7 +323,10 @@ async function confirmPayment(guid) {
 
         await sendChiaRPCCommand(
           rpc[subscriptionData.cmd],
-          subscriptionData.data
+          {
+            subscriptionId: subscription.id,
+            ...subscriptionData.data
+          }
         );
 
         console.log(`Subscription ID: ${subscription.id} marked as active.`);
@@ -353,13 +356,14 @@ async function checkSubscriptionsForExpiration() {
     };
 
     try {
+      const appConfig = await getConfigurationFile("app.config.json");
       const rows = await dbQuery(queryString, queryValues);
       console.log(`Found ${rows.length} subscriptions expiring soon.`);
 
       const invoicePromises = rows.map(async (subscription) => {
         try {
           const invoice = await createInvoice(subscription.id);
-          const invoiceUrl = `https://example.com/invoices/${invoice.guid}`;
+          const invoiceUrl = `https://app.${appConfig.serviceDomain}/invoices/${invoice.guid}`;
 
           await sendEmail(
             subscription.email,
