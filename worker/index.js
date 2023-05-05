@@ -67,20 +67,25 @@ const runWorker = async () => {
         "https://sqs.us-east-1.amazonaws.com/873139760123/worker-gateway-message-handler.fifo",
       messageAttributeNames: ["All"],
       handleMessage: async (message) => {
-        console.log("received message", message);
-        const body = JSON.parse(message.Body);
-        const data = JSON.parse(body.message);
-        const connectionId =
-          message?.MessageAttributes?.connectionId?.StringValue || 1;
-        console.log(data, connectionId);
-        // if (utils.matchKey(rpc, data.cmd)) {
-        await processJob(data.cmd, data.payload, connectionId, {
-          postback_url,
-          aws_region,
-        });
-        //  } else {
-        //   console.log("Invalid message key");
-        // }
+        try {
+          console.log("received message", message);
+          const body = JSON.parse(message.Body);
+          const data = JSON.parse(body.message);
+          const connectionId =
+            message?.MessageAttributes?.connectionId?.StringValue || 1;
+          console.log(data, connectionId);
+          // if (utils.matchKey(rpc, data.cmd)) {
+          await processJob(data.cmd, data.payload, connectionId, {
+            postback_url,
+            aws_region,
+          });
+          //  } else {
+          //   console.log("Invalid message key");
+          // }
+        } catch (error) {
+          console.log("Error processing message");
+        }
+        
       },
       sqs: new SQSClient({
         region: aws_region,

@@ -257,7 +257,7 @@ exports.handler = async (event, context, callback) => {
       </div>
       <div id="container">
         <h1>Invoice for subscription: ${product.name}</h1>
-        <h3>Please send exactly${
+        <h3>Please send exactly ${
           invoiceData.total_amount_due - invoiceData.amount_paid
         } XCH to activate this subscription.</h3>
         <h5>All sales are final.</h5>

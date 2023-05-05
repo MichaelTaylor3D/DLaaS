@@ -27,7 +27,7 @@ const createMirror = async (payload) => {
       urls: `https://${cdnConfig.public}`,
       amount: 1,
       fee: 300000000,
-    });
+    }, payload);
 
     const response = await superagent
       .post(
@@ -51,9 +51,9 @@ const createMirror = async (payload) => {
         ON DUPLICATE KEY UPDATE active = true;
       `,
         {
-          userId: payload.data.userId,
-          singletonId: payload.data.id,
-          name: payload.data.name || "",
+          userId: payload.userId,
+          singletonId: payload.id,
+          name: payload.name || "",
           subscriptionId: payload.subscriptionId || "",
         }
       );

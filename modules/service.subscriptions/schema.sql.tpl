@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ${db_name}.payments (
   invoice_guid CHAR(36) NOT NULL,
   coin_name VARCHAR(66) UNIQUE NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
-  confirmed_at_height DATETIME NOT NULL,
+  confirmed_at_height VARCHAR(100) NOT NULL,
   fee VARCHAR(300) NOT NULL,
   FOREIGN KEY (invoice_guid) REFERENCES invoices(guid)
 );
