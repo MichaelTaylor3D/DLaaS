@@ -5,7 +5,7 @@ resource "aws_api_gateway_resource" "invoice_resource" {
   path_part   = "invoices"
 }
 
-# /invoice/view
+# /invoices/view
 ## Resource
 resource "aws_api_gateway_resource" "view_invoice_api_resource" {
   rest_api_id = var.app_gateway_id

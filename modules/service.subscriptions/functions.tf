@@ -222,6 +222,41 @@ resource "aws_lambda_function" "cron_clean_up_unfulfilled_subscriptions_function
 
 ### END cron_clean_up_unfulfilled_subscriptions LAMBDA ###
 
+### START get_unpaid_invoices LAMBDA ###
+
+data "archive_file" "get_unpaid_invoices_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/get_unpaid_invoices"
+  output_path = "${path.module}/lambdas/get-unpaid-invoices-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "get_unpaid_invoices_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/get-unpaid-invoices-tf-handler.zip"
+  source = data.archive_file.get_unpaid_invoices_function_source.output_path
+  etag   = data.archive_file.get_unpaid_invoices_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "get_unpaid_invoices_function_handler" {
+  function_name     = "get-unpaid-invoices-handler"
+  description       = "${var.aws_profile}: Get Unpaid Invoices function"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.get_unpaid_invoices_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.get_unpaid_invoices_function_source.output_base64sha256
+}
+
+### END get_unpaid_invoices LAMBDA ###
 
 
 

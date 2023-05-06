@@ -1,0 +1,22 @@
+{
+  "name": "get_unpaid_invoices",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mkdir common && cp ../../../../common/*.* common/"
+  },
+  "dependencies": {
+    "htm": "^3.1.1",
+    "jsonwebtoken": "^9.0.0",
+    "mysql": "^2.18.1",
+    "qrcode": "^1.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ws": "^8.13.0",
+    "uuid": "^8.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
