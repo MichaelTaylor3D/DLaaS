@@ -173,7 +173,11 @@ exports.handler = async (event, context, callback) => {
     });
 
     const productKey = subscription[0].product_key;
-    const productsConfig = await getConfigurationFile("products.config.json");
+    const [productsConfig, appConfig] = await Promise.all([
+      getConfigurationFile("products.config.json"),
+      getConfigurationFile("app.config.json")
+    ]);
+    
     const product = productsConfig[productKey];
 
     // Generate QR code if the invoice is unpaid or overdue
@@ -205,8 +209,9 @@ exports.handler = async (event, context, callback) => {
           }
 
         function checkPayment() {
-          const currentUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-          fetch(currentUrl + '/check-for-payment', {
+          fetch('https://api.${
+            appConfig.SERVICE_DOMAIN
+          }/invoices/v1/${invoiceId}/check-for-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ invoiceId: '${invoiceId}' }),

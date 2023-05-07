@@ -1,3 +1,5 @@
+resource "random_uuid" "archive" { }
+
 ### START upload LAMBDA ###
 
 data "archive_file" "upload_function_source" {
@@ -43,7 +45,7 @@ resource "aws_lambda_permission" "upload_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.plugin_service.execution_arn}/*/*"
 }
 
 ### END upload LAMBDA ###
@@ -93,7 +95,7 @@ resource "aws_lambda_permission" "handle_upload_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.plugin_service.execution_arn}/*/*"
 }
 
 ### END handle_upload LAMBDA ###
@@ -143,7 +145,7 @@ resource "aws_lambda_permission" "add_missing_files_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.plugin_service.execution_arn}/*/*"
 }
 
 ### END add_missing_files LAMBDA ###
@@ -193,7 +195,7 @@ resource "aws_lambda_permission" "plugin_info_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.plugin_service.execution_arn}/*/*"
 }
 
 ### END plugin_info LAMBDA ###

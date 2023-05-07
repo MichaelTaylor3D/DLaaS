@@ -26,7 +26,7 @@ resource "aws_api_gateway_deployment" "production_plugin_deployment" {
 }
 
 resource "aws_api_gateway_usage_plan" "plugin_service_usage_plan" {
-  name = "${local.config.AWS_PROFILE}-plugin-service-usage-plan"
+  name = "${var.aws_profile}-plugin-service-usage-plan"
 
   api_stages {
     api_id = aws_api_gateway_rest_api.plugin_service.id

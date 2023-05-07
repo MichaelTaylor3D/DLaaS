@@ -4,9 +4,8 @@
  * request body and sends a separate message to an SQS queue for each file.
  */
 
-const AWS = require("aws-sdk");
-const { v4: uuidv4 } = require("uuid");
-const { getConfigurationFile } = require("./common");
+const { sendChiaRPCCommand } = require("./common");
+const rpc = require("./common/rpc.json");
 
 /**
  * @typedef {Object} LambdaEvent
@@ -20,35 +19,14 @@ const { getConfigurationFile } = require("./common");
  * @param {Function} callback - The callback function for API Gateway.
  */
 exports.handler = async (event, context, callback) => {
-  // Retrieve SQS configuration
-  const queueConfig = await getConfigurationFile("command-queue.config.json");
-  const queueUrl = queueConfig.queue_url;
-
   // Parse the request parameters from the event body
   const requestBody = JSON.parse(event.body);
   const store_id = requestBody.store_id;
   const files = requestBody.files;
 
-  // Create the SQS client
-  const sqs = new AWS.SQS();
-
   // Send a separate message to the SQS queue for each file
   const promises = files.map(async (file) => {
-    const message = JSON.stringify({
-      MessageGroupId: uuidv4(),
-      requestId: uuidv4(),
-      message: JSON.stringify({
-        cmd: "UPLOAD_MISSING_FILE_TO_S3",
-        payload: { store_id, file },
-      }),
-    });
-
-    const params = {
-      QueueUrl: queueUrl,
-      MessageBody: message,
-    };
-
-    return sqs.sendMessage(params).promise();
+    return sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file });
   });
 
   try {

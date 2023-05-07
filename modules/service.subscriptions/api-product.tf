@@ -4,21 +4,9 @@ resource "aws_api_gateway_resource" "product_api_resource" {
   path_part   = "product"
 }
 
-resource "aws_api_gateway_resource" "invoice_api_resource" {
-  rest_api_id = var.app_gateway_id
-  parent_id   = var.app_root_resource_id
-  path_part   = "invoices"
-}
-
 resource "aws_api_gateway_resource" "product_v1_api_resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = aws_api_gateway_resource.product_api_resource.id
-  path_part   = "v1"
-}
-
-resource "aws_api_gateway_resource" "invoice_v1_api_resource" {
-  rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.invoice_api_resource.id
   path_part   = "v1"
 }
 
@@ -27,13 +15,6 @@ resource "aws_api_gateway_resource" "create_subscription_api_resource" {
   rest_api_id = var.api_gateway_id
   parent_id   = aws_api_gateway_resource.product_v1_api_resource.id
   path_part   = "create_subscription"
-}
-
-# /invoices/get_unpaid
-resource "aws_api_gateway_resource" "get_unpaid_invoices_api_resource" {
-  rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.invoice_v1_api_resource.id
-  path_part   = "get_unpaid"
 }
 
 resource "aws_api_gateway_method" "get_unpaid_invoices_method" {
@@ -59,13 +40,4 @@ resource "aws_api_gateway_integration" "create_subscription_lambda_api_integrati
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.create_subscription_function_handler.invoke_arn
-}
-
-resource "aws_api_gateway_integration" "get_unpaid_invoices_lambda_api_integration" {
-  rest_api_id             = var.api_gateway_id
-  resource_id             = aws_api_gateway_resource.get_unpaid_invoices_api_resource.id
-  http_method             = aws_api_gateway_method.get_unpaid_invoices_method.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.get_unpaid_invoices_function_handler.invoke_arn
 }

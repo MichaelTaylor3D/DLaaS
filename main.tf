@@ -14,6 +14,25 @@ provider "aws" {
   region     = local.config.AWS_REGION 
 }
 
+module "service-datalayer-upload-plugin" {
+  source                     = "./modules/service.datalayer-upload-plugin"
+
+  # AWS Profile
+  aws_profile                 = local.config.AWS_PROFILE
+
+  # Storage
+  dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
+
+  # Policies And Roles
+  default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
+
+  domain_zone_id              = aws_route53_zone.service-zone.zone_id
+  service_domain              = local.config.SERVICE_DOMAIN
+
+  # Certificates
+  wildcard_certificate_arn    = aws_acm_certificate.wildcard-domain.arn
+}
+
 module "service-system-utils" {
   source                     = "./modules/service.system-utils"
 

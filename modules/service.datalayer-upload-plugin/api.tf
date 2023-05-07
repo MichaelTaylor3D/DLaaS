@@ -80,7 +80,7 @@ resource "aws_api_gateway_resource" "plugin_info_api_resource" {
 resource "aws_api_gateway_method" "plugin_info_method" {
   rest_api_id      = aws_api_gateway_rest_api.plugin_service.id
   resource_id      = aws_api_gateway_resource.plugin_info_api_resource.id
-  http_method      = "GET"
+  http_method      = "POST"
   authorization    = "NONE"
   api_key_required = false
 }

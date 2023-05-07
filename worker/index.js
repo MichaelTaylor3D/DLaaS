@@ -73,20 +73,25 @@ const runWorker = async () => {
       queueUrl: queue_url,
       messageAttributeNames: ["All"],
       handleMessage: async (message) => {
-        console.log("received message", message);
-        const body = JSON.parse(message.Body);
-        const data = JSON.parse(body.message);
-        const connectionId =
-          message?.MessageAttributes?.connectionId?.StringValue || 1;
-        console.log(data, connectionId);
-        // if (utils.matchKey(rpc, data.cmd)) {
-        await processJob(data.cmd, data.payload, connectionId, {
-          postback_url,
-          aws_region,
-        });
-        //  } else {
-        //   console.log("Invalid message key");
-        // }
+        try {
+          console.log("received message", message);
+          const body = JSON.parse(message.Body);
+          const data = JSON.parse(body.message);
+          const connectionId =
+            message?.MessageAttributes?.connectionId?.StringValue || 1;
+          console.log(data, connectionId);
+          // if (utils.matchKey(rpc, data.cmd)) {
+          await processJob(data.cmd, data.payload, connectionId, {
+            postback_url,
+            aws_region,
+          });
+          //  } else {
+          //   console.log("Invalid message key");
+          // }
+        } catch (err) {
+          console.error(err.message);
+        }
+        
       },
       sqs: new SQSClient({
         region: aws_region,

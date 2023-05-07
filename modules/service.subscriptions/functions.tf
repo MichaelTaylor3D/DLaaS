@@ -145,7 +145,7 @@ resource "aws_lambda_permission" "check_for_payment_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.app_gateway_arn}/*/*"
+  source_arn    = "${var.api_gateway_arn}/*/*"
 }
 
 ### END check_for_payment LAMBDA ###

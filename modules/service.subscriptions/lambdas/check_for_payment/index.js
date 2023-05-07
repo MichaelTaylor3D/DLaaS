@@ -24,6 +24,13 @@ exports.handler = async (event, context, callback) => {
     callback(null, {
       statusCode: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
+      },
       body: JSON.stringify({
         message: "Checked for payment successfully.",
         invoice_id: invoiceId,

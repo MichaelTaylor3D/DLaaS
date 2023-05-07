@@ -39,6 +39,7 @@ async function createSubscription(userId, productKey, data) {
       INSERT INTO subscriptions (user_id, product_key, start_date, end_date, status, data)
       VALUES (:userId, :productKey, :startDate, :endDate, 'pending', :data);
     `;
+    
     const queryValues = {
       userId,
       productKey,
@@ -46,6 +47,7 @@ async function createSubscription(userId, productKey, data) {
       endDate,
       data: JSON.stringify({
         cmd: product.cmd,
+        revert_cmd: product.revert_cmd,
         data: {
           userId,
           ...data,
