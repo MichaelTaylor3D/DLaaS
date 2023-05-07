@@ -70,8 +70,7 @@ const runWorker = async () => {
     const [{ postback_url, aws_region }, { queue_url }] = globalConfigs;
 
     const consumer = Consumer.create({
-      queueUrl:
-        "https://sqs.us-east-1.amazonaws.com/873139760123/worker-gateway-message-handler.fifo",
+      queueUrl: queue_url,
       messageAttributeNames: ["All"],
       handleMessage: async (message) => {
         console.log("received message", message);

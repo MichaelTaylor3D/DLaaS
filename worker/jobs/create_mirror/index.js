@@ -36,7 +36,7 @@ const createMirror = async (payload) => {
       )
       .send({
         id: payload.id,
-        urls: `https://${cdnConfig.public}`,
+        urls: `https://${cdnConfig.public}/${payload.id}`,
         amount: 1,
         fee: 300000000,
       })
