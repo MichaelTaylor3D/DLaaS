@@ -1,4 +1,4 @@
-const { assertBearerTokenOrBasicAuth, dbQuery } = require("./common");
+const { assertBearerTokenOrBasicAuth, dbQuery } = require("/opt/nodejs/common");
 
 async function getAllUnpaidInvoices(userId) {
   const queryString = `

@@ -18,7 +18,7 @@ const {
   dbQuery,
   assertRequiredBodyParams,
   getConfigurationFile,
-} = require("./common");
+} = require("/opt/nodejs/common");
 
 
 /**

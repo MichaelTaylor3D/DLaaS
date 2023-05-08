@@ -4,8 +4,8 @@
  * message to an SQS queue for further processing.
  */
 
-const { sendChiaRPCCommand } = require("./common");
-const rpc = require("./common/rpc.json");
+const { sendChiaRPCCommand } = require("/opt/nodejs/common");
+const rpc = require("/opt/nodejs/common/rpc.json");
 
 /**
  * @typedef {Object} LambdaEvent

@@ -2,8 +2,8 @@
  * @fileoverview Lambda function for creating a subscription using the provided productKey.
  */
 
-const { checkForPayment } = require("./common");
-const config = require('./common/config.json');
+const { checkForPayment } = require("/opt/nodejs/common");
+const config = require("/opt/nodejs/common/config.json");
 
 /**
  * Handles the subscription creation event.

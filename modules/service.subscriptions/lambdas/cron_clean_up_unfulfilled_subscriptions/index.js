@@ -1,4 +1,4 @@
-const { dbQuery, sendEmail } = require("./common");
+const { dbQuery, sendEmail } = require("/opt/nodejs/common");
 
 const getExpiredInvoicesAndSubscriptions = async () => {
   const result = await dbQuery(`

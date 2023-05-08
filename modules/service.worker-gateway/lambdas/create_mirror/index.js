@@ -6,7 +6,7 @@ const {
   getConfigurationFile,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
-} = require("./common");
+} = require("/opt/nodejs/common");
 
 const recordMirrorToUser = async (userId, singletonId, singletonName) => {
   return dbQuery(

@@ -7,7 +7,7 @@
 
 "use strict";
 
-const { assertBearerTokenOrBasicAuth, dbQuery } = require("./common");
+const { assertBearerTokenOrBasicAuth, dbQuery } = require("/opt/nodejs/common");
 
 /**
  * Deletes the access key for the specified user.

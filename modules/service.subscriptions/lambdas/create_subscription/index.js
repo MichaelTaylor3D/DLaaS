@@ -6,7 +6,7 @@ const {
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
   createSubscription,
-} = require("./common");
+} = require("/opt/nodejs/common");
 
 /**
  * Handles the subscription creation event.

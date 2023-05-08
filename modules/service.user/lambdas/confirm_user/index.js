@@ -7,7 +7,7 @@
 "use strict";
 
 // Import required modules
-const { dbQuery } = require("./common");
+const { dbQuery } = require("/opt/nodejs/common");
 
 /**
  * Confirms a user's account using the given confirmation code.

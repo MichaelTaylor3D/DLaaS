@@ -6,7 +6,7 @@
  * a QR code for payment.
  */
 
-const { dbQuery, getConfigurationFile } = require("./common");
+const { dbQuery, getConfigurationFile } = require("/opt/nodejs/common");
 const QRCode = require("qrcode");
 
 // NOTE: Not a big fan of this file and I would like to rewrite it using React

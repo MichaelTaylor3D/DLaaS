@@ -6,7 +6,7 @@
 
 "use strict";
 
-const { dbQuery } = require("./common");
+const { dbQuery } = require("/opt/nodejs/common");
 
 /**
  * Lambda function that processes and executes SQL files for schema, triggers, and procedures.

@@ -8,7 +8,7 @@
 "use strict";
 
 // Import utility functions
-const { dbQuery, deleteUserMeta } = require("./common");
+const { dbQuery, deleteUserMeta } = require("/opt/nodejs/common");
 
 /**
  * Retrieves a user object by their email change code.

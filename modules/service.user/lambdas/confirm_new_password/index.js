@@ -16,7 +16,7 @@ const {
   hashWithSalt,
   upsertUserMeta,
   assertRequiredBodyParams,
-} = require("./common");
+} = require("/opt/nodejs/common");
 
 /**
  * Retrieves a user object by their password reset code.

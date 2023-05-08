@@ -1,4 +1,4 @@
-const { dbQuery, checkForPayment } = require("./common");
+const { dbQuery, checkForPayment } = require("/opt/nodejs/common");
 
 // Include your dbQuery, insertTransactionsAndCalculateSum and checkForPayment functions here
 

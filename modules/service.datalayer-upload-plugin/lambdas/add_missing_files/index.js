@@ -4,8 +4,8 @@
  * request body and sends a separate message to an SQS queue for each file.
  */
 
-const { sendChiaRPCCommand } = require("./common");
-const rpc = require("./common/rpc.json");
+const { sendChiaRPCCommand } = require("/opt/nodejs/common");
+const rpc = require("/opt/nodejs/common/rpc.json");
 
 /**
  * @typedef {Object} LambdaEvent

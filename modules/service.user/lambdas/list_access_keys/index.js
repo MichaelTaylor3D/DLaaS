@@ -7,7 +7,7 @@
 
 "use strict";
 
-const { assertBearerTokenOrBasicAuth, dbQuery } = require("./common");
+const { assertBearerTokenOrBasicAuth, dbQuery } = require("/opt/nodejs/common");
 
 /**
  * Retrieves the access keys associated with the given user ID.

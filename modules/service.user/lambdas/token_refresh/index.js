@@ -1,7 +1,7 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
-const { getConfigurationFile } = require("./common");
+const { getConfigurationFile } = require("/opt/nodejs/common");
 
 /**
  * Generates a new access token for the user.
