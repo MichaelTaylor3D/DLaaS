@@ -1,38 +1,46 @@
-var fs = require('fs');
-var resolve = require('path').resolve;
-var join = require('path').join;
-var cp = require('child_process');
-var os = require('os');
+/**
+ * @fileoverview A script to recursively build npm modules for all modules in a directory.
+ */
 
-// get library path
-var lib = resolve(__dirname, '../modules');
+const fs = require("fs");
+const path = require("path");
+const cp = require("child_process");
+const os = require("os");
 
-const installRecursively = (dir) => {
-  fs.readdirSync(dir).forEach(function (mod) {
-    var modPath = join(dir, mod);
+const modulesPath = path.resolve(__dirname, "../modules");
 
-    // ensure path has package.json
-    if (!fs.existsSync(join(modPath, 'package.json'))) {
-      const lambdaPath = join(modPath, 'lambdas');
-      if (fs.existsSync(lambdaPath)) {
-        installRecursively(lambdaPath);
+/**
+ * Recursively builds npm modules for all modules in the given directory.
+ * @param {string} directory - The directory path to search for modules.
+ */
+const buildModulesRecursively = (directory) => {
+  // Iterate over all items in the directory
+  fs.readdirSync(directory).forEach((module) => {
+    const modulePath = path.join(directory, module);
+
+    // Check if the current item has a package.json file
+    if (!fs.existsSync(path.join(modulePath, "package.json"))) {
+      const lambdasPath = path.join(modulePath, "lambdas");
+
+      // If there's a "lambdas" subdirectory, process it recursively
+      if (fs.existsSync(lambdasPath)) {
+        buildModulesRecursively(lambdasPath);
       }
-
       return;
     }
 
-    console.log(`Building module at path: ${modPath}`);
+    console.log(`Building module at path: ${modulePath}`);
 
-    // npm binary based on OS
-    var npmCmd = os.platform().startsWith('win') ? 'npm.cmd' : 'npm';
+    // Determine the appropriate npm command based on the platform
+    const npmCommand = os.platform().startsWith("win") ? "npm.cmd" : "npm";
 
-    // install folder
-    cp.spawn(npmCmd, ['run', 'build'], {
+    // Execute npm run build for the current module
+    cp.spawn(npmCommand, ["run", "build"], {
       env: process.env,
-      cwd: modPath,
-      stdio: 'inherit',
+      cwd: modulePath,
+      stdio: "inherit",
     });
   });
 };
 
-installRecursively(lib);
+buildModulesRecursively(modulesPath);

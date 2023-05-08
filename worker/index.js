@@ -3,6 +3,7 @@
  * sends the results back to the client through a WebSocket connection.
  */
 require("dotenv").config();
+
 const { Consumer } = require("sqs-consumer");
 const { SQSClient } = require("@aws-sdk/client-sqs");
 const {
@@ -66,7 +67,6 @@ const fetchGlobalConfigs = async () => {
  */
 const runWorker = async () => {
   try {
-    console.log("running worker");
     const [{ postback_url, aws_region }, { queue_url }] = globalConfigs;
 
     const consumer = Consumer.create({
@@ -79,19 +79,14 @@ const runWorker = async () => {
           const data = JSON.parse(body.message);
           const connectionId =
             message?.MessageAttributes?.connectionId?.StringValue || 1;
-          console.log(data, connectionId);
-          // if (utils.matchKey(rpc, data.cmd)) {
-          await processJob(data.cmd, data.payload, connectionId, {
+          // fire and forget
+          processJob(data.cmd, data.payload, connectionId, {
             postback_url,
             aws_region,
           });
-          //  } else {
-          //   console.log("Invalid message key");
-          // }
         } catch (err) {
           console.error(err.message);
         }
-        
       },
       sqs: new SQSClient({
         region: aws_region,

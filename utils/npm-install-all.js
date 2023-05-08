@@ -1,38 +1,46 @@
-var fs = require("fs");
-var resolve = require("path").resolve;
-var join = require("path").join;
-var cp = require("child_process");
-var os = require("os");
+/**
+ * @fileoverview A script to recursively install npm dependencies for all modules in a directory.
+ */
 
-// get library path
-var lib = resolve(__dirname, "../modules");
+const fs = require("fs");
+const path = require("path");
+const cp = require("child_process");
+const os = require("os");
 
-const installRecursively = (dir) => {
-  fs.readdirSync(dir).forEach(function (mod) {
-    var modPath = join(dir, mod);
+const modulesPath = path.resolve(__dirname, "../modules");
 
-    // ensure path has package.json
-    if (!fs.existsSync(join(modPath, "package.json"))) {
-      const lambdaPath = join(modPath, "lambdas");
+/**
+ * Recursively installs npm dependencies for all modules in the given directory.
+ * @param {string} directory - The directory path to search for modules.
+ */
+const installDependenciesRecursively = (directory) => {
+  // Iterate over all items in the directory
+  fs.readdirSync(directory).forEach((module) => {
+    const modulePath = path.join(directory, module);
 
-      if (fs.existsSync(lambdaPath)) {
-        installRecursively(lambdaPath);
+    // Check if the current item has a package.json file
+    if (!fs.existsSync(path.join(modulePath, "package.json"))) {
+      const lambdasPath = path.join(modulePath, "lambdas");
+
+      // If there's a "lambdas" subdirectory, process it recursively
+      if (fs.existsSync(lambdasPath)) {
+        installDependenciesRecursively(lambdasPath);
       }
       return;
     }
 
-    console.log(`Installing module at path: ${modPath}`);
+    console.log(`Installing module at path: ${modulePath}`);
 
-    // npm binary based on OS
-    var npmCmd = os.platform().startsWith("win") ? "npm.cmd" : "npm";
+    // Determine the appropriate npm command based on the platform
+    const npmCommand = os.platform().startsWith("win") ? "npm.cmd" : "npm";
 
-    // install folder
-    cp.spawn(npmCmd, ["install"], {
+    // Execute npm install for the current module
+    cp.spawn(npmCommand, ["install"], {
       env: process.env,
-      cwd: modPath,
+      cwd: modulePath,
       stdio: "inherit",
     });
   });
 };
 
-installRecursively(lib);
+installDependenciesRecursively(modulesPath);

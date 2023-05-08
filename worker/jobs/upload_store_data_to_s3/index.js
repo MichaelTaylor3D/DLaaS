@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const fs = require("fs");
 const path = require("path");
 const config = require("../../../common/config.json");
@@ -35,7 +35,7 @@ const uploadStoreDataToS3 = async (payload) => {
     };
 
     try {
-      await s3.upload(params).promise();
+      await s3.send(new PutObjectCommand(params));
       return true;
     } catch (error) {
       console.error("Error:", error.message);
@@ -44,12 +44,13 @@ const uploadStoreDataToS3 = async (payload) => {
   };
 
   // Create the S3 client
-  const s3 = new AWS.S3({
-    apiVersion: "2006-03-01",
-    signatureVersion: "v4",
+  const s3 = new S3Client({
+    region: "us-east-1",
     useAccelerateEndpoint: true,
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
   });
 
   try {

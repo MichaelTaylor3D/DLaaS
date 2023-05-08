@@ -1,8 +1,12 @@
-const AWS = require("aws-sdk");
+/**
+ * @fileoverview This module provides a function to retrieve a configuration file 
+ * from an S3 bucket using the AWS SDK for JavaScript (v3).
+ */
 
-const s3 = new AWS.S3({
-  apiVersion: "2006-03-01",
-  signatureVersion: "v4",
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+
+const s3 = new S3Client({
+  region: "us-east-1",
   useAccelerateEndpoint: true,
 });
 
@@ -17,30 +21,39 @@ const appConfig = require("./config.json");
  * @throws {Error} If there was an issue retrieving the file from the S3 bucket.
  */
 const getConfigurationFile = async (filename) => {
-  // Create the parameters for calling getObject
   const bucketParams = {
     Bucket: `${appConfig.DEFAULT_S3_BUCKET}.devops`,
     Key: `configurations/${filename}`,
   };
 
-  let fileData = {};
-
-  // Call S3 to obtain a list of the objects in the bucket
   try {
-    fileData = await s3.getObject(bucketParams).promise();
+    // Send a GetObjectCommand to the S3 client to retrieve the specified file
+    const result = await s3.send(new GetObjectCommand(bucketParams));
+    // Convert the received file stream to a string
+    const fileData = await streamToString(result.Body);
+    // Parse the file data as JSON and return the resulting object
+    return JSON.parse(fileData);
   } catch (err) {
-    return (
-      "There was an error grabbing " +
-      bucketParams.Key +
-      " from S3 bucket " +
-      bucketParams.Bucket +
-      ". Error: " +
-      err
+    // Throw an error with a descriptive message if the file retrieval fails
+    throw new Error(
+      `There was an error grabbing ${bucketParams.Key} from S3 bucket ${bucketParams.Bucket}. Error: ${err}`
     );
   }
+};
 
-  // Parse the obtained file data and return it as an object
-  return JSON.parse(fileData.Body.toString("utf-8"));
+/**
+ * Converts a stream to a string.
+ * @param {ReadableStream} stream - The stream to convert to a string.
+ * @returns {Promise<string>} - A promise that resolves with the resulting string.
+ * @throws {Error} If there was an issue reading the stream.
+ */
+const streamToString = (stream) => {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+    stream.on("error", (error) => reject(error));
+  });
 };
 
 module.exports = {

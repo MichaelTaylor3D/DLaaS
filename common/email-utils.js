@@ -1,7 +1,6 @@
-const SES = require("aws-sdk/clients/ses");
+const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
-const ses = new SES({
-  apiVersion: "2010-12-01",
+const sesClient = new SESClient({
   region: "us-east-1",
 });
 
@@ -17,27 +16,33 @@ const ses = new SES({
  * @throws {Error} If the email sending process fails.
  */
 const sendEmail = async (email, title, message, htmlMessage) => {
-  return ses
-    .sendEmail({
-      Destination: { ToAddresses: [email] },
-      Message: {
-        Subject: {
+  const command = new SendEmailCommand({
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: {
+        Charset: "UTF-8",
+        Data: title,
+      },
+      Body: {
+        Text: {
           Charset: "UTF-8",
-          Data: title,
+          Data: message,
         },
-        Body: {
-          Text: {
-            Charset: "UTF-8",
-            Data: message,
-          },
-          Html: {
-            Data: `<html><body>${htmlMessage || message}</body></html>`,
-          },
+        Html: {
+          Charset: "UTF-8",
+          Data: `<html><body>${htmlMessage || message}</body></html>`,
         },
       },
-      Source: "support@datalayer.storage",
-    })
-    .promise();
+    },
+    Source: "support@datalayer.storage",
+  });
+
+  try {
+    const response = await sesClient.send(command);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
