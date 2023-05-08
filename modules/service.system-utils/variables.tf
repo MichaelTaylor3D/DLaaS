@@ -4,3 +4,4 @@ variable "aws_region"                  {}
 variable "aws_profile"                 {}
 variable "dev_bucket_id"               {}
 variable "default_lambda_role_arn"     {}
+variable "lambda_layer_arn"            {}

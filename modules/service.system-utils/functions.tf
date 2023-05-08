@@ -37,6 +37,8 @@ resource "aws_lambda_function" "create-schema-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true

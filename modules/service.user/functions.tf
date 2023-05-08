@@ -28,6 +28,8 @@ resource "aws_lambda_function" "authorizer-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -77,6 +79,8 @@ resource "aws_lambda_function" "register-user-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -128,6 +132,8 @@ resource "aws_lambda_function" "confirm-user-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -177,6 +183,8 @@ resource "aws_lambda_function" "login-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -228,6 +236,8 @@ resource "aws_lambda_function" "generate-access-key-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -277,6 +287,8 @@ resource "aws_lambda_function" "list-access-keys-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -328,6 +340,8 @@ resource "aws_lambda_function" "delete-access-key-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -377,6 +391,8 @@ resource "aws_lambda_function" "reset-password-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -428,6 +444,8 @@ resource "aws_lambda_function" "confirm-new-password-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -477,6 +495,8 @@ resource "aws_lambda_function" "change-email-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -528,6 +548,8 @@ resource "aws_lambda_function" "cancel-change-email-function-handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -577,6 +599,8 @@ resource "aws_lambda_function" "confirm-change-email-function-handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -628,6 +652,8 @@ resource "aws_lambda_function" "token_refresh_function_handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+  
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true

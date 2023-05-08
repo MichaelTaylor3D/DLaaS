@@ -14,3 +14,4 @@ variable "create_schema_utility"       {}
 variable "app_gateway_id"              {}
 variable "app_root_resource_id"        {}
 variable "app_gateway_arn"             {}
+variable "lambda_layer_arn"            {}

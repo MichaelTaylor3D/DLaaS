@@ -68,6 +68,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Install Lambda Layer
+      run: cd lambda-npm-layer && npm install && cd ..
+
     - name: Install All Node Packages
       run: node ./utils/npm-install-all.js    
       

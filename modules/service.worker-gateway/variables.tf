@@ -9,3 +9,4 @@ variable "api_gateway_id"              {}
 variable "root_resource_id"            {}
 variable "api_gateway_arn"             {}
 variable "default_lambda_role_arn"     {}
+variable "lambda_layer_arn"            {}

@@ -8,11 +8,5 @@
     "build": "cp ../../../../utils/lambda-utils.js ./utils.js"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "uuid": "^9.0.0",
-    "ws": "^8.12.1",
-    "mysql": "^2.18.1",
-    "jsonwebtoken": "^9.0.0"
-  }
+  "license": "ISC"
 }
