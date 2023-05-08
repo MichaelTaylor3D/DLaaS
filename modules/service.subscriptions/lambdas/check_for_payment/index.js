@@ -3,6 +3,7 @@
  */
 
 const { checkForPayment } = require("./common");
+const config = require('./common/config.json');
 
 /**
  * Handles the subscription creation event.
@@ -26,7 +27,7 @@ exports.handler = async (event, context, callback) => {
       headers: { "Content-Type": "application/json; charset=utf-8" },
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": `https://${config.SERVICE_DOMAIN}, https://app.${config.SERVICE_DOMAIN}`,
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
