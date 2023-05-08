@@ -7,7 +7,6 @@ const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
 
 const s3 = new S3Client({
   region: "us-east-1",
-  useAccelerateEndpoint: true,
 });
 
 const appConfig = require("./config.json");
@@ -21,6 +20,7 @@ const appConfig = require("./config.json");
  * @throws {Error} If there was an issue retrieving the file from the S3 bucket.
  */
 const getConfigurationFile = async (filename) => {
+  // Define the bucket parameters, specifying the target Bucket and Key (file path)
   const bucketParams = {
     Bucket: `${appConfig.DEFAULT_S3_BUCKET}.devops`,
     Key: `configurations/${filename}`,
