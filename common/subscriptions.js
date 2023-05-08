@@ -163,8 +163,13 @@ async function createInvoice(userId, subscriptionId, product) {
   });
 }
 
-async function insertTransactionsAndCalculateSum(transactions, invoiceId) {
+async function insertTransactionsAndCalculateSum(
+  transactions,
+  invoiceId,
+  userId
+) {
   let confirmedSum = 0;
+  let paymentDetails = [];
 
   for (const transaction of transactions) {
     if (transaction.confirmed) {
@@ -184,7 +189,24 @@ async function insertTransactionsAndCalculateSum(transactions, invoiceId) {
       };
 
       await dbQuery(query, values);
+      paymentDetails.push(
+        `${transaction.name}: ${transaction.amount / 1000000000000} XCH`
+      );
     }
+  }
+
+  const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {
+    userId: userId,
+  });
+
+  if (user[0].email && paymentDetails.length > 0) {
+    sendEmail(
+      user[0].email,
+      "Payment Details",
+      `The following payments have been detected: <br />${paymentDetails.join(
+        "<br />"
+      )}<br />Thank you for your business.`
+    );
   }
 
   return confirmedSum;
@@ -193,8 +215,9 @@ async function insertTransactionsAndCalculateSum(transactions, invoiceId) {
 async function checkForPayment(invoiceId) {
   return new Promise(async (resolve, reject) => {
     const getInvoiceQueryString = `
-      SELECT * FROM invoices
-      WHERE guid = :invoiceId;
+      SELECT invoices.*, subscriptions.user_id FROM invoices
+      JOIN subscriptions ON invoices.subscription_id = subscriptions.id
+      WHERE invoices.guid = :invoiceId;
     `;
     const getInvoiceQueryValues = {
       invoiceId,
@@ -237,7 +260,8 @@ async function checkForPayment(invoiceId) {
 
       const totalXchPaid = await insertTransactionsAndCalculateSum(
         addressTransactions,
-        invoiceId
+        invoiceId,
+        invoice.user_id
       );
 
       if (!totalXchPaid) {
@@ -274,15 +298,15 @@ async function checkForPayment(invoiceId) {
 
 // assumes that the payment
 // verification with the Chia blockchain is done outside of this function.
-async function confirmPayment(guid) {
+async function confirmPayment(invoiceId) {
   return new Promise(async (resolve, reject) => {
     const updateInvoiceQueryString = `
       UPDATE invoices
       SET status = 'paid'
-      WHERE guid = :guid;
+      WHERE guid = :invoiceId;
     `;
     const updateInvoiceQueryValues = {
-      guid,
+      invoiceId,
     };
 
     try {
@@ -297,14 +321,14 @@ async function confirmPayment(guid) {
         return;
       }
 
-      console.log(`Invoice with GUID: ${guid} marked as paid.`);
+      console.log(`Invoice with GUID: ${invoiceId} marked as paid.`);
 
       const getSubscriptionQueryString = `
         SELECT s.* FROM subscriptions s
         JOIN invoices i ON s.id = i.subscription_id
-        WHERE i.guid = :guid;
+        WHERE i.guid = :invoiceId;
       `;
-      const rows = await dbQuery(getSubscriptionQueryString, { guid });
+      const rows = await dbQuery(getSubscriptionQueryString, { invoiceId });
 
       if (rows.length === 0) {
         console.error("Error fetching subscription.");
@@ -341,204 +365,9 @@ async function confirmPayment(guid) {
   });
 }
 
-async function checkSubscriptionsForExpiration() {
-  return new Promise(async (resolve, reject) => {
-    const currentDate = new Date();
-    const expirationDate = new Date(currentDate);
-    expirationDate.setDate(currentDate.getDate() + 15);
-
-    const queryString = `
-      SELECT s.*, u.email FROM subscriptions s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.status = 'active' AND s.end_date BETWEEN :currentDate AND :expirationDate;
-    `;
-    const queryValues = {
-      currentDate,
-      expirationDate,
-    };
-
-    try {
-      const appConfig = await getConfigurationFile("app.config.json");
-      const rows = await dbQuery(queryString, queryValues);
-      console.log(`Found ${rows.length} subscriptions expiring soon.`);
-
-      const invoicePromises = rows.map(async (subscription) => {
-        try {
-          const invoice = await createInvoice(subscription.id);
-          const invoiceUrl = `https://app.${appConfig.serviceDomain}/invoices/${invoice.guid}`;
-
-          await sendEmail(
-            subscription.email,
-            "Your Subscription Is Expiring Soon",
-            `Your subscription is expiring soon. Please pay the invoice at ${invoiceUrl} to renew your subscription.`
-          );
-
-          console.log(`Invoice email sent to user ID: ${subscription.user_id}`);
-        } catch (error) {
-          console.error("Error creating invoice or sending email:", error);
-        }
-      });
-
-      await Promise.all(invoicePromises);
-      resolve();
-    } catch (error) {
-      console.error("Error fetching subscriptions:", error);
-      reject(error);
-    }
-  });
-}
-
-async function renewSubscription(subscriptionId) {
-  return new Promise(async (resolve, reject) => {
-    const getSubscriptionQueryString = `
-      SELECT * FROM subscriptions
-      WHERE id = :subscriptionId;
-    `;
-    try {
-      const rows = await dbQuery(getSubscriptionQueryString, {
-        subscriptionId,
-      });
-
-      if (rows.length === 0) {
-        console.error("Error fetching subscription");
-        reject(new Error("Subscription not found"));
-        return;
-      }
-
-      const subscription = rows[0];
-
-      if (subscription.status === "terminated") {
-        console.error("Cannot renew a terminated subscription");
-        reject(new Error("Cannot renew a terminated subscription"));
-        return;
-      }
-
-      const newEndDate = new Date(subscription.end_date);
-      newEndDate.setFullYear(newEndDate.getFullYear() + 1);
-
-      const updateSubscriptionQueryString = `
-        UPDATE subscriptions
-        SET end_date = :newEndDate
-        WHERE id = :subscriptionId;
-      `;
-      await dbQuery(updateSubscriptionQueryString, {
-        newEndDate,
-        subscriptionId,
-      });
-
-      console.log(`Subscription ID: ${subscriptionId} renewed.`);
-      resolve({
-        ...subscription,
-        end_date: newEndDate,
-      });
-    } catch (error) {
-      console.error("Error renewing subscription:", error);
-      reject(error);
-    }
-  });
-}
-
-async function terminateSubscription(subscriptionId) {
-  try {
-    const getSubscriptionQueryString = `
-      SELECT * FROM subscriptions
-      WHERE id = :subscriptionId;
-    `;
-    const rows = await dbQuery(getSubscriptionQueryString, { subscriptionId });
-
-    if (rows.length === 0) {
-      console.error("Error fetching subscription: not found");
-      throw new Error("Subscription not found");
-    }
-
-    const subscription = rows[0];
-
-    const updateSubscriptionQueryString = `
-      UPDATE subscriptions
-      SET status = 'terminated'
-      WHERE id = :subscriptionId;
-    `;
-
-    await dbQuery(updateSubscriptionQueryString, { subscriptionId });
-
-    console.log(`Subscription ID: ${subscriptionId} terminated.`);
-    return {
-      ...subscription,
-      status: "terminated",
-    };
-  } catch (error) {
-    console.error("Error in terminateSubscription:", error);
-    throw error;
-  }
-}
-
-async function setSubscriptionsToGracePeriod() {
-  return new Promise(async (resolve, reject) => {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    const queryString = `
-      SELECT s.*, u.email FROM subscriptions s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.status = 'active' AND s.end_date = :currentDate;
-    `;
-
-    try {
-      const rows = await dbQuery(queryString, { currentDate });
-
-      console.log(`Found ${rows.length} subscriptions that expired today.`);
-
-      if (rows.length === 0) {
-        resolve(0);
-        return;
-      }
-
-      const updateSubscriptionQueryString = `
-        UPDATE subscriptions
-        SET status = 'grace_period'
-        WHERE id IN (:subscriptionIds);
-      `;
-      const subscriptionIds = rows.map((subscription) => subscription.id);
-
-      const result = await dbQuery(updateSubscriptionQueryString, {
-        subscriptionIds,
-      });
-
-      console.log(`${result.affectedRows} subscriptions set to grace_period.`);
-
-      // Send emails to users
-      const emailPromises = rows.map(async (subscription) => {
-        try {
-          await sendEmail(
-            subscription.email,
-            "Your Subscription Has Expired",
-            `Your subscription has expired. You have a grace period of ${15} days to renew your subscription.`
-          );
-
-          console.log(
-            `Grace period email sent to user ID: ${subscription.user_id}`
-          );
-        } catch (error) {
-          console.error("Error sending grace period email:", error);
-        }
-      });
-
-      await Promise.all(emailPromises);
-      resolve(result.affectedRows);
-    } catch (error) {
-      console.error("Error fetching subscriptions:", error);
-      reject(error);
-    }
-  });
-}
-
 module.exports = {
   createSubscription,
   createInvoice,
   confirmPayment,
-  checkSubscriptionsForExpiration,
-  renewSubscription,
-  terminateSubscription,
-  setSubscriptionsToGracePeriod,
   checkForPayment,
 };

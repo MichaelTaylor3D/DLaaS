@@ -45,3 +45,11 @@ xch1ecyxgv2ft2rj3q26ltmcfpy5gfg0dh2rdqlr0rhf8stfxph3tjnqpxtvpd
 Every contribution, big or small, helps me maintain and enhance the project, ensuring its sustainability and success. I sincerely appreciate your support and am grateful for any donations made.
 
 Thank you for believing in **DLaaS** and supporting my mission.
+
+## Author Availability for Consulting
+
+The author of this repository is available for hire to help you set up or develop your business product on DLaaS (Datalayer as a Service). With extensive experience and expertise in the field, they can provide valuable insights and guidance to ensure that your project is a success.
+
+Whether you need assistance in setting up the infrastructure, optimizing your data storage and management, or integrating the service into your existing systems, the author is well-equipped to help you make the most out of DLaaS.
+
+To discuss your project requirements and consulting rates, please [contact the author](mailto:your-email@example.com) directly. Let's work together to bring your business to the next level with advanced datalayer solutions.
