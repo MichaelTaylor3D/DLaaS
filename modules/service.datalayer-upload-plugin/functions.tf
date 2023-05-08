@@ -28,6 +28,8 @@ resource "aws_lambda_function" "upload_function_handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -77,6 +79,8 @@ resource "aws_lambda_function" "handle_upload_function_handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -128,6 +132,8 @@ resource "aws_lambda_function" "add_missing_files_function_handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -177,6 +183,8 @@ resource "aws_lambda_function" "plugin_info_function_handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn

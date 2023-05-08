@@ -28,6 +28,8 @@ resource "aws_lambda_function" "create_subscription_function_handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -77,6 +79,8 @@ resource "aws_lambda_function" "view_invoice_function_handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -128,6 +132,8 @@ resource "aws_lambda_function" "check_for_payment_function_handler" {
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -145,7 +151,7 @@ resource "aws_lambda_permission" "check_for_payment_api_gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${var.app_gateway_arn}/*/*"
 }
 
 ### END check_for_payment LAMBDA ###
@@ -177,6 +183,8 @@ resource "aws_lambda_function" "cron_check_for_payment_function_handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
@@ -214,6 +222,8 @@ resource "aws_lambda_function" "cron_clean_up_unfulfilled_subscriptions_function
   runtime           = "nodejs16.x"
   timeout           = 60
 
+  layers = [var.lambda_layer_arn]
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
@@ -249,6 +259,8 @@ resource "aws_lambda_function" "get_unpaid_invoices_function_handler" {
   handler           = "index.handler"
   runtime           = "nodejs16.x"
   timeout           = 60
+
+  layers = [var.lambda_layer_arn]
 
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn

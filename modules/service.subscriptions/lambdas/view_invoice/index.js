@@ -209,12 +209,10 @@ exports.handler = async (event, context, callback) => {
           }
 
         function checkPayment() {
-          fetch('https://api.${
+          fetch('https://app.${
             appConfig.SERVICE_DOMAIN
-          }/invoices/v1/${invoiceId}/check-for-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ invoiceId: '${invoiceId}' }),
+          }/invoices/${invoiceId}/check-for-payment', {
+            method: 'POST'
           });
           showCountdownModal();
         }
@@ -263,12 +261,12 @@ exports.handler = async (event, context, callback) => {
       <div id="container">
         <h1>Invoice for subscription: ${product.name}</h1>
         ${
-          invoiceData.status === "paid" &&
+          invoiceData.status !== "paid" ?
           `
           <h3>Please send exactly ${
             invoiceData.total_amount_due - invoiceData.amount_paid
           } XCH to activate this subscription.</h3>
-        `
+        ` : ''
         }
         
         <h5>All sales are final.</h5>

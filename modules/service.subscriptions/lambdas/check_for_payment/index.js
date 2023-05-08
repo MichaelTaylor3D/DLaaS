@@ -24,10 +24,9 @@ exports.handler = async (event, context, callback) => {
     // Send a success response with the invoice ID
     callback(null, {
       statusCode: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8" },
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": `https://app.${config.SERVICE_DOMAIN}`,
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",

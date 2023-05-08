@@ -168,48 +168,53 @@ async function insertTransactionsAndCalculateSum(
   invoiceId,
   userId
 ) {
-  let confirmedSum = 0;
-  let paymentDetails = [];
+  try {
+ let confirmedSum = 0;
+ let paymentDetails = [];
 
-  for (const transaction of transactions) {
-    if (transaction.confirmed) {
-      confirmedSum += transaction.amount / 1000000000000;
+ for (const transaction of transactions) {
+   if (transaction.confirmed) {
+     confirmedSum += transaction.amount / 1000000000000;
 
-      const query = `
+     const query = `
         INSERT IGNORE INTO payments (invoice_guid, coin_name, amount, confirmed_at_height, fee)
         VALUES (:invoice_guid, :coinName, :amount, :confirmedAtHeight, :fee)
       `;
 
-      const values = {
-        invoice_guid: invoiceId,
-        coinName: transaction.name,
-        amount: transaction.amount / 1000000000000,
-        confirmedAtHeight: transaction.confirmed_at_height,
-        fee: transaction.fee_amount,
-      };
+     const values = {
+       invoice_guid: invoiceId,
+       coinName: transaction.name,
+       amount: transaction.amount / 1000000000000,
+       confirmedAtHeight: transaction.confirmed_at_height,
+       fee: transaction.fee_amount,
+     };
 
-      await dbQuery(query, values);
-      paymentDetails.push(
-        `${transaction.name}: ${transaction.amount / 1000000000000} XCH`
-      );
-    }
+     await dbQuery(query, values);
+     paymentDetails.push(
+       `${transaction.name}: ${transaction.amount / 1000000000000} XCH`
+     );
+   }
+ }
+
+ const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {
+   userId: userId,
+ });
+
+ if (user[0].email && paymentDetails.length > 0) {
+   sendEmail(
+     user[0].email,
+     "Payment Details",
+     `The following payments have been detected: <br />${paymentDetails.join(
+       "<br />"
+     )}<br />Thank you for your business.`
+   );
+ }
+
+ return confirmedSum;
+  } catch(error) {
+    console.trace(error.message);
+    throw error;
   }
-
-  const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {
-    userId: userId,
-  });
-
-  if (user[0].email && paymentDetails.length > 0) {
-    sendEmail(
-      user[0].email,
-      "Payment Details",
-      `The following payments have been detected: <br />${paymentDetails.join(
-        "<br />"
-      )}<br />Thank you for your business.`
-    );
-  }
-
-  return confirmedSum;
 }
 
 async function checkForPayment(invoiceId) {
@@ -264,7 +269,7 @@ async function checkForPayment(invoiceId) {
         invoice.user_id
       );
 
-      if (!totalXchPaid) {
+      if (!totalXchPaid && totalXchPaid !== 0) {
         throw new Error("Error retrieving balance from Chia node.");
       }
 
