@@ -20,6 +20,28 @@ const { v4: uuidv4 } = require("uuid");
  */
 async function createSubscription(userId, productKey, data) {
   return new Promise(async (resolve, reject) => {
+    // Check if user_id and singleton_id already exist in user_mirrors
+    const checkSingletonQuery =
+      "SELECT * FROM user_mirrors WHERE user_id = :userId AND singleton_id = :singletonId LIMIT 1";
+    try {
+      const existingSingleton = await dbQuery(checkSingletonQuery, {
+        userId: userId,
+        singletonId: data.id,
+      });
+      if (existingSingleton.length > 0) {
+        reject(
+          new Error(
+            "A subscription already exists for this user with the given singleton_id."
+          )
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking user_id and singleton_id:", error);
+      reject(error);
+      return;
+    }
+
     // Set the subscription start and end dates
     const startDate = new Date();
     const endDate = new Date(startDate);
@@ -39,7 +61,7 @@ async function createSubscription(userId, productKey, data) {
       INSERT INTO subscriptions (user_id, product_key, start_date, end_date, status, data)
       VALUES (:userId, :productKey, :startDate, :endDate, 'pending', :data);
     `;
-    
+
     const queryValues = {
       userId,
       productKey,
@@ -341,24 +363,28 @@ async function confirmPayment(invoiceId) {
       } else {
         const subscription = rows[0];
 
+        // Get current date and calculate the date one year from now
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setFullYear(startDate.getFullYear() + 1);
+
         const updateSubscriptionQueryString = `
           UPDATE subscriptions
-          SET status = 'active'
+          SET status = 'active', start_date = :startDate, end_date = :endDate
           WHERE id = :subscriptionId;
         `;
         await dbQuery(updateSubscriptionQueryString, {
           subscriptionId: subscription.id,
+          startDate,
+          endDate,
         });
 
         const subscriptionData = JSON.parse(subscription.data);
 
-        await sendChiaRPCCommand(
-          rpc[subscriptionData.cmd],
-          {
-            subscriptionId: subscription.id,
-            ...subscriptionData.data
-          }
-        );
+        await sendChiaRPCCommand(rpc[subscriptionData.cmd], {
+          subscriptionId: subscription.id,
+          ...subscriptionData.data,
+        });
 
         console.log(`Subscription ID: ${subscription.id} marked as active.`);
         resolve(subscription.id);
