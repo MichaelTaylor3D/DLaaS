@@ -53,6 +53,13 @@ module "service-system-utils" {
 
   # lambda
   lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+
+  # API Root
+  api_gateway_id              = aws_api_gateway_rest_api.main.id
+  root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
+  api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
+
+  service_domain              = local.config.SERVICE_DOMAIN
 }
 
 module "service-user" {

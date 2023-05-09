@@ -41,6 +41,11 @@ resource "aws_s3_bucket" "storage-bucket" {
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
+
+  website {
+    index_document = "index.html"
+    error_document = "error.html"
+  }
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {

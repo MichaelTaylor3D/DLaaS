@@ -24,13 +24,19 @@ const uploadFileToS3 = async (payload) => {
 
   // Create the S3 client
   const s3 = new S3Client({
-    region: "us-east-1",
+    region: config.AWS_REGION,
     useAccelerateEndpoint: true,
     credentials: {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
   });
+
+  // Check if the file exists
+  if (!fs.existsSync(sourceFilePath)) {
+    console.error(`File does not exist: ${sourceFilePath}`);
+    return false;
+  }
 
   // Read the file from the local file system
   const fileStream = fs.createReadStream(sourceFilePath);

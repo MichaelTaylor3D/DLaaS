@@ -28,6 +28,14 @@ resource "aws_api_gateway_resource" "invoice_api_resource" {
   path_part   = "{invoiceId}"
 }
 
+resource "aws_api_gateway_method" "get_unpaid_invoices_method" {
+  rest_api_id      = var.api_gateway_id
+  resource_id      = aws_api_gateway_resource.get_unpaid_invoices_api_resource.id
+  http_method      = "GET"
+  authorization    = "NONE"
+  api_key_required = false
+}
+
 resource "aws_api_gateway_integration" "get_unpaid_invoices_lambda_api_integration" {
   rest_api_id             = var.api_gateway_id
   resource_id             = aws_api_gateway_resource.get_unpaid_invoices_api_resource.id

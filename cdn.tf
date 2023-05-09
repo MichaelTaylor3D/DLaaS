@@ -1,18 +1,15 @@
+
 resource "aws_cloudfront_distribution" "cdn_distribution" {
   origin {
-    domain_name = aws_s3_bucket.storage-bucket.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.storage-bucket.website_endpoint
     origin_id   = local.config.DEFAULT_S3_BUCKET
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.static_site_identity.cloudfront_access_identity_path
-    }
-
-  /*  custom_origin_config {
+    custom_origin_config {
       http_port = 80
       https_port = 443
       origin_protocol_policy = "http-only"
       origin_ssl_protocols = ["TLSv1.2"]
-    }*/
+    }
   }
 
   restrictions {
@@ -52,27 +49,6 @@ resource "aws_cloudfront_distribution" "cdn_distribution" {
   }
 }
 
-# Create an origin access identity for the CloudFront distribution
-resource "aws_cloudfront_origin_access_identity" "static_site_identity" {}
-
-# Grant access to the S3 bucket for the origin access identity
-resource "aws_s3_bucket_policy" "static_site_bucket_policy" {
-  bucket = aws_s3_bucket.storage-bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "s3:GetObject"
-        Effect = "Allow"
-        Principal = {
-          AWS = aws_cloudfront_origin_access_identity.static_site_identity.iam_arn
-        }
-        Resource = "${aws_s3_bucket.storage-bucket.arn}/*"
-      },
-    ]
-  })
-}
 
 resource "aws_s3_bucket_object" "configurations-cdn-config-file-upload" {
   bucket       = aws_s3_bucket.storage_devops_bucket.id

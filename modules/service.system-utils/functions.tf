@@ -80,3 +80,17 @@ resource "aws_lambda_function" "list-s3-files-function-handler" {
   publish           = true
   source_code_hash  = data.archive_file.list-s3-files-function-source.output_base64sha256
 }
+
+# Give permission to the API gateway to access this lambda
+resource "aws_lambda_permission" "list-s3-files-function-handler" {
+  statement_id  = "AllowAPIGatewayInvoke"
+
+  # Name of lambda from above
+  function_name = aws_lambda_function.list-s3-files-function-handler.arn
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+
+  # Link to execution arn of API Gateway REST API
+  # The "/*/*" portion grants access to any method, any resource within API Gateway
+  source_arn    = "${var.api_gateway_arn}/*/*"
+}
