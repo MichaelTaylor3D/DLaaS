@@ -29,7 +29,7 @@ resource "null_resource" "copy_common_files_to_layer" {
   }
 
   triggers = {
-    rebuild_trigger = local.common_files_sha256
+    rebuild_trigger = sha1(timestamp())
   }
 
   depends_on = [
@@ -48,7 +48,7 @@ resource "null_resource" "wait_for_file" {
   }
 
   triggers = {
-    rebuild_trigger = local.common_files_sha256
+    rebuild_trigger = sha1(timestamp())
   }
 }
 

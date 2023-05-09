@@ -46,3 +46,37 @@ resource "aws_lambda_function" "create-schema-function-handler" {
 }
 
 ### END Create User Schema LAMBDA ###
+
+data "archive_file" "list-s3-files-function-source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/list-s3-files"
+  output_path = "${path.module}/lambdas/list-s3-files-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "list-s3-files-function-storage-upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/list-s3-files-tf-handler.zip"
+  source = data.archive_file.list-s3-files-function-source.output_path
+  etag   = data.archive_file.list-s3-files-function-source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "list-s3-files-function-handler" {
+  function_name     = "list-s3-files-handler"
+  description       = "${var.aws_profile}: List files in S3"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.list-s3-files-function-storage-upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.list-s3-files-function-source.output_base64sha256
+}

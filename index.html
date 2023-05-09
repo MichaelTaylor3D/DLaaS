@@ -1,14 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>S3 Bucket Index</title>
+    <title>Index of /</title>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
 </head>
 <body>
-    <h1>Index of Files in S3 Bucket</h1>
-    <ul>
-    #foreach($object in $objects)
-        <li><a href="${object.Key}">${object.Key}</a></li>
-    #end
-    </ul>
+    <h1>Index of /</h1>
+    <ul id="file-list"></ul>
+    
+    <script>
+        AWS.config.update({region: 'us-east-1'});
+        const lambda = new AWS.Lambda();
+        const params = {
+            FunctionName: 'list-s3-files'
+        };
+        
+        lambda.invoke(params, (err, data) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
+            const files = JSON.parse(data.Payload);
+            const fileList = document.getElementById('file-list');
+            
+            files.forEach((file) => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `https://${window.location.host}/${file}`;
+                a.textContent = file;
+                li.appendChild(a);
+                fileList.appendChild(li);
+            });
+        });
+    </script>
 </body>
 </html>
