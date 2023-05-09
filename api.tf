@@ -22,7 +22,12 @@ resource "aws_api_gateway_deployment" "production-deployment" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_api_gateway_rest_api.main]
+  depends_on = [
+    aws_api_gateway_rest_api.main,
+    module.service-user,
+    module.service-subscriptions,
+    module.service-system-utils
+  ]
 }
 
 resource "aws_api_gateway_usage_plan" "api-usage-plan" {

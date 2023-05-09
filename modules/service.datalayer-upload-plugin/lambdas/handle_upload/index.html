@@ -1,52 +1,58 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Index of /</title>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <h1 id="title">Index of /</h1>
     <ul id="file-list"></ul>
-    
+
     <script>
-        function getLastPartOfPath(path) {
-            let parts = path.split("/");
-            // remove empty strings from parts array caused by leading/trailing slashes
-            parts = parts.filter(part => part !== "");
-            // return the second part of the path
-            return parts.length > 1 ? "/" + parts[1] : "";
+      function getLastPartOfPath(path) {
+        let parts = path.split("/");
+        // remove empty strings from parts array caused by leading/trailing slashes
+        parts = parts.filter((part) => part !== "");
+        // return the second part of the path
+        return parts.length > 1 ? "/" + parts[1] : "";
+      }
+
+      const fileList = document.getElementById("file-list");
+
+      // Update the title
+      const pathname = getLastPartOfPath(window.location.pathname);
+      document.title = `Index of ${pathname}`;
+      document.getElementById("title").textContent = `Index of ${pathname}`;
+
+      // Parse the current location hostname and replace the subdomain with "api"
+      const currentHostname = window.location.hostname;
+      const domain = currentHostname.substring(
+        currentHostname.indexOf(".") + 1
+      );
+      const apiHostname = `api.${domain}`;
+
+      fetch(
+        `https://${apiHostname}/system/v1/get_files?prefix=${window.location.pathname}`,
+        {
+          headers: {
+            Origin: window.location.origin,
+          },
         }
-
-
-        const fileList = document.getElementById('file-list');
-
-        // Update the title
-        const pathname = getLastPartOfPath(window.location.pathname);
-        document.title = `Index of ${pathname}`;
-        document.getElementById('title').textContent = `Index of ${pathname}`;
-
-        // Parse the current location hostname and replace the subdomain with "api"
-        const currentHostname = window.location.hostname;
-        const domain = currentHostname.substring(currentHostname.indexOf('.') + 1);
-        const apiHostname = `api.${domain}`;
-
-        fetch(`https://${apiHostname}/system/v1/get_files?prefix=${window.location.pathname}`, {
-            headers: {
-                'Origin': window.location.origin
+      )
+        .then((response) => response.json())
+        .then((files) => {
+          files.forEach((file) => {
+            if (file !== "index.html") {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = `https://${window.location.host}${window.location.pathname}${file}`;
+              a.textContent = file;
+              li.appendChild(a);
+              fileList.appendChild(li);
             }
+          });
         })
-        .then(response => response.json())
-        .then(files => {
-            files.forEach(file => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.href = `https://${window.location.host}${window.location.pathname}${file}`;
-                a.textContent = file;
-                li.appendChild(a);
-                fileList.appendChild(li);
-            });
-        })
-        .catch(error => console.error('Error fetching files:', error));
+        .catch((error) => console.error("Error fetching files:", error));
     </script>
-</body>
+  </body>
 </html>

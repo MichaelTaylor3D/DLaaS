@@ -97,6 +97,15 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
           "execute-api:ManageConnections"
         ],
         "Resource": "*"
+      }, 
+      {
+      "Effect" : "Allow",
+      "Action" : [
+        "cloudfront:CreateInvalidation",
+        "cloudfront:GetInvalidation",
+        "cloudfront:ListInvalidations"
+      ],
+      "Resource" : "*"
       },
 			{
 				"Effect": "Allow",

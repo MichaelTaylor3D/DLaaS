@@ -17,7 +17,7 @@ resource "aws_api_gateway_stage" "production_www" {
 
 resource "aws_api_gateway_deployment" "production_www_deployment" {
   rest_api_id = aws_api_gateway_rest_api.www.id
-  description = "${local.config.AWS_PROFILE}:: API Gateway deployment WWW"
+  description = "${local.config.AWS_PROFILE}:: API Gateway deployment for WWW pages"
 
   triggers = {
     redeployment = sha1(timestamp())
@@ -27,7 +27,10 @@ resource "aws_api_gateway_deployment" "production_www_deployment" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_api_gateway_rest_api.www]
+  depends_on = [
+    aws_api_gateway_rest_api.www, 
+    module.service-subscriptions
+  ]
 }
 
 resource "aws_api_gateway_usage_plan" "www-usage-plan" {

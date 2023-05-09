@@ -3,7 +3,7 @@ const {
   CreateInvalidationCommand,
 } = require("@aws-sdk/client-cloudfront");
 const { getConfigurationFile } = require("/opt/nodejs/common");
-const config = require("/opt/nodejs/common/config.js");
+const config = require("/opt/nodejs/common/config.json");
 
 exports.handler = async (event) => {
   // Get the object from the event
@@ -22,9 +22,7 @@ exports.handler = async (event) => {
       CallerReference: `${Date.now()}`,
       Paths: {
         Quantity: 1,
-        Items: [
-          `/${key}`,
-        ],
+        Items: [`/${key}`],
       },
     },
   };

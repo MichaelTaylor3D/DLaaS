@@ -11,15 +11,15 @@
  * 8. /user/v1/access_keys/{accessKey} (for deleting an access key)
  */
 
-resource "aws_api_gateway_resource" "v1-api-resource" {
+resource "aws_api_gateway_resource" "user_service" {
   rest_api_id = var.api_gateway_id
   parent_id   = var.root_resource_id
   path_part   = "user"
 }
 
-resource "aws_api_gateway_resource" "user-api-resource" {
+resource "aws_api_gateway_resource" "v1-api-resource" {
   rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.v1-api-resource.id
+  parent_id   = aws_api_gateway_resource.user_service.id
   path_part   = "v1"
 }
 
@@ -46,7 +46,7 @@ resource "aws_api_gateway_resource" "token_refresh_api_resource" {
 # /user/register
 resource "aws_api_gateway_resource" "register-api-resource" {
   rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.user-api-resource.id
+  parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
   path_part   = "register"
 }
@@ -55,7 +55,7 @@ resource "aws_api_gateway_resource" "register-api-resource" {
 resource "aws_api_gateway_resource" "login-api-resource" {
   # ID to AWS API Gateway Rest API definition above
   rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.user-api-resource.id
+  parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
   path_part   = "login"
 }
@@ -64,7 +64,7 @@ resource "aws_api_gateway_resource" "login-api-resource" {
 resource "aws_api_gateway_resource" "reset-password-api-resource" {
   # ID to AWS API Gateway Rest API definition above
   rest_api_id = var.api_gateway_id
-  parent_id   = aws_api_gateway_resource.user-api-resource.id
+  parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
   path_part   = "reset_password"
 }
@@ -73,7 +73,7 @@ resource "aws_api_gateway_resource" "reset-password-api-resource" {
 resource "aws_api_gateway_resource" "confirm-new-password-api-resource" {
     # ID to AWS API Gateway Rest API definition above
     rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+    parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
     path_part   = "confirm_new_password"
 }
@@ -82,7 +82,7 @@ resource "aws_api_gateway_resource" "confirm-new-password-api-resource" {
 resource "aws_api_gateway_resource" "change-email-api-resource" {
     # ID to AWS API Gateway Rest API definition above
     rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+    parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
     path_part   = "change_email"
 }
@@ -91,7 +91,7 @@ resource "aws_api_gateway_resource" "change-email-api-resource" {
 resource "aws_api_gateway_resource" "access-keys-api-resource" {
     # ID to AWS API Gateway Rest API definition above
     rest_api_id = var.api_gateway_id
-    parent_id   = aws_api_gateway_resource.user-api-resource.id
+    parent_id   = aws_api_gateway_resource.v1-api-resource.id
 
     path_part   = "access_keys"
 }
