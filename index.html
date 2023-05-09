@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>S3 Bucket Index</title>
+</head>
+<body>
+    <h1>Index of Files in S3 Bucket</h1>
+    <ul>
+    #foreach($object in $objects)
+        <li><a href="${object.Key}">${object.Key}</a></li>
+    #end
+    </ul>
+</body>
+</html>
