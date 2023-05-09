@@ -47,6 +47,7 @@ module "service-system-utils" {
 
   # Storage
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
+  service_bucket_id           = aws_s3_bucket.storage-bucket.id
 
   # Policies And Roles
   default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
@@ -60,6 +61,7 @@ module "service-system-utils" {
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
 
   service_domain              = local.config.SERVICE_DOMAIN
+  service_bucket_arn          = aws_s3_bucket.storage-bucket.arn
 }
 
 module "service-user" {

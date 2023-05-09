@@ -9,3 +9,5 @@ variable "api_gateway_arn"             {}
 variable "api_gateway_id"              {}
 variable "root_resource_id"            {}
 variable "service_domain"              {}
+variable "service_bucket_arn"          {}
+variable "service_bucket_id"           {}

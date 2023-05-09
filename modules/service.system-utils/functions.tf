@@ -94,3 +94,41 @@ resource "aws_lambda_permission" "list-s3-files-function-handler" {
   # The "/*/*" portion grants access to any method, any resource within API Gateway
   source_arn    = "${var.api_gateway_arn}/*/*"
 }
+
+### START S3 Trigger Invalidate CDN LAMBDA ###
+
+data "archive_file" "invalidate_cdn_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/s3-trigger-invalidate-cdn"
+  output_path = "${path.module}/lambdas/s3-trigger-invalidate-cdn-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "invalidate_cdn_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/s3-trigger-invalidate-cdn-tf-handler.zip"
+  source = data.archive_file.invalidate_cdn_function_source.output_path
+  etag   = data.archive_file.invalidate_cdn_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "invalidate_cdn_function_handler" {
+  function_name     = "s3-trigger-invalidate-cdn-handler"
+  description       = "${var.aws_profile}: Invalidate CDN on S3 changes"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.invalidate_cdn_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.invalidate_cdn_function_source.output_base64sha256
+}
+
+### END S3 Trigger Invalidate CDN LAMBDA ###

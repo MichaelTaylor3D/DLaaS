@@ -48,6 +48,14 @@ resource "aws_s3_bucket" "storage-bucket" {
   }
 }
 
+resource "aws_lambda_permission" "allow_bucket" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.invalidate_cdn_function_handler.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = "${aws_s3_bucket.your_bucket.arn}"
+}
+
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.storage-bucket.id
 
