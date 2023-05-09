@@ -17,14 +17,6 @@ resource "aws_api_gateway_resource" "create_subscription_api_resource" {
   path_part   = "create_subscription"
 }
 
-resource "aws_api_gateway_method" "get_unpaid_invoices_method" {
-  rest_api_id      = var.api_gateway_id
-  resource_id      = aws_api_gateway_resource.get_unpaid_invoices_api_resource.id
-  http_method      = "GET"
-  authorization    = "NONE"
-  api_key_required = false
-}
-
 resource "aws_api_gateway_method" "create_subscription_method" {
   rest_api_id      = var.api_gateway_id
   resource_id      = aws_api_gateway_resource.create_subscription_api_resource.id
