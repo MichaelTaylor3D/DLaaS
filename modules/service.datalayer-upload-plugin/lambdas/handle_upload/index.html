@@ -40,7 +40,7 @@
             files.forEach(file => {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
-                a.href = `https://${window.location.host}${pathname}/${file}`;
+                a.href = `https://${window.location.host}${window.location.pathname}${file}`;
                 a.textContent = file;
                 li.appendChild(a);
                 fileList.appendChild(li);

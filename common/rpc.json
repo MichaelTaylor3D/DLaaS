@@ -3,5 +3,6 @@
   "CREATE_MIRROR": "createMirror",
   "GET_TRANSACTIONS": "getTransactions",
   "UPLOAD_FILE_TO_S3": "uploadFileToS3",
-  "DELETE_MIRROR": "deleteMirror"
+  "DELETE_MIRROR": "deleteMirror",
+  "ADD_MISSING_FILES": "addMissingFiles"
 }
