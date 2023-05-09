@@ -68,7 +68,7 @@ resource "aws_s3_bucket_policy" "static_site_bucket_policy" {
         Principal = {
           AWS = aws_cloudfront_origin_access_identity.static_site_identity.iam_arn
         }
-        Resource = "${aws_s3_bucket.static_site_bucket.arn}/*"
+        Resource = "${aws_s3_bucket.storage-bucket.arn}/*"
       },
     ]
   })
