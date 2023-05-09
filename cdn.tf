@@ -57,7 +57,7 @@ resource "aws_cloudfront_origin_access_identity" "static_site_identity" {}
 
 # Grant access to the S3 bucket for the origin access identity
 resource "aws_s3_bucket_policy" "static_site_bucket_policy" {
-  bucket = aws_s3_bucket.static_site_bucket.id
+  bucket = aws_s3_bucket.storage-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
