@@ -4,7 +4,8 @@
   "SERVICE_NAME": "dlaas",
   "SERVICE_DOMAIN": "datalayer.storage",
   "DEFAULT_S3_BUCKET": "dlaas",
+  "DONATE_TO_SUPPORT_MORE_DEVELOPMENT": "true",
   "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7",
-  "DB_INSTANCE_CLASS": "db.t3.micro",
-  "OWNER_EMAIL_ADDRESS": "mtaylor@michaeltaylor.dev"
+  "DONATION_PERCENTAGE": "0.002",
+  "DB_INSTANCE_CLASS": "db.t3.micro"
 }

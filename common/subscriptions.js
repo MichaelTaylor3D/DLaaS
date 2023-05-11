@@ -9,7 +9,9 @@ const { getUserBy, dbQuery } = require("./database-utils");
 const { sendChiaRPCCommand } = require("./worker-bridge");
 const rpc = require("./rpc.json");
 const { v4: uuidv4 } = require("uuid");
+const config = require("./config.json");
 
+const mojosPerXCH = 1000000000000;
 /**
  * Creates a new subscription for a user and sends an email with the invoice.
  *
@@ -191,49 +193,49 @@ async function insertTransactionsAndCalculateSum(
   userId
 ) {
   try {
- let confirmedSum = 0;
- let paymentDetails = [];
+    let confirmedSum = 0;
+    let paymentDetails = [];
 
- for (const transaction of transactions) {
-   if (transaction.confirmed) {
-     confirmedSum += transaction.amount / 1000000000000;
+    for (const transaction of transactions) {
+      if (transaction.confirmed) {
+        confirmedSum += transaction.amount / mojosPerXCH;
 
-     const query = `
+        const query = `
         INSERT IGNORE INTO payments (invoice_guid, coin_name, amount, confirmed_at_height, fee)
         VALUES (:invoice_guid, :coinName, :amount, :confirmedAtHeight, :fee)
       `;
 
-     const values = {
-       invoice_guid: invoiceId,
-       coinName: transaction.name,
-       amount: transaction.amount / 1000000000000,
-       confirmedAtHeight: transaction.confirmed_at_height,
-       fee: transaction.fee_amount,
-     };
+        const values = {
+          invoice_guid: invoiceId,
+          coinName: transaction.name,
+          amount: transaction.amount / mojosPerXCH,
+          confirmedAtHeight: transaction.confirmed_at_height,
+          fee: transaction.fee_amount,
+        };
 
-     await dbQuery(query, values);
-     paymentDetails.push(
-       `${transaction.name}: ${transaction.amount / 1000000000000} XCH`
-     );
-   }
- }
+        await dbQuery(query, values);
+        paymentDetails.push(
+          `${transaction.name}: ${transaction.amount / mojosPerXCH} XCH`
+        );
+      }
+    }
 
- const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {
-   userId: userId,
- });
+    const user = await dbQuery("SELECT * FROM users WHERE id = :userId", {
+      userId: userId,
+    });
 
- if (user[0].email && paymentDetails.length > 0) {
-   sendEmail(
-     user[0].email,
-     "Payment Details",
-     `The following payments have been detected: <br />${paymentDetails.join(
-       "<br />"
-     )}<br />Thank you for your business.`
-   );
- }
+    if (user[0].email && paymentDetails.length > 0) {
+      sendEmail(
+        user[0].email,
+        "Payment Details",
+        `The following payments have been detected: <br />${paymentDetails.join(
+          "<br />"
+        )}<br />Thank you for your business.`
+      );
+    }
 
- return confirmedSum;
-  } catch(error) {
+    return confirmedSum;
+  } catch (error) {
     console.trace(error.message);
     throw error;
   }
@@ -308,6 +310,17 @@ async function checkForPayment(invoiceId) {
         try {
           // Mark the invoice as paid
           await confirmPayment(invoiceId);
+
+          // Donate a percentage of the payment to support more development
+          if (config.DONATE_TO_SUPPORT_MORE_DEVELOPMENT === "true") {
+            const donationAmountInMojos =
+              totalXchPaid * mojosPerXCH * Number(config.DONATION_PERCENTAGE);
+
+            await sendChiaRPCCommand(rpc.SEND_TO_DONATION_ADDRESS, {
+              amountInMojos: donationAmountInMojos,
+            });
+          }
+
           resolve(invoice);
         } catch (error) {
           reject(error);

@@ -2,10 +2,11 @@ const superagent = require("superagent");
 const path = require("path");
 const fs = require("fs");
 const https = require("https");
+const config = require("../../../common/config.json");
 
 const { getChiaRoot } = require("../../utils");
 
-const addMissingFiles = async () => {
+const sendToDonationAddress = async (payload) => {
   try {
     const chiaRoot = getChiaRoot();
     const certFile = path.resolve(
@@ -17,9 +18,14 @@ const addMissingFiles = async () => {
 
     const response = await superagent
       .post(
-        `https://${process.env.RPC_HOST}:${process.env.RPC_DATALAYER_PORT}/add_missing_files`
+        `https://${process.env.RPC_HOST}:${process.env.RPC_WALLET_PORT}/send_transaction`
       )
-      .send({})
+      .send({
+        wallet_id: "1",
+        address: config.DONATION_ADDRESS,
+        amount: payload.amountInMojos,
+        fee: 6000000,
+      })
       .set("Content-Type", "application/json")
       .key(fs.readFileSync(keyFile))
       .cert(fs.readFileSync(certFile))
@@ -39,5 +45,5 @@ const addMissingFiles = async () => {
 };
 
 module.exports = {
-  addMissingFiles,
+  sendToDonationAddress,
 };
