@@ -151,7 +151,7 @@ resource "aws_lambda_permission" "confirm-user-api-gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${var.app_gateway_arn}/*/*"
 }
 
 ### END Confirm Account  LAMBDA ###
@@ -567,7 +567,7 @@ resource "aws_lambda_permission" "cancel-change-email-api-gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${var.app_gateway_arn}/*/*"
 }
 
 ### END Cancel Change Email LAMBDA ###
@@ -619,7 +619,7 @@ resource "aws_lambda_permission" "confirm-change-email-api-gateway" {
 
   # Link to execution arn of API Gateway REST API
   # The "/*/*" portion grants access to any method, any resource within API Gateway
-  source_arn    = "${var.api_gateway_arn}/*/*"
+  source_arn    = "${var.app_gateway_arn}/*/*"
 }
 
 ### END Confirm Change Email LAMBDA ###

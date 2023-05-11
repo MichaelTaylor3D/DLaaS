@@ -26,7 +26,7 @@ exports.handler = async (event, context, callback) => {
   const diff_filename = requestBody.diff_filename;
 
   try {
-    await Promise.all([
+    Promise.all([
       sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
         store_id,
         file: full_tree_filename,
@@ -39,7 +39,7 @@ exports.handler = async (event, context, callback) => {
 
     dbQuery(
       `INSERT INTO datalayer_files (filename, store_id)
-              VALUES (':filename1', :storeId1), (':filename2', :storeId2);`,
+              VALUES (:filename1, :storeId1), (:filename2, :storeId2);`,
       {
         filename1: full_tree_filename,
         storeId1: store_id,

@@ -2,10 +2,16 @@ const superagent = require("superagent");
 const path = require("path");
 const fs = require("fs");
 const https = require("https");
-const { getConfigurationFile, dbQuery, sendEmail } = require("../../../common");
+const {
+  getConfigurationFile,
+  dbQuery,
+  sendEmail,
+  generateSalt,
+  getFilenamesForStore,
+} = require("../../../common");
 
 const { getChiaRoot } = require("../../utils");
-
+const { uploadFileToS3 } = require("../upload_file_to_s3");
 const chiaRoot = getChiaRoot();
 const certFile = path.resolve(
   `${chiaRoot}/config/ssl/data_layer/private_data_layer.crt`
@@ -14,34 +20,12 @@ const keyFile = path.resolve(
   `${chiaRoot}/config/ssl/data_layer/private_data_layer.key`
 );
 
-const getMirrors = async (payload) => {
-  const getMirrorsResponse = await superagent
-    .post(
-      `https://${process.env.RPC_HOST}:${process.env.RPC_DATALAYER_PORT}/get_mirrors`
-    )
-    .set("Content-Type", "application/json")
-    .send({ id: payload.id })
-    .key(fs.readFileSync(keyFile))
-    .cert(fs.readFileSync(certFile))
-    .agent(
-      new https.Agent({
-        rejectUnauthorized: false,
-      })
-    );
-
-  return getMirrorsResponse.body;
-};
-
 const createMirror = async (payload) => {
   try {
     const cdnConfig = await getConfigurationFile("cdn.config.json");
 
-    const mirrorResults = await getMirrors(payload);
-    const mirrorUrl = `https://${cdnConfig.public}/${payload.id}`;
-
-    const existingMirror = mirrorResults?.mirrors?.find((mirror) =>
-      mirror.urls.includes(mirrorUrl)
-    );
+    const salt = await generateSalt(24);
+    const mirrorUrl = `https://${cdnConfig.public}/${salt}/${payload.id}`;
 
     console.log("SUBSCRIBING:", { id: payload.id });
 
@@ -65,36 +49,34 @@ const createMirror = async (payload) => {
       throw new Error("Subscription failed");
     }
 
-    if (!existingMirror) {
-      console.log("CREATING MIRROR:", {
+    console.log("CREATING MIRROR:", {
+      id: payload.id,
+      urls: [mirrorUrl],
+      amount: 1,
+      fee: 300000000,
+    });
+
+    const addMirrorResponse = await superagent
+      .post(
+        `https://${process.env.RPC_HOST}:${process.env.RPC_DATALAYER_PORT}/add_mirror`
+      )
+      .send({
         id: payload.id,
-        urls: [`https://${cdnConfig.public}/${payload.id}`],
+        urls: [mirrorUrl],
         amount: 1,
         fee: 300000000,
-      });
-      
-      const addMirrorResponse = await superagent
-        .post(
-          `https://${process.env.RPC_HOST}:${process.env.RPC_DATALAYER_PORT}/add_mirror`
-        )
-        .send({
-          id: payload.id,
-          urls: [`https://${cdnConfig.public}/${payload.id}`],
-          amount: 1,
-          fee: 300000000,
+      })
+      .set("Content-Type", "application/json")
+      .key(fs.readFileSync(keyFile))
+      .cert(fs.readFileSync(certFile))
+      .agent(
+        new https.Agent({
+          rejectUnauthorized: false,
         })
-        .set("Content-Type", "application/json")
-        .key(fs.readFileSync(keyFile))
-        .cert(fs.readFileSync(certFile))
-        .agent(
-          new https.Agent({
-            rejectUnauthorized: false,
-          })
-        );
+      );
 
-      if (!addMirrorResponse.body.success) {
-        throw new Error("Creating mirror failed");
-      }
+    if (!addMirrorResponse.body.success) {
+      throw new Error("Creating mirror failed");
     }
 
     console.log({
@@ -102,12 +84,13 @@ const createMirror = async (payload) => {
       singletonId: payload.id,
       name: payload.name || "",
       subscriptionId: payload.subscriptionId || "",
+      permissionedFor: payload.permissioned_for.join(",") || "All",
     });
 
     await dbQuery(
       `
-      INSERT INTO user_mirrors (user_id, singleton_id, name, subscription_id, active)
-      VALUES (:userId, :singletonId, :name, :subscriptionId, true)
+      INSERT INTO user_mirrors (user_id, singleton_id, name, subscription_id, active, salt, permissioned_for)
+      VALUES (:userId, :singletonId, :name, :subscriptionId, true, :salt, JSON_ARRAY(:permissionedFor))
       ON DUPLICATE KEY UPDATE active = true;
     `,
       {
@@ -115,6 +98,8 @@ const createMirror = async (payload) => {
         singletonId: payload.id,
         name: payload.name || "",
         subscriptionId: payload.subscriptionId || "",
+        salt,
+        permissionedFor: payload.permissioned_for.join(",") || "All",
       }
     );
 
@@ -126,10 +111,16 @@ const createMirror = async (payload) => {
       sendEmail(
         user[0].email,
         "Mirror Created",
-        `Your mirror is now active. It is being served from https://${cdnConfig.public}/${payload.id}. <br />
+        `Your mirror is now active. It is being served from ${mirrorUrl}. <br />
          Thank you for your business.`
       );
     }
+
+    const previouslyExistingFiles = await getFilenamesForStore(payload.id);
+
+    previouslyExistingFiles.forEach((file) => {
+      uploadFileToS3({ store_id: payload.id, file });
+    });
 
     return true;
   } catch (error) {

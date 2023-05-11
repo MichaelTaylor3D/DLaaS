@@ -1,5 +1,3 @@
-variable "aws_access_key"              {}
-variable "aws_secret_key"              {}
 variable "aws_region"                  {}
 variable "aws_profile"                 {}
 variable "dev_bucket_id"               {}
@@ -11,3 +9,4 @@ variable "root_resource_id"            {}
 variable "service_domain"              {}
 variable "service_bucket_arn"          {}
 variable "service_bucket_id"           {}
+variable "domain_zone"              {}

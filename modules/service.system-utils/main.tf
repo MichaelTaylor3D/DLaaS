@@ -1,7 +1,11 @@
-provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-  region     = var.aws_region
+# notify the admin via email that route 53 is created and nameservers must be set to continue deployment
+resource "aws_lambda_invocation" "notify_route53_nameservers_available" {
+  function_name = aws_lambda_function.send_route53_email_function_handler.function_name
+  input = ""
+
+  depends_on = [
+    var.domain_zone
+  ]
 }
 
 output "create_schema_utility" { value = aws_lambda_function.create-schema-function-handler.function_name }

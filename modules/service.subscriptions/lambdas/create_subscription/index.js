@@ -30,8 +30,8 @@ exports.handler = async (event, context, callback) => {
       "productKey",
     ]);
 
-    if (data?.permissions_for) {
-      data.permissions_for = ["All"];
+    if (!data?.permissioned_for) {
+      data.permissioned_for = ['All'];
     }
 
     // Create a subscription for the user

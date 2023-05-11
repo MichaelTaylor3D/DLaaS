@@ -19,40 +19,36 @@ const rpc = require("/opt/nodejs/common/rpc.json");
  * @param {Function} callback - The callback function for API Gateway.
  */
 exports.handler = async (event, context, callback) => {
-  // Parse the request parameters from the event body
-  const requestBody = JSON.parse(event.body);
-  const store_id = requestBody.store_id;
-  const files = requestBody.files;
-
-  // Send a separate message to the SQS queue for each file
-  const promises = files.map(async (file) => {
-    return sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file });
-  });
-
-  const dbPromises = files.map(async (file) => {
-    return dbQuery(
-      `INSERT INTO datalayer_files (filename, store_id) VALUES (':filename', :storeId);`,
-      {
-        filename: file,
-        storeId,
-      }
-    );
-  });
-
   try {
-    await Promise.all(promises.concat(dbPromises));
+    const { store_id, files } = JSON.parse(event.body);
 
-    // Invoke the callback function with a successful response
+    const chiaRPCPromises = files.map((file) =>
+      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file })
+    );
+    const dbPromises = files.map((file) =>
+      dbQuery(
+        `INSERT INTO datalayer_files (filename, store_id) VALUES (:filename, :storeId);`,
+        { filename: file, storeId: store_id }
+      )
+    );
+
+    Promise.all([...chiaRPCPromises, ...dbPromises]);
+
     callback(null, {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
       body: JSON.stringify({ uploaded: true }),
     });
   } catch (error) {
     console.error(error);
 
-    // Invoke the callback function with an error response
     callback(null, {
       statusCode: 500,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
       body: JSON.stringify({ uploaded: false }),
     });
   }

@@ -23,11 +23,11 @@ END;
 CREATE PROCEDURE ${db_name}.confirm_account(
   IN confirmationCode VARCHAR(100)
 ) 
-BEGIN	
+BEGIN  
   UPDATE users 
   INNER JOIN user_meta 
   ON user_meta.user_id = users.id 
   SET users.confirmed = true 
-  WHERE user_meta.meta_key = 'confirmationCode' 
-  AND user_meta.meta_value = confirmationCode;
+  WHERE user_meta.meta_key COLLATE utf8mb4_unicode_ci = 'confirmationCode' 
+  AND user_meta.meta_value COLLATE utf8mb4_unicode_ci = confirmationCode;
 END;

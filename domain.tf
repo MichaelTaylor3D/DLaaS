@@ -47,18 +47,6 @@ resource "aws_route53_record" "cdn-subdomain-a-record" {
   }
 }
 
-# notify the admin via email that route 53 is created and nameservers must be set to continue deployment
-resource "aws_lambda_invocation" "notify_route53_nameservers_available" {
-  function_name = module.service-system-utils.send_route53_email_function_handler_name
-  input = ""
-
-  depends_on = [
-    aws_route53_zone.service-zone,
-    aws_s3_bucket_object.domain-config-upload,
-    module.service-system-utils.send_route53_email_function_handler_name
-  ]
-}
-
 resource "aws_s3_bucket_object" "domain-config-upload" {
   bucket       = aws_s3_bucket.storage_devops_bucket.id
   key          = "configurations/domain.config.json"

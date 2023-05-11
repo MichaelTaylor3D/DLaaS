@@ -342,7 +342,19 @@ const getUserBy = async (column, value) => {
   });
 };
 
+/**
+ * Gets the filename+extension of all files in the datalayer_files table for a given store_id.
+ * @param {number} storeId - The ID of the store to get the files for.
+ * @returns {Promise<Array<string>>} - A promise that resolves to an array of filenames with extensions.
+ */
+const getFilenamesForStore = async (storeId) => {
+  const query = `SELECT filename FROM datalayer_files WHERE store_id = :storeId`;
+  const results = await dbQuery(query, { storeId });
+  return results.map((result) => result.filename);
+};
+
 module.exports = {
+  getFilenamesForStore,
   queryFormat,
   upsertUserMeta,
   getUserMeta,

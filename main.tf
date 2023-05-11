@@ -17,6 +17,10 @@ provider "aws" {
 module "service-datalayer-upload-plugin" {
   source                     = "./modules/service.datalayer-upload-plugin"
 
+  providers = {
+    aws = aws
+  }
+
   # AWS Profile
   aws_profile                 = local.config.AWS_PROFILE
 
@@ -45,15 +49,18 @@ module "service-datalayer-upload-plugin" {
 module "service-system-utils" {
   source                     = "./modules/service.system-utils"
 
+  providers = {
+    aws = aws
+  }
+
   # AWS Profile
-  aws_access_key              = var.aws_access_key
-  aws_secret_key              = var.aws_secret_key
   aws_region                  = local.config.AWS_REGION 
   aws_profile                 = local.config.AWS_PROFILE
 
   # Storage
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
   service_bucket_id           = aws_s3_bucket.storage-bucket.id
+  service_bucket_arn          = aws_s3_bucket.storage-bucket.arn
 
   # Policies And Roles
   default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
@@ -66,8 +73,9 @@ module "service-system-utils" {
   root_resource_id            = aws_api_gateway_rest_api.main.root_resource_id
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
 
+  # domain
   service_domain              = local.config.SERVICE_DOMAIN
-  service_bucket_arn          = aws_s3_bucket.storage-bucket.arn
+  domain_zone              = aws_route53_zone.service-zone
 }
 
 module "service-user" {
@@ -78,8 +86,6 @@ module "service-user" {
   }
 
   # AWS Profile
-  aws_access_key              = var.aws_access_key
-  aws_secret_key              = var.aws_secret_key
   aws_region                  = local.config.AWS_REGION 
   aws_profile                 = local.config.AWS_PROFILE
 
@@ -126,8 +132,6 @@ module "service-subscriptions" {
   }
 
   # AWS Profile
-  aws_access_key              = var.aws_access_key
-  aws_secret_key              = var.aws_secret_key
   aws_region                  = local.config.AWS_REGION 
   aws_profile                 = local.config.AWS_PROFILE
 
@@ -170,9 +174,11 @@ module "service-subscriptions" {
 module "service-worker-gateway" {
   source                      = "./modules/service.worker-gateway"
 
+  providers = {
+    aws = aws
+  }
+
   # AWS Profile
-  aws_access_key              = var.aws_access_key
-  aws_secret_key              = var.aws_secret_key
   aws_region                  = local.config.AWS_REGION 
   aws_profile                 = local.config.AWS_PROFILE
 

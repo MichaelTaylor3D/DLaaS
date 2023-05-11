@@ -48,6 +48,7 @@ resource "aws_s3_bucket" "storage-bucket" {
   }
 }
 
+/*
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.storage-bucket.id
 
@@ -69,7 +70,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
   depends_on = [
     aws_s3_bucket_object.public-folder
   ]
-}
+}*/
 
 resource "aws_s3_bucket_object" "public-folder" {
   bucket = aws_s3_bucket.storage-bucket.id

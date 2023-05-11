@@ -31,7 +31,7 @@ const processJob = async (jobKey, payload, connectionId, options) => {
   try {
     result = await jobs[jobKey](payload);
   } catch (error) {
-    console.log(error.message);
+    console.log(jobKey, error.message);
   }
 
   const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
