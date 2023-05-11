@@ -61,11 +61,11 @@ const hashWithSalt = async (str, salt) => {
  * @function
  * @returns {Promise<string>} - A promise that resolves with the generated salt.
  */
-const generateSalt = async () => {
+const generateSalt = async (saltLength) => {
   const pbkdf2 = await getConfigurationFile("crypto.config.json");
 
   return crypto
-    .randomBytes(pbkdf2.dynamic_salt_length)
+    .randomBytes(saltLength || pbkdf2.dynamic_salt_length)
     .toString(pbkdf2.byte_to_string_encoding);
 };
 

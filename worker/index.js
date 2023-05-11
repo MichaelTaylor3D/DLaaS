@@ -74,8 +74,8 @@ const runWorker = async () => {
       messageAttributeNames: ["All"],
       handleMessage: async (message) => {
         try {
-          console.log("received message", message);
           const body = JSON.parse(message.Body);
+          console.log("received message", body);
           const data = JSON.parse(body.message);
           const connectionId =
             message?.MessageAttributes?.connectionId?.StringValue || 1;

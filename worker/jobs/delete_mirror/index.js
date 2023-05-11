@@ -1,13 +1,12 @@
 const superagent = require("superagent");
 const path = require("path");
 const fs = require("fs");
+const https = require("https");
 const {
   getConfigurationFile,
   dbQuery,
   sendEmail
 } = require("../../../common");
-
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 const { getChiaRoot } = require("../../utils");
 

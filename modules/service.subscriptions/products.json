@@ -5,6 +5,7 @@
     "description": "Create a mirror of an existing datastore",
     "cmd": "CREATE_MIRROR",
     "revert_cmd": "DELETE_MIRROR",
-    "cost": 1
+    "cost": 1,
+    "currency": "XCH"
   }
 }

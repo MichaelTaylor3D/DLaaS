@@ -1,12 +1,11 @@
 const superagent = require("superagent");
 const path = require("path");
 const fs = require("fs");
-
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+const https = require("https");
 
 const { getChiaRoot } = require("../../utils");
 
-const add_missing_files = async (payload) => {
+const add_missing_files = async () => {
   try {
     const chiaRoot = getChiaRoot();
     const certFile = path.resolve(
@@ -20,10 +19,15 @@ const add_missing_files = async (payload) => {
       .post(
         `https://${process.env.RPC_HOST}:${process.env.RPC_DATALAYER_PORT}/add_missing_files`
       )
-      .send({ })
+      .send({})
       .set("Content-Type", "application/json")
       .key(fs.readFileSync(keyFile))
-      .cert(fs.readFileSync(certFile));
+      .cert(fs.readFileSync(certFile))
+      .agent(
+        new https.Agent({
+          rejectUnauthorized: false,
+        })
+      );
 
     console.log('response.body: ', response.body);
 
@@ -35,5 +39,5 @@ const add_missing_files = async (payload) => {
 }
 
 module.exports = {
-  getTransactions,
+  add_missing_files,
 };
