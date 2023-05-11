@@ -17,3 +17,4 @@ resource "aws_s3_bucket_object" "app-config-upload" {
 # Add these variables to your tfvars file or the variables tab in Terraform Cloud Workspace
 variable "aws_access_key"         {}
 variable "aws_secret_key"         {}
+variable "owner_email"            {}

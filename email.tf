@@ -58,3 +58,7 @@ resource "aws_route53_record" "spf_domain" {
   ttl     = "600"
   records = ["v=spf1 include:amazonses.com -all"]
 }
+
+resource "aws_ses_email_identity" "owner_email" {
+  email = var.owner_email
+}

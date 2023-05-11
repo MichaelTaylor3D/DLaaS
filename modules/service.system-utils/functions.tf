@@ -132,3 +132,41 @@ resource "aws_lambda_function" "invalidate_cdn_function_handler" {
 }
 
 ### END S3 Trigger Invalidate CDN LAMBDA ###
+
+### START Send Route53 Availability Email LAMBDA ###
+
+data "archive_file" "send_route53_email_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/send_route53_available_email"  // Replace this with the path to your Lambda function's source code
+  output_path = "${path.module}/lambdas/send-route53-email-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "send_route53_email_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/send-route53-email-tf-handler.zip"
+  source = data.archive_file.send_route53_email_function_source.output_path
+  etag   = data.archive_file.send_route53_email_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "send_route53_email_function_handler" {
+  function_name     = "send-route53-email-handler"
+  description       = "${var.aws_profile}: Send Route53 Availability Email"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.send_route53_email_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 900
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.send_route53_email_function_source.output_base64sha256
+}
+
+### END Send Route53 Availability Email LAMBDA ###

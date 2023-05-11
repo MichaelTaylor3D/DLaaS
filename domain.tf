@@ -8,6 +8,10 @@
 
 resource "aws_route53_zone" "service-zone" {
   name = local.config.SERVICE_DOMAIN
+
+  depends_on = [
+    aws_ses_email_identity.owner_email
+  ]
 }
 
 resource "aws_route53_record" "www-api-subdomain" {
@@ -41,4 +45,27 @@ resource "aws_route53_record" "cdn-subdomain-a-record" {
     zone_id                = aws_cloudfront_distribution.cdn_distribution.hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+# notify the admin via email that route 53 is created and nameservers must be set to continue deployment
+resource "aws_lambda_invocation" "notify_route53_nameservers_available" {
+  function_name = module.service-system-utils.send_route53_email_function_handler_name
+  input = ""
+
+  depends_on = [
+    aws_route53_zone.service-zone,
+    aws_s3_bucket_object.domain-config-upload,
+    module.service-system-utils.send_route53_email_function_handler_name
+  ]
+}
+
+resource "aws_s3_bucket_object" "domain-config-upload" {
+  bucket       = aws_s3_bucket.storage_devops_bucket.id
+  key          = "configurations/domain.config.json"
+  content_type = "application/json"
+  content      = <<EOF
+  { 
+    "nameservers": ${jsonencode(aws_route53_zone.service-zone.name_servers)}
+  }
+  EOF
 }
