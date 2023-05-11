@@ -4,7 +4,7 @@
  * message to an SQS queue for further processing.
  */
 
-const { sendChiaRPCCommand } = require("/opt/nodejs/common");
+const { sendChiaRPCCommand, dbQuery } = require("/opt/nodejs/common");
 const rpc = require("/opt/nodejs/common/rpc.json");
 
 /**
@@ -27,9 +27,26 @@ exports.handler = async (event, context, callback) => {
 
   try {
     await Promise.all([
-      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file: full_tree_filename }),
-      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file: diff_filename })
+      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
+        store_id,
+        file: full_tree_filename,
+      }),
+      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
+        store_id,
+        file: diff_filename,
+      }),
     ]);
+
+    dbQuery(
+      `INSERT INTO datalayer_files (filename, store_id)
+              VALUES (':filename1', :storeId1), (':filename2', :storeId2);`,
+      {
+        filename1: full_tree_filename,
+        storeId1: store_id,
+        filename2: diff_filename,
+        storeId2: store_id,
+      }
+    );
 
     // Invoke the callback function with a successful response
     callback(null, {

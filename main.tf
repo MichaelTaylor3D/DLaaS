@@ -29,6 +29,12 @@ module "service-datalayer-upload-plugin" {
   domain_zone_id              = aws_route53_zone.service-zone.zone_id
   service_domain              = local.config.SERVICE_DOMAIN
 
+  # System Utils
+  create_schema_utility       = module.service-system-utils.create_schema_utility
+
+  # Database
+  db_name                     = local.config.SERVICE_NAME
+
   # Certificates
   wildcard_certificate_arn    = aws_acm_certificate.wildcard-domain.arn
 

@@ -4,7 +4,7 @@
  * request body and sends a separate message to an SQS queue for each file.
  */
 
-const { sendChiaRPCCommand } = require("/opt/nodejs/common");
+const { sendChiaRPCCommand, dbQuery } = require("/opt/nodejs/common");
 const rpc = require("/opt/nodejs/common/rpc.json");
 
 /**
@@ -29,8 +29,18 @@ exports.handler = async (event, context, callback) => {
     return sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file });
   });
 
+  const dbPromises = files.map(async (file) => {
+    return dbQuery(
+      `INSERT INTO datalayer_files (filename, store_id) VALUES (':filename', :storeId);`,
+      {
+        filename: file,
+        storeId,
+      }
+    );
+  });
+
   try {
-    await Promise.all(promises);
+    await Promise.all(promises.concat(dbPromises));
 
     // Invoke the callback function with a successful response
     callback(null, {
