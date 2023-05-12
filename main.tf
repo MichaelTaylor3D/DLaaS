@@ -15,11 +15,8 @@ provider "aws" {
 }
 
 module "service-datalayer-upload-plugin" {
-  source                     = "./modules/service.datalayer-upload-plugin"
-
-  providers = {
-    aws = aws
-  }
+  source                      = "./modules/service.datalayer-upload-plugin"
+  providers                   = { aws = aws }
 
   # AWS Profile
   aws_profile                 = local.config.AWS_PROFILE
@@ -47,11 +44,8 @@ module "service-datalayer-upload-plugin" {
 }
 
 module "service-system-utils" {
-  source                     = "./modules/service.system-utils"
-
-  providers = {
-    aws = aws
-  }
+  source                      = "./modules/service.system-utils"
+  providers                   = { aws = aws }
 
   # AWS Profile
   aws_region                  = local.config.AWS_REGION 
@@ -75,15 +69,12 @@ module "service-system-utils" {
 
   # domain
   service_domain              = local.config.SERVICE_DOMAIN
-  domain_zone              = aws_route53_zone.service-zone
+  domain_zone                 = aws_route53_zone.service-zone
 }
 
 module "service-user" {
-  source                     = "./modules/service.user"
-
-  providers = {
-    aws = aws
-  }
+  source                      = "./modules/service.user"
+  providers                   = { aws = aws }
 
   # AWS Profile
   aws_region                  = local.config.AWS_REGION 
@@ -125,11 +116,8 @@ module "service-user" {
 }
 
 module "service-subscriptions" {
-  source                     = "./modules/service.subscriptions"
-
-  providers = {
-    aws = aws
-  }
+  source                      = "./modules/service.subscriptions"
+  providers                   = { aws = aws }
 
   # AWS Profile
   aws_region                  = local.config.AWS_REGION 
@@ -173,10 +161,7 @@ module "service-subscriptions" {
 
 module "service-worker-gateway" {
   source                      = "./modules/service.worker-gateway"
-
-  providers = {
-    aws = aws
-  }
+  providers                   = { aws = aws }
 
   # AWS Profile
   aws_region                  = local.config.AWS_REGION 

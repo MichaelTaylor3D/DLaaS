@@ -61,7 +61,8 @@ resource "aws_iam_role_policy" "default-lambda-policy" {
         "Effect": "Allow",
         "Action": [
           "ses:SendEmail",
-          "ses:ListIdentities"
+          "ses:ListIdentities",
+          "ses:GetIdentityVerificationAttributes"
         ]
         "Resource": "*"
       },
