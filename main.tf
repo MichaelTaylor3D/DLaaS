@@ -56,8 +56,6 @@ module "service-system-utils" {
   # AWS Profile
   aws_region                  = local.config.AWS_REGION 
   aws_profile                 = local.config.AWS_PROFILE
-  owner_email                 = var.owner_email
-
 
   # Storage
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
