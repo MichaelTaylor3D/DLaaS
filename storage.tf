@@ -21,8 +21,8 @@
 
 
 resource "aws_s3_bucket" "storage_devops_bucket" {
-  # Bucket name must be unique across all AWS users!
   bucket = "${local.config.DEFAULT_S3_BUCKET}.devops"
+  force_destroy = true
 
   tags = {
     Name        = "${local.config.AWS_PROFILE} Configuration Bucket"
@@ -32,6 +32,7 @@ resource "aws_s3_bucket" "storage_devops_bucket" {
 
 resource "aws_s3_bucket" "storage-bucket" {
   bucket              = local.config.DEFAULT_S3_BUCKET
+  force_destroy       = true
   acceleration_status = "Enabled"
 
   cors_rule {
@@ -47,30 +48,6 @@ resource "aws_s3_bucket" "storage-bucket" {
     error_document = "error.html"
   }
 }
-
-/*
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.storage-bucket.id
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "DistinctPublicFolder",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "*"
-        },
-        "Action": "s3:GetObject",
-        "Resource": "arn:aws:s3:::${local.config.DEFAULT_S3_BUCKET}/public/*"
-      }
-    ]
-  })
-
-  depends_on = [
-    aws_s3_bucket_object.public-folder
-  ]
-}*/
 
 resource "aws_s3_bucket_object" "public-folder" {
   bucket = aws_s3_bucket.storage-bucket.id

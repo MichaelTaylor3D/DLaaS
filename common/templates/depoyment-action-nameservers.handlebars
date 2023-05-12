@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Welcome Email</title>
+  <style>
+    /* Add some basic CSS styles */
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome, {{name}}!</h1>
+  <p>
+    We're glad you've joined {{company}}! Here are some things you might find useful:
+  </p>
+  <ul>
+    {{#each resources}}
+    <li>
+      <a href="{{this.url}}">{{this.name}}</a>
+    </li>
+    {{/each}}
+  </ul>
+  <p>
+    If you have any questions, feel free to reach out to us at any time.
+  </p>
+  <p>Best,</p>
+  <p>The {{company}} Team</p>
+</body>
+</html>

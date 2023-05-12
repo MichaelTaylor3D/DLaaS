@@ -29,6 +29,8 @@ resource "null_resource" "copy_common_files_to_layer" {
   }
 
   triggers = {
+    # someone please help me find a way to build this common layer,
+    # without having to rebuild it every deployment 
     rebuild_trigger = sha1(timestamp())
   }
 

@@ -102,7 +102,7 @@ exports.handler = async (event, context, callback) => {
       // Send a confirmation email to the user
       await sendEmail(
         existingUser.email,
-        "DataLayer Storage Reset Email Confirmation",
+        "DataLayer Storage Reset Password Confirmation",
         `The password on your account has changed. If you did not request this change, please contact the administrator immediately.`
       );
     }

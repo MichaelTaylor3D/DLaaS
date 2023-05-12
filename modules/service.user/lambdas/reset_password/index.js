@@ -55,7 +55,7 @@ exports.handler = async (event, context, callback) => {
       // Send the reset password code to the user's email
       await sendEmail(
         email,
-        "DataLayer Storage Reset Email Request",
+        "DataLayer Storage Reset Password Request",
         `Your reset password code is: ${resetPasswordCode}.`,
         `<div>Your reset password code is:</div><div>${resetPasswordCode}</div>`
       );
