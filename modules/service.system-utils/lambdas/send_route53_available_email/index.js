@@ -1,4 +1,8 @@
-const { SESClient, ListIdentitiesCommand } = require("@aws-sdk/client-ses");
+const {
+  SESClient,
+  ListIdentitiesCommand,
+  GetIdentityVerificationAttributesCommand,
+} = require("@aws-sdk/client-ses");
 const { getConfigurationFile, sendEmail } = require("/opt/nodejs/common");
 const config = require("/opt/nodejs/common/config.json");
 
@@ -8,6 +12,7 @@ exports.handler = async (event) => {
   try {
     const domainConfig = await getConfigurationFile("domain.config.json");
     let identities;
+    let verifiedIdentity;
 
     do {
       // wait for 5 seconds before the next try
@@ -16,12 +21,26 @@ exports.handler = async (event) => {
       identities = await sesClient.send(
         new ListIdentitiesCommand({ IdentityType: "EmailAddress" })
       );
-    } while (!identities.Identities.length);
 
-    const email = identities.Identities[0];
+      for (let identity of identities.Identities) {
+        const attributes = await sesClient.send(
+          new GetIdentityVerificationAttributesCommand({
+            Identities: [identity],
+          })
+        );
 
-    await sendEmail(
-      email,
+        if (
+          attributes.VerificationAttributes[identity].VerificationStatus ===
+          "Success"
+        ) {
+          verifiedIdentity = identity;
+          break;
+        }
+      }
+    } while (!verifiedIdentity);
+
+    return sendEmail(
+      verifiedIdentity,
       "DLaaS Deployment Action Required",
       `Your DLaaS Route 53 zone is now available, <br /> 
         The current deployment is currently on hold until you complete this manual step.
@@ -35,7 +54,7 @@ exports.handler = async (event) => {
           <li>${domainConfig.nameservers[3]}</li>
         </ul>
         <br />
-        If you do not do this within the nest 20 mins your DLaaS deployment may timeout and you will have to restart it after following this step.
+        If the deployment times out before this change is submitted and propagated, simply restart the deployment and it should pick up where it left off.
       `
     );
   } catch (error) {

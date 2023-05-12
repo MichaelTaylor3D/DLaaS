@@ -163,6 +163,12 @@ resource "aws_lambda_function" "send_route53_email_function_handler" {
 
   layers = [var.lambda_layer_arn]
 
+   environment {
+    variables = {
+      OWNER_EMAIL = var.owner_email
+    }
+  }
+
   # IAM role for lambda defined below
   role              = var.default_lambda_role_arn
   publish           = true
