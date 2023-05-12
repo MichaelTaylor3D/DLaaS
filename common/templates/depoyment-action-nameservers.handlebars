@@ -1,30 +1,44 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <title>Welcome Email</title>
-  <style>
-    /* Add some basic CSS styles */
-    body {
-      font-family: Arial, sans-serif;
-    }
-  </style>
-</head>
-<body>
-  <h1>Welcome, {{name}}!</h1>
-  <p>
-    We're glad you've joined {{company}}! Here are some things you might find useful:
-  </p>
-  <ul>
-    {{#each resources}}
-    <li>
-      <a href="{{this.url}}">{{this.name}}</a>
-    </li>
-    {{/each}}
-  </ul>
-  <p>
-    If you have any questions, feel free to reach out to us at any time.
-  </p>
-  <p>Best,</p>
-  <p>The {{company}} Team</p>
-</body>
+  <head>
+    <title>DLaaS Deployment Action Required</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome!</h1>
+    <p>
+      We are delighted to inform you that you have successfully initiated the
+      process to deploy Datalayer as a Service (DLaaS). Your decision to utilize
+      this pivotal technology is highly appreciated, and we are excited to
+      support you in this endeavor.
+      <br />
+      <br />
+      We are writing to inform you that your Amazon Route 53 hosted zone is now
+      operational. However, the current deployment process has been temporarily
+      paused and is at risk of timing out. This pause is in place to allow you
+      to update your nameservers with your Domain Name System (DNS) provider.
+      This step is crucial for the generation of SSL certificates and the
+      completion of the DLaaS deployment. You can find the nameservers
+      associated with your account in your Amazon Web Services (AWS) console,
+      specifically within your Route 53 zone. For your convenience, we have also
+      listed the nameservers information below.
+    </p>
+    <ul>
+      {{#each nameservers}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    <p>
+      We kindly request that you update your nameservers at the earliest
+      opportunity to avoid any disruption in the deployment process. In the
+      event that your deployment times out, please rest assured that you can
+      resume the process by clicking the "Deploy" button in the Terraform
+      console. The deployment will continue from where it left off. Thank you
+      for your prompt attention to this matter. We look forward to the
+      successful deployment of your Datalayer as a Service.
+    </p>
+    <p>Best,</p>
+    <p>The DLaaS Team</p>
+  </body>
 </html>

@@ -1,8 +1,23 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const fs = require("fs");
+const Handlebars = require("handlebars");
+const path = require("path");
 
 const sesClient = new SESClient({
   region: "us-east-1",
 });
+
+const getEmailTemplate = async (templateName, values) => {
+  const filePath = path.join(__dirname, "templates", templateName);
+  const source = fs.readFileSync(filePath, "utf8");
+  const template = Handlebars.compile(source);
+  return template(values);
+};
+
+const sendEmailWithTemplate = async (email, title, templateName, values) => {
+  const message = await getEmailTemplate(templateName, values);
+  return sendEmail(email, title, message, message);
+}
 
 /**
  * Sends an email using the AWS SES service.
@@ -47,4 +62,5 @@ const sendEmail = async (email, title, message, htmlMessage) => {
 
 module.exports = {
   sendEmail,
+  sendEmailWithTemplate,
 };
