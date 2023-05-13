@@ -12,11 +12,13 @@ const {
   upsertUserMeta,
   getUserBy,
   sendEmail,
+  sendEmailByTemplate,
   generateConfirmationCode,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
-  getConfigurationFile,
 } = require("/opt/nodejs/common");
+
+const config = require("/opt/nodejs/common/config.json");
 
 /**
  * Handles the email change request event.
@@ -43,8 +45,6 @@ exports.handler = async (event, context, callback) => {
     // Generate an email change confirmation code
     const changeEmailCode = generateConfirmationCode();
 
-    const appConfig = await getConfigurationFile("app.config.json");
-
     // Perform necessary actions to process the email change request
     await Promise.all([
       // Upsert user meta for change email code and pending email
@@ -52,20 +52,28 @@ exports.handler = async (event, context, callback) => {
       upsertUserMeta(user_id, "pendingEmail", email),
 
       // Send an email to the old email address to cancel the change
-      sendEmail(
-        user.email,
-        "DataLayer Storage Email Change",
-        `A Request has been made to change you email to ${email}. If this was not you, go to the following link to cancel. https://app.${appConfig.SERVICE_DOMAIN}/user/v1/cancel_change_email?code=${changeEmailCode}`,
-        `<div>A Request has been made to change you email to ${email}. If this was not you, Click on the link below to cancel the request.</div><a href='https://app.${appConfig.SERVICE_DOMAIN}/user/v1/cancel_change_email?code=${changeEmailCode}'>Cancel Email Change</a>`
-      ),
-
+      sendEmailByTemplate({
+        email: user.email,
+        subject: `${config.SERVICE_NAME} Email Change`,
+        template: "email-change-confirm.handlebars",
+        values: {
+          serviceName: config.SERVICE_NAME,
+          email,
+          domain: config.SERVICE_DOMAIN,
+          changeEmailCode,
+        },
+      }),
       // Send an email to the new email address to confirm the change
-      sendEmail(
+      sendEmailByTemplate({
         email,
-        "DataLayer Storage Email Change",
-        `An email change request has been made. Go to the following link to confirm. https://app.${appConfig.SERVICE_DOMAIN}/user/v1/confirm_change_email?code=${changeEmailCode}`,
-        `<div>An email change request has been made. Click on the link below to confirm email change.</div><a href='https://app.${appConfig.SERVICE_DOMAIN}/user/v1/confirm_change_email?code=${changeEmailCode}'>Confirm Email</a>`
-      ),
+        subject: `${config.SERVICE_NAME} Email Change`,
+        template: "email-change-request.handlebars",
+        values: {
+          serviceName: config.SERVICE_NAME,
+          domain: config.SERVICE_DOMAIN,
+          changeEmailCode,
+        }
+      })
     ]);
 
     // Send a success response

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Payment Details</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{serviceName}} Payment Details</h1>
+    <p>
+      The following payments have been detected:
+    </p>
+    <table>
+      <tr>
+        <th>Transaction Name</th>
+        <th>Amount (XCH)</th>
+      </tr>
+      {{#each paymentDetails}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{this.amount}}</td>
+        </tr>
+      {{/each}}
+    </table>
+    <p><strong>Total: {{totalAmount}} XCH</strong></p>
+    <p>Thank you for your business.</p>
+    <p>Best Regards,</p>
+    <p>The {{serviceName}} Team</p>
+  </body>
+</html>

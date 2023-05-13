@@ -12,7 +12,7 @@ const { passwordStrength } = require("check-password-strength");
 const {
   hashWithSalt,
   generateSalt,
-  sendEmail,
+  sendEmailByTemplate,
   generateConfirmationCode,
   getUserByEmailOrUsername,
   dbQuery,
@@ -20,6 +20,7 @@ const {
   getConfigurationFile,
 } = require("/opt/nodejs/common");
 
+const config = require("/opt/nodejs/common/config.json");
 
 /**
  * Inserts a new user into the database.
@@ -95,12 +96,16 @@ exports.handler = async (event, context, callback) => {
     const appConfig = await getConfigurationFile("app.config.json");
 
     // Send confirmation email
-    await sendEmail(
+    await sendEmailByTemplate({
       email,
-      "DataLayer Storage Account Creation",
-      `Your account has been created successfully. Go to the following link to activate your account. https://app.${appConfig.SERVICE_DOMAIN}/user/confirm?code=${confirmationCode}`,
-      `<div>Your account has been created successfully. Click on the link below to activate your account.</div><a href='https://app.${appConfig.SERVICE_DOMAIN}/user/confirm?code=${confirmationCode}'>Activate Account</a>`
-    );
+      subject: `${config.SERVICE_NAME} Account Creation`,
+      template: "account-created.handlebars",
+      values: {
+        serviceName: config.SERVICE_NAME,
+        serviceDomain: config.SERVICE_DOMAIN,
+        confirmationCode,
+      }
+    });
 
     // Send a success response
     callback(null, {

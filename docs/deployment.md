@@ -55,7 +55,8 @@ In this project, configuration variables are stored in a `config.json` file. The
 {
   "AWS_REGION": "us-east-1",
   "AWS_PROFILE": "dlaas",
-  "SERVICE_NAME": "dlaas",
+  "SERVICE_NAME": "DLaaS",
+  "DB_NAME": "dlaas",
   "SERVICE_DOMAIN": "datalayer.storage",
   "DEFAULT_S3_BUCKET": "dlaas",
   "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7",

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>DLaaS Deployment Action Required</title>
@@ -26,7 +27,7 @@
     </p>
     <ul>
       {{#each nameservers}}
-        <li>{{this}}</li>
+        <li>{{this}}.</li>
       {{/each}}
     </ul>
     <p>
@@ -39,6 +40,6 @@
       successful deployment of your Datalayer as a Service.
     </p>
     <p>Best,</p>
-    <p>The DLaaS Team</p>
+    <p>The {{serviceName}} Team</p>
   </body>
 </html>

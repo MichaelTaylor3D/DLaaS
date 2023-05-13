@@ -6,7 +6,7 @@
  */
 
 resource "aws_db_instance" "default" {
-  identifier                  = "${local.config.SERVICE_NAME}-db"
+  identifier                  = "${local.config.DB_NAME}-db"
   allocated_storage           = 20
   max_allocated_storage       = 500
   storage_type                = "gp2"
@@ -15,7 +15,7 @@ resource "aws_db_instance" "default" {
   allow_major_version_upgrade = true
   apply_immediately           = true
   instance_class              = local.config.DB_INSTANCE_CLASS
-  name                        = local.config.SERVICE_NAME
+  name                        = local.config.DB_NAME
   username                    = random_password.username.result
   password                    = random_password.password.result
   parameter_group_name        = aws_db_parameter_group.default.name
@@ -106,7 +106,7 @@ resource "aws_s3_bucket_object" "database-config-upload" {
     "address": "${aws_db_instance.default.address}",
     "arn": "${aws_db_instance.default.arn}",
     "endpoint": "${aws_db_instance.default.endpoint}",
-    "db_name": "${local.config.SERVICE_NAME}",
+    "db_name": "${local.config.DB_NAME}",
     "db_port": "${aws_db_instance.default.port}",
     "username": "${aws_db_instance.default.username}",
     "password": "${aws_db_instance.default.password}"

@@ -4,7 +4,7 @@
  * The module also sends emails to users for various events, such as subscription expiration or invoice creation.
  */
 const { getConfigurationFile } = require("./config-utils");
-const { sendEmail } = require("./email-utils");
+const { sendEmail, sendEmailWithTemplate } = require("./email-utils");
 const { getUserBy, dbQuery } = require("./database-utils");
 const { sendChiaRPCCommand } = require("./worker-bridge");
 const rpc = require("./rpc.json");
@@ -164,11 +164,17 @@ async function createInvoice(userId, subscriptionId, product) {
 
       // Send the invoice email to the user
       const invoiceUrl = `https://app.${serviceDomain}/invoices/${invoiceId}`;
-      await sendEmail(
-        user.email,
-        "Your Invoice",
-        `Please pay the invoice at ${invoiceUrl} to activate or renew your subscription.`
-      );
+      
+      await sendEmailWithTemplate({
+        email: user.email,
+        subject: `${config.SERVICE_NAME} Subscription - Invoice Ready for Payment`,
+        template: "invoice.handlebars",
+        values: {
+          serviceName: config.SERVICE_NAME,
+          invoiceUrl
+        }
+      });
+      
       console.log(`Invoice email sent to user: ${user.email}`);
 
       resolve({
@@ -215,7 +221,7 @@ async function insertTransactionsAndCalculateSum(
 
         await dbQuery(query, values);
         paymentDetails.push(
-          `${transaction.name}: ${transaction.amount / mojosPerXCH} XCH`
+          {name: transaction.name, amount: transaction.amount / mojosPerXCH}
         );
       }
     }
@@ -225,13 +231,16 @@ async function insertTransactionsAndCalculateSum(
     });
 
     if (user[0].email && paymentDetails.length > 0) {
-      sendEmail(
-        user[0].email,
-        "Payment Details",
-        `The following payments have been detected: <br />${paymentDetails.join(
-          "<br />"
-        )}<br />Thank you for your business.`
-      );
+      await sendEmailWithTemplate({
+        email: user[0].email,
+        subject: `${config.SERVICE_NAME} Subscription - Payment Details`,
+        template: "payments.handlebars",
+        values: {
+          serviceName: config.SERVICE_NAME,
+          paymentDetails: paymentDetails,
+          totalAmount: paymentDetails.reduce((sum, transaction) => sum + transaction.amount, 0)
+        }
+      });
     }
 
     return confirmedSum;

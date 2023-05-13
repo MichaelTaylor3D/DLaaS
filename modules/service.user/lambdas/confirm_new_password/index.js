@@ -11,12 +11,14 @@
 const { passwordStrength } = require("check-password-strength");
 const {
   generateSalt,
-  sendEmail,
+  sendEmailByTemplate,
   dbQuery,
   hashWithSalt,
   upsertUserMeta,
   assertRequiredBodyParams,
 } = require("/opt/nodejs/common");
+
+const config = require("/opt/nodejs/common/config.json");
 
 /**
  * Retrieves a user object by their password reset code.
@@ -100,11 +102,14 @@ exports.handler = async (event, context, callback) => {
       await resetPassword(password, existingUser.user_id);
 
       // Send a confirmation email to the user
-      await sendEmail(
-        existingUser.email,
-        "DataLayer Storage Reset Password Confirmation",
-        `The password on your account has changed. If you did not request this change, please contact the administrator immediately.`
-      );
+      await sendEmailByTemplate({
+        email: existingUser.email,
+        subject: `${config.SERVICE_NAME} Reset Password Confirmation`,
+        template: "password-reset-confirmation.handlebars",
+        values: {
+          service_name: config.SERVICE_NAME,
+        }
+      });
     }
 
     // Send a success response

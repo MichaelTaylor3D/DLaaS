@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{serviceName}} Email Change Confirmation</title>
+    <style>
+      /* Add some basic CSS styles */ body { font-family: Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>{{serviceName}} Email Change Confirmation</h1>
+    <p>
+      An email change request has been made for your account. If this request
+      was made by you, please click the link below to confirm the change.
+    </p>
+    <p>
+      <a
+        href="https://app.{{domain}}/user/confirm_change_email?code={{changeEmailCode}}"
+      >Confirm Email Change</a>
+    </p>
+    <p>If you did not make this request, please ignore this email.</p>
+    <p>Best Regards,</p>
+    <p>The {{serviceName}} Team</p>
+  </body>
+</html>

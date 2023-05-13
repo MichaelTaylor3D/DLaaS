@@ -14,9 +14,9 @@ const getEmailTemplate = async (templateName, values) => {
   return template(values);
 };
 
-const sendEmailWithTemplate = async (email, title, templateName, values) => {
-  const message = await getEmailTemplate(templateName, values);
-  return sendEmail(email, title, message, message);
+const sendEmailWithTemplate = async ({email, subject, template, values}) => {
+  const message = await getEmailTemplate(template, values);
+  return sendEmail(email, subject, message, message);
 }
 
 /**

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account Created Successfully</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to {{serviceName}}</h1>
+    <p>
+      Your account has been created successfully. Please click on the link below
+      to activate your account.
+    </p>
+    <p>
+      <a
+        href="https://app.{{serviceDomain}}/user/confirm?code={{confirmationCode}}"
+      >Activate Account</a>
+    </p>
+    <p>
+      If you have any questions, feel free to reach out to us at any time.
+    </p>
+    <p>Best,</p>
+    <p>The {{serviceName}} Team</p>
+  </body>
+</html>

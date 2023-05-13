@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>New Invoice from {{serviceName}}</title>
+    <style>
+      /* Add some basic CSS styles */ body { font-family: Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>Your {{serviceName}} Invoice is Ready for Payment</h1>
+    <p>
+      Your latest invoice is now available. Please note that your subscription
+      will not begin until this invoice has been paid. Click on the link below
+      to view and pay your invoice.
+    </p>
+    <p>
+      <a href="{{invoiceURL}}">View Invoice</a>
+    </p>
+    <p>
+      If you have any questions or concerns about this invoice, please don't
+      hesitate to contact us.
+    </p>
+    <p>Best,</p>
+    <p>The {{serviceName}} Team</p>
+  </body>
+</html>

@@ -12,5 +12,5 @@ resource "aws_lambda_permission" "allow_bucket" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.invalidate_cdn_function_handler.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "${var.service_bucket_arn}"
+  source_arn    = var.service_bucket_arn
 }

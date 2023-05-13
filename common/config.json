@@ -1,7 +1,8 @@
 {
   "AWS_REGION": "us-east-1",
   "AWS_PROFILE": "dlaas",
-  "SERVICE_NAME": "dlaas", 
+  "SERVICE_NAME": "DLaaS",
+  "DB_NAME": "dlaas",
   "SERVICE_DOMAIN": "datalayer.storage",
   "DEFAULT_S3_BUCKET": "dlaas",
   "DONATE_TO_SUPPORT_MORE_DEVELOPMENT": "true",

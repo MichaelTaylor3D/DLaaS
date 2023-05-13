@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{serviceName}} Email Change</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>{{serviceName}} Email Change</h1>
+    <p>
+      A request has been made to change your email to
+      {{email}}. If this was not you, you can cancel this request by clicking
+      the link below.
+    </p>
+    <p>
+      <a
+        href="https://app.{{domain}}/user/cancel_change_email?code={{changeEmailCode}}"
+      >Cancel Email Change</a>
+    </p>
+    <p>Best Regards,</p>
+    <p>The {{serviceName}} Team</p>
+  </body>
+</html>

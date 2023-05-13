@@ -44,14 +44,14 @@ exports.handler = async (event) => {
       }
     } while (!verifiedIdentity);
 
-    return sendEmailWithTemplate(
-      verifiedIdentity,
-      "DLaaS Deployment Action Required",
-      "depoyment-action-nameservers.handlebars",
-      {
+    return sendEmailWithTemplate({
+      email: verifiedIdentity,
+      subject: "DLaaS Deployment Action Required",
+      template: "depoyment-action-nameservers.handlebars",
+      values: {
         nameservers: [...domainConfig.nameservers],
-      }
-    );
+      },
+    });
   } catch (error) {
     console.error(error);
   }

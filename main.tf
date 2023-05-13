@@ -34,7 +34,7 @@ module "service-datalayer-upload-plugin" {
   create_schema_utility       = module.service-system-utils.create_schema_utility
 
   # Database
-  db_name                     = local.config.SERVICE_NAME
+  db_name                     = local.config.DB_NAME
 
   # Certificates
   wildcard_certificate_arn    = aws_acm_certificate.wildcard-domain.arn
@@ -85,7 +85,7 @@ module "service-user" {
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
-  db_name                     = local.config.SERVICE_NAME
+  db_name                     = local.config.DB_NAME
 
   # System Utils
   create_schema_utility       = module.service-system-utils.create_schema_utility
@@ -128,7 +128,7 @@ module "service-subscriptions" {
   dev_bucket_id               = aws_s3_bucket.storage_devops_bucket.id
 
   # Database
-  db_name                     = local.config.SERVICE_NAME
+  db_name                     = local.config.DB_NAME
 
   # System Utils
   create_schema_utility       = module.service-system-utils.create_schema_utility

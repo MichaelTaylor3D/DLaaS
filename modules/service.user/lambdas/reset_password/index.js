@@ -9,12 +9,14 @@
 
 const {
   upsertUserMeta,
-  sendEmail,
+  sendEmailByTemplate,
   generateConfirmationCode,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
   getUserBy,
 } = require("/opt/nodejs/common");
+
+const config = require("/opt/nodejs/common/config.json");
 
 /**
  * AWS Lambda function handler that generates a reset password code and sends it to the user's email address.
@@ -53,12 +55,15 @@ exports.handler = async (event, context, callback) => {
       );
 
       // Send the reset password code to the user's email
-      await sendEmail(
+      await sendEmailByTemplate({
         email,
-        "DataLayer Storage Reset Password Request",
-        `Your reset password code is: ${resetPasswordCode}.`,
-        `<div>Your reset password code is:</div><div>${resetPasswordCode}</div>`
-      );
+        subject: `${config.SERVICE_NAME} Reset Password Request`,
+        template: "password-reset-request.handlebars",
+        values: {
+          serviceName: config.SERVICE_NAME,
+          resetPasswordCode,
+        },
+      });
     }
 
     // Send a success response
