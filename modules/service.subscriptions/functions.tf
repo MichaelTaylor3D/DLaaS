@@ -194,44 +194,6 @@ resource "aws_lambda_function" "cron_check_for_payment_function_handler" {
 
 ### END cron_check_for_payment LAMBDA ###
 
-### START cron_clean_up_unfulfilled_subscriptions LAMBDA ###
-
-data "archive_file" "cron_clean_up_unfulfilled_subscriptions_function_source" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/cron_clean_up_unfulfilled_subscriptions"
-  output_path = "${path.module}/lambdas/cron-clean-up-unfulfilled-subscriptions-tf-handler-${random_uuid.archive.result}.zip"
-}
-
-# Upload Lamda function to S3
-resource "aws_s3_bucket_object" "cron_clean_up_unfulfilled_subscriptions_function_storage_upload" {
-  bucket = var.dev_bucket_id
-  key    = "lambdas/cron-clean-up-unfulfilled-subscriptions-tf-handler.zip"
-  source = data.archive_file.cron_clean_up_unfulfilled_subscriptions_function_source.output_path
-  etag   = data.archive_file.cron_clean_up_unfulfilled_subscriptions_function_source.output_md5
-}
-
-# Lamda Initialization
-resource "aws_lambda_function" "cron_clean_up_unfulfilled_subscriptions_function_handler" {
-  function_name     = "cron-clean-up-unfulfilled-subscriptions-handler"
-  description       = "${var.aws_profile}: Cron Clean Up Unfulfilled Subscriptions function"
-  s3_bucket         = var.dev_bucket_id
-  s3_key            = aws_s3_bucket_object.cron_clean_up_unfulfilled_subscriptions_function_storage_upload.key
-
-  # Entrypoint to lambda function. Format is <file-name>.<property-name>
-  handler           = "index.handler"
-  runtime           = "nodejs16.x"
-  timeout           = 60
-
-  layers = [var.lambda_layer_arn]
-
-  # IAM role for lambda defined below
-  role              = var.default_lambda_role_arn
-  publish           = true
-  source_code_hash  = data.archive_file.cron_clean_up_unfulfilled_subscriptions_function_source.output_base64sha256
-}
-
-### END cron_clean_up_unfulfilled_subscriptions LAMBDA ###
-
 ### START get_unpaid_invoices LAMBDA ###
 
 data "archive_file" "get_unpaid_invoices_function_source" {
@@ -269,6 +231,122 @@ resource "aws_lambda_function" "get_unpaid_invoices_function_handler" {
 }
 
 ### END get_unpaid_invoices LAMBDA ###
+
+### START cron_check_for_incoming_renewals LAMBDA ###
+
+data "archive_file" "cron_check_for_incoming_renewals_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/cron_check_for_incoming_renewals"
+  output_path = "${path.module}/lambdas/cron-check-for-incoming-renewals-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "cron_check_for_incoming_renewals_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/cron-check-for-incoming-renewals-tf-handler.zip"
+  source = data.archive_file.cron_check_for_incoming_renewals_function_source.output_path
+  etag   = data.archive_file.cron_check_for_incoming_renewals_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "cron_check_for_incoming_renewals_function_handler" {
+  function_name     = "cron-check-for-incoming-renewals-handler"
+  description       = "${var.aws_profile}: Cron Check for Incoming Renewals function"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.cron_check_for_incoming_renewals_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.cron_check_for_incoming_renewals_function_source.output_base64sha256
+}
+
+### END cron_check_for_incoming_renewals LAMBDA ###
+
+### START cron_cleanup_expired_subscriptions LAMBDA ###
+
+data "archive_file" "cron_cleanup_expired_subscriptions_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/cron_cleanup_expired_subscriptions"
+  output_path = "${path.module}/lambdas/cron-cleanup-expired-subscriptions-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "cron_cleanup_expired_subscriptions_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/cron-cleanup-expired-subscriptions-tf-handler.zip"
+  source = data.archive_file.cron_cleanup_expired_subscriptions_function_source.output_path
+  etag   = data.archive_file.cron_cleanup_expired_subscriptions_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "cron_cleanup_expired_subscriptions_function_handler" {
+  function_name     = "cron-cleanup-expired-subscriptions-handler"
+  description       = "${var.aws_profile}: Cron Cleanup Expired Subscriptions function"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.cron_cleanup_expired_subscriptions_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.cron_cleanup_expired_subscriptions_function_source.output_base64sha256
+}
+
+### END cron_cleanup_expired_subscriptions LAMBDA ###
+
+### START cron_set_subscriptions_to_expired LAMBDA ###
+
+data "archive_file" "cron_set_subscriptions_to_expired_function_source" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/cron_set_subscriptions_to_expired"
+  output_path = "${path.module}/lambdas/cron-set-subscriptions-to-expired-tf-handler-${random_uuid.archive.result}.zip"
+}
+
+# Upload Lambda function to S3
+resource "aws_s3_bucket_object" "cron_set_subscriptions_to_expired_function_storage_upload" {
+  bucket = var.dev_bucket_id
+  key    = "lambdas/cron-set-subscriptions-to-expired-tf-handler.zip"
+  source = data.archive_file.cron_set_subscriptions_to_expired_function_source.output_path
+  etag   = data.archive_file.cron_set_subscriptions_to_expired_function_source.output_md5
+}
+
+# Lambda Initialization
+resource "aws_lambda_function" "cron_set_subscriptions_to_expired_function_handler" {
+  function_name     = "cron-set-subscriptions-to-expired-handler"
+  description       = "${var.aws_profile}: Cron Set Subscriptions to Expired function"
+  s3_bucket         = var.dev_bucket_id
+  s3_key            = aws_s3_bucket_object.cron_set_subscriptions_to_expired_function_storage_upload.key
+
+  # Entrypoint to lambda function. Format is <file-name>.<property-name>
+  handler           = "index.handler"
+  runtime           = "nodejs16.x"
+  timeout           = 60
+
+  layers = [var.lambda_layer_arn]
+
+  # IAM role for lambda defined below
+  role              = var.default_lambda_role_arn
+  publish           = true
+  source_code_hash  = data.archive_file.cron_set_subscriptions_to_expired_function_source.output_base64sha256
+}
+
+### END cron_set_subscriptions_to_expired LAMBDA ###
+
+
 
 
 

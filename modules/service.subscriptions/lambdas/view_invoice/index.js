@@ -166,6 +166,30 @@ exports.handler = async (event, context, callback) => {
 
     // Get invoice, subscription, and product data
     const invoiceData = invoice[0];
+
+    if (invoiceData.status === "expired") {
+      const expiredResponse = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            ${css}
+          </style>
+        </head>
+        <body>
+          <h1>Invoice not found</h1>
+          <div id="invalid-invoice">INVOICE EXPIRED</div>
+        </body>
+        </html>
+      `;
+
+      return {
+        statusCode: 404,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+        body: expiredResponse,
+      };
+    }
+
     const subscriptionQueryString =
       "SELECT * FROM subscriptions WHERE id = :subscriptionId";
     const subscription = await dbQuery(subscriptionQueryString, {
@@ -175,9 +199,9 @@ exports.handler = async (event, context, callback) => {
     const productKey = subscription[0].product_key;
     const [productsConfig, appConfig] = await Promise.all([
       getConfigurationFile("products.config.json"),
-      getConfigurationFile("app.config.json")
+      getConfigurationFile("app.config.json"),
     ]);
-    
+
     const product = productsConfig[productKey];
 
     // Generate QR code if the invoice is unpaid or overdue
@@ -189,7 +213,6 @@ exports.handler = async (event, context, callback) => {
       });
     }
 
-    // ...
     const html = `
     <!DOCTYPE html>
     <html>
@@ -261,12 +284,13 @@ exports.handler = async (event, context, callback) => {
       <div id="container">
         <h1>Invoice for subscription: ${product.name}</h1>
         ${
-          invoiceData.status !== "paid" ?
-          `
+          invoiceData.status !== "paid"
+            ? `
           <h3>Please send exactly ${
             invoiceData.total_amount_due - invoiceData.amount_paid
           } XCH to activate this subscription.</h3>
-        ` : ''
+        `
+            : ""
         }
         
         <h5>All sales are final.</h5>

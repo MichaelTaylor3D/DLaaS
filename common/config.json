@@ -9,5 +9,6 @@
   "_comment": "By default, the donation address is assigned to the DLAAS team. To donate to the DLAAS team, kindly keep the address as is. Alternatively, you may specify an XCH address for a charity you wish to support. To opt out of donating, set the value to false.",
   "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7",
   "DONATION_PERCENTAGE": "0.002",
-  "DB_INSTANCE_CLASS": "db.t3.micro"
+  "DB_INSTANCE_CLASS": "db.t3.micro",
+  "SUBSCRIPTION_GRACE_PERIOD_IN_DAYS": "15"
 }

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ${db_name}.invoices (
   total_amount_due DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
   amount_paid DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
   xch_payment_address VARCHAR(62) NOT NULL,
-  status ENUM('unpaid', 'paid', 'overdue') NOT NULL
+  status ENUM('unpaid', 'paid', 'overdue', 'expired') NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS ${db_name}.payments (

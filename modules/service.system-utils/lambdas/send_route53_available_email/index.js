@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     return sendEmailWithTemplate({
       email: verifiedIdentity,
       subject: "DLaaS Deployment Action Required",
-      template: "depoyment-action-nameservers.handlebars",
+      template: "deployment-action-nameservers.handlebars",
       values: {
         nameservers: [...domainConfig.nameservers],
       },

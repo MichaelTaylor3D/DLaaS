@@ -385,10 +385,23 @@ async function confirmPayment(invoiceId) {
       } else {
         const subscription = rows[0];
 
-        // Get current date and calculate the date one year from now
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setFullYear(startDate.getFullYear() + 1);
+        // Check if the subscription start_date is in the future
+        const now = new Date();
+        let startDate = new Date(subscription.start_date);
+        let endDate;
+
+        if (startDate > now) {
+          // The start_date is in the future, so the end_date is calculated as 1 year from the start_date
+          // this handles renewal payments
+          endDate = new Date(startDate);
+          endDate.setFullYear(startDate.getFullYear() + 1);
+        } else {
+          // The start_date is in the past, so the start_date is today and the end_date is calculated as 1 year from today
+          // this handles new payments
+          startDate = now;
+          endDate = new Date();
+          endDate.setFullYear(now.getFullYear() + 1);
+        }
 
         const updateSubscriptionQueryString = `
           UPDATE subscriptions
@@ -417,6 +430,7 @@ async function confirmPayment(invoiceId) {
     }
   });
 }
+
 
 module.exports = {
   createSubscription,
