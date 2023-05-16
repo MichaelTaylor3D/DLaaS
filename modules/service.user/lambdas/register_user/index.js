@@ -12,7 +12,7 @@ const { passwordStrength } = require("check-password-strength");
 const {
   hashWithSalt,
   generateSalt,
-  sendEmailByTemplate,
+  sendEmailWithTemplate,
   generateConfirmationCode,
   getUserByEmailOrUsername,
   dbQuery,
@@ -96,7 +96,7 @@ exports.handler = async (event, context, callback) => {
     const appConfig = await getConfigurationFile("app.config.json");
 
     // Send confirmation email
-    await sendEmailByTemplate({
+    await sendEmailWithTemplate({
       email,
       subject: `${config.SERVICE_NAME} Account Creation`,
       template: "account-created.handlebars",
@@ -104,7 +104,7 @@ exports.handler = async (event, context, callback) => {
         serviceName: config.SERVICE_NAME,
         serviceDomain: config.SERVICE_DOMAIN,
         confirmationCode,
-      }
+      },
     });
 
     // Send a success response

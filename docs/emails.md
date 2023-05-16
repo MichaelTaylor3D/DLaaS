@@ -41,3 +41,11 @@ Follow these steps to request Amazon SES to move your account from sandbox mode 
 Once you have completed these steps, AWS will review your request to increase the sending limit. Once your request is approved, you'll be able to send emails to any recipient from your verified domains and email addresses.
 
 Keep in mind that while you're in sandbox mode, you also need to verify every email address that you send emails to. This step is not necessary once your account is in production mode.
+
+## Email Templates
+
+DLaaS uses a set of email templates to compose the transactional emails sent to users. These templates are located in the `common/templates` directory of the codebase. The templates provided are basic HTML with placeholders for dynamic content and do not include any specific styling. This makes it easy for you to adapt the templates to match your own branding by adding CSS or other design elements.
+
+The email templates use the Handlebars templating language. Handlebars allows for logic-less templates that are easy to write and understand, with powerful features for dynamically inserting content. With Handlebars, you can insert variables into the template using double curly braces, like `{{variable}}`. The actual variable values are provided as a JavaScript object when the template is rendered. 
+
+This setup provides a flexible and powerful system for creating professional, customized emails for your DLaaS system. Whether you're notifying users of account changes, sending alerts, or distributing reports, these templates offer a solid starting point that can easily be expanded and customized to fit your needs.

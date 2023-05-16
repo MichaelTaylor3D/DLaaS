@@ -9,7 +9,7 @@
 
 const {
   upsertUserMeta,
-  sendEmailByTemplate,
+  sendEmailWithTemplate,
   generateConfirmationCode,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
@@ -55,7 +55,7 @@ exports.handler = async (event, context, callback) => {
       );
 
       // Send the reset password code to the user's email
-      await sendEmailByTemplate({
+      await sendEmailWithTemplate({
         email,
         subject: `${config.SERVICE_NAME} Reset Password Request`,
         template: "password-reset-request.handlebars",

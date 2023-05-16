@@ -1,36 +1,63 @@
-# DLAAS - Datalayer as a Service
-## Chia Blockchain Node Monetization Infrastructure
+# DLaaS - Datalayer as a Service
+## Monetize Your Chia Blockchain Node
 
-This repository contains the necessary infrastructure for monetizing your Chia Blockchain node and offering its services to customers on a rental basis. The focus of this project is on the Chia data layer, and it is designed as a Software as a Service (SaaS) product, not a decentralized application (dApp). It enables secure interaction with your self-hosted Chia node, providing user-scoped blockchain services. The infrastructure is built on Amazon Web Services (AWS), and an AWS account is required to deploy your instance of the service. The project uses Terraform as an Infrastructure as Code (IaC) tool, allowing for quick and easy provisioning of the service.
+Welcome to the DLaaS repository, your one-stop solution for converting your Chia Blockchain node into a lucrative venture. This project focuses on the Chia data layer, offering its services to clients on a rental basis. The system operates as a Software as a Service (SaaS) product, facilitating secure interactions with your self-hosted Chia node, and delivering user-scoped blockchain services.
 
-A significant portion of this SaaS product relies on an RDS database to manage application state. This approach was chosen to expedite the development process and ensure a timely initial release. In future iterations, the plan is to eliminate the RDS database dependency and transition the service to operate exclusively on its own dedicated data layer tables.
+Built on Amazon Web Services (AWS), the infrastructure requires an AWS account for deployment. The repository utilizes Terraform as an Infrastructure as Code (IaC) tool for seamless service provisioning. Keep in mind that at the outset, running DLaaS without customers costs approximately $30 per month. As your customer base grows, expenses will increase, necessitating appropriately priced products to cover costs.
 
-## Main Components
+The SaaS product heavily depends on an RDS database to manage application state, an approach chosen to accelerate development and ensure a swift initial release. Future plans include phasing out the RDS dependency and shifting the service to operate solely on its dedicated data layer tables.
 
-The primary components of this repository include:
+## Quick Start Guide
 
-1. **Baseline AWS Infrastructure**: This includes the necessary AWS resources and configurations to deploy and run the application.
-2. **User Management System**: A comprehensive user management system that enables users to register, log in, and manage their accounts.
-3. **Subscription System**: A system that allows users to access the service for a recurring fee, paid in XCH (Chia cryptocurrency).
-4. **Worker Script**: A script that runs alongside your Chia node, securely receiving messages from the SaaS product to execute commands against your node.
+Follow these steps for swift setup and usage of the DLaaS system:
+
+1. **Fork the Repository**: Fork the DLaaS repository to your GitHub account.
+
+2. **Create Terraform Cloud Account**: Sign up for a free account on [terraform.io](https://www.terraform.io/cloud/signup/account) and create a new workspace.
+
+3. **Adjust Terraform Settings**: In the `main.tf` file of your forked repository, modify the "remote" settings to match your Terraform workspace.
+
+4. **Modify Project Settings**: Update properties in `common/config.json` and `modules/service.subscriptions/projects.json` to align with your project. Retaining default properties may result in deployment errors due to AWS resource conflicts.
+
+5. **Define Terraform Variables**: Define the following variables in your Terraform workspace: `aws_access_key`, `aws_secret_key`, and `owner_email`.
+
+6. **Verify AWS Identity**: Upon the first deployment, AWS will email a verification request. Complete this promptly to prevent deployment delays.
+
+7. **Set Up Nameservers**: Post-verification, you'll receive instructions for setting up your nameservers. Deployment cannot proceed until nameservers are configured with your DNS provider. If propagation causes a timeout, restart the deployment to continue from where it left off.
+
+8. **Clone Repository**: Clone the forked repository onto a machine running a Chia Wallet (full node not required). Ensure datalayer settings are enabled on this machine.
+
+Congratulations, you're all set to use the DLaaS system!
+
+## Components
+
+The repository primarily comprises:
+
+1. **Baseline AWS Infrastructure**: Necessary AWS resources and configurations for application deployment and running.
+
+2. **User Management System**: A robust system for user registration, login, and account management.
+
+3. **Subscription System**: Allows users to access the service for a recurring fee, payable in XCH (Chia cryptocurrency).
+
+4. **Worker Script**: A script running alongside your Chia node, securely receiving and executing commands from the SaaS product.
 
 ## Requirements
 
-- An AWS account
-- Terraform installed or a terraform.io account
-- A self-hosted Chia Blockchain node
+- AWS account
+- Terraform installation or a terraform.io account
+- Self-hosted Chia Blockchain node
 
 ## Deployment
 
-To deploy your own instance of the Chia Blockchain Node Monetization Infrastructure, follow the steps provided in the [Deployment Guide](./docs/deployment.md).
+Follow the [Deployment Guide](./docs/deployment.md) for deploying your Chia Blockchain Node Monetization Infrastructure.
 
 ## Documentation
 
-For more information on the project and detailed instructions on configuration and usage, refer to the [Documentation](./docs).
+Refer to the [Documentation](./docs) for comprehensive project information and usage instructions.
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
+This project is under the [MIT License](./LICENSE).
 
 # Support My Project
 

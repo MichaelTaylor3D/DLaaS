@@ -11,8 +11,7 @@
 const {
   upsertUserMeta,
   getUserBy,
-  sendEmail,
-  sendEmailByTemplate,
+  sendEmailWithTemplate,
   generateConfirmationCode,
   assertBearerTokenOrBasicAuth,
   assertRequiredBodyParams,
@@ -52,7 +51,7 @@ exports.handler = async (event, context, callback) => {
       upsertUserMeta(user_id, "pendingEmail", email),
 
       // Send an email to the old email address to cancel the change
-      sendEmailByTemplate({
+      sendEmailWithTemplate({
         email: user.email,
         subject: `${config.SERVICE_NAME} Email Change`,
         template: "email-change-confirm.handlebars",
@@ -64,7 +63,7 @@ exports.handler = async (event, context, callback) => {
         },
       }),
       // Send an email to the new email address to confirm the change
-      sendEmailByTemplate({
+      sendEmailWithTemplate({
         email,
         subject: `${config.SERVICE_NAME} Email Change`,
         template: "email-change-request.handlebars",
@@ -72,8 +71,8 @@ exports.handler = async (event, context, callback) => {
           serviceName: config.SERVICE_NAME,
           domain: config.SERVICE_DOMAIN,
           changeEmailCode,
-        }
-      })
+        },
+      }),
     ]);
 
     // Send a success response

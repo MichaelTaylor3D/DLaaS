@@ -36,7 +36,6 @@ Before deploying the Terraform project, ensure that the AWS user associated with
 
 - `AmazonRDSFullAccess`: This policy allows Terraform to create and manage RDS instances and associated resources such as parameter groups and subnet groups.
 - `AmazonS3FullAccess`: This policy allows Terraform to create and manage S3 buckets and objects, which are used in this file to upload a JSON configuration file to an S3 bucket.
-- `AmazonEC2ReadOnlyAccess`: This policy allows Terraform to read information about the subnets used in the subnet group created in this file.
 - `IAMFullAccess`: This policy allows Terraform to create and manage IAM roles, which are used in this file to create an IAM role for RDS to import MySQL backups from S3.
 
 Note that the exact policies required may depend on your specific environment and use case, and it is recommended to review and limit the permissions granted by each policy to the minimum required for Terraform to function properly.
@@ -59,8 +58,11 @@ In this project, configuration variables are stored in a `config.json` file. The
   "DB_NAME": "dlaas",
   "SERVICE_DOMAIN": "datalayer.storage",
   "DEFAULT_S3_BUCKET": "dlaas",
+  "DONATE_TO_SUPPORT_MORE_DEVELOPMENT": "true",
   "DONATION_ADDRESS": "xch1am3lgxqhqyp6g7ulxx98kzl85w724mecpyydsqlfrtdpme9strwsacnsx7",
-  "DB_INSTANCE_CLASS": "db.t3.micro"
+  "DONATION_PERCENTAGE": "0.002",
+  "DB_INSTANCE_CLASS": "db.t3.micro",
+  "SUBSCRIPTION_GRACE_PERIOD_IN_DAYS": "15"
 }
 ```
 

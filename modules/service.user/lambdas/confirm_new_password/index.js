@@ -11,7 +11,7 @@
 const { passwordStrength } = require("check-password-strength");
 const {
   generateSalt,
-  sendEmailByTemplate,
+  sendEmailWithTemplate,
   dbQuery,
   hashWithSalt,
   upsertUserMeta,
@@ -102,13 +102,13 @@ exports.handler = async (event, context, callback) => {
       await resetPassword(password, existingUser.user_id);
 
       // Send a confirmation email to the user
-      await sendEmailByTemplate({
+      await sendEmailWithTemplate({
         email: existingUser.email,
         subject: `${config.SERVICE_NAME} Reset Password Confirmation`,
         template: "password-reset-confirmation.handlebars",
         values: {
           service_name: config.SERVICE_NAME,
-        }
+        },
       });
     }
 

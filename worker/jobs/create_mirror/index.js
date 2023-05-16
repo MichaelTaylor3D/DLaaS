@@ -5,7 +5,7 @@ const https = require("https");
 const {
   getConfigurationFile,
   dbQuery,
-  sendEmailByTemplate,
+  sendEmailWithTemplate,
   generateSalt,
   getFilenamesForStore,
 } = require("../../../common");
@@ -110,7 +110,7 @@ const createMirror = async (payload) => {
     });
 
     if (user[0].email) {
-      sendEmailByTemplate({
+      sendEmailWithTemplate({
         email: user[0].email,
         subject: "Your Mirror is being created",
         template: "mirror-activation.handlebars",
@@ -137,17 +137,17 @@ const createMirror = async (payload) => {
 
     if (user[0].email) {
       if (error.message === "Subscription failed") {
-        sendEmailByTemplate({
+        sendEmailWithTemplate({
           email: user[0].email,
           subject: "Mirror Creation Failed",
           template: "mirror-failed-invalid-storeid.handlebars",
           values: {
             serviceName: config.serviceName,
             storeId: payload.id,
-          }
+          },
         });
       } else if (error.message === "Creating mirror failed") {
-         sendEmailByTemplate({
+         sendEmailWithTemplate({
            email: user[0].email,
            subject: "Mirror Creation Failed",
            template: "mirror-failed-general-error.handlebars",
