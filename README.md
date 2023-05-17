@@ -25,9 +25,9 @@ Follow these steps for swift setup and usage of the DLaaS system:
 
 2. **Create Terraform Cloud Account**: Sign up for a free account on [terraform.io](https://www.terraform.io/cloud/signup/account) and create a new workspace.
 
-3. **Adjust Terraform Settings**: In the `main.tf` file of your forked repository, modify the "remote" settings to match your Terraform workspace.
+3. **Adjust Terraform Settings**: In the `main.tf` file of your forked repository, modify the "remote" settings to match your Terraform workspace. Also be sure to set your terraform version to 0.14.9 in the project settings.
 
-4. **Modify Project Settings**: Update properties in `common/config.json` and `modules/service.subscriptions/projects.json` to align with your project. Retaining default properties may result in deployment errors due to AWS resource conflicts.
+4. **Modify Project Settings**: Update properties in `common/config.json` and `modules/service.subscriptions/products.json` to align with your project. Retaining default properties may result in deployment errors due to AWS resource conflicts.
 
 5. **Define Terraform Variables**: Define the following variables in your Terraform workspace: `aws_access_key`, `aws_secret_key`, and `owner_email`.
 
