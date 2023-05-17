@@ -7,6 +7,16 @@ Built on Amazon Web Services (AWS), the infrastructure requires an AWS account f
 
 The SaaS product heavily depends on an RDS database to manage application state, an approach chosen to accelerate development and ensure a swift initial release. Future plans include phasing out the RDS dependency and shifting the service to operate solely on its dedicated data layer tables.
 
+# Use at Your Own Risk Warning
+
+Please be aware that this software is provided "as is", without warranty of any kind, expressed or implied. While we make every effort to provide you with quality code and comprehensive documentation, we cannot guarantee that this software is free from bugs or secure from hacking or other cybersecurity threats.
+
+You use this software at your own risk. The developers, contributors, and the associated entities are not responsible for any damage, data loss, or negative effects that may occur as a result of using this software. Always back up your data and test the software extensively before integrating it into your systems or using it for any critical applications or functions.
+
+It is your responsibility to comply with all applicable laws and regulations when using this software. This includes, but is not limited to, data protection and privacy laws, intellectual property laws, and any rules or requirements specific to your industry or jurisdiction.
+
+By choosing to use this software, you acknowledge that you understand these risks and accept full responsibility for any outcomes that may arise from its use. If you are unsure about any aspect of these warnings or if you have any questions, we recommend seeking advice from a qualified professional before proceeding.
+
 ## Quick Start Guide
 
 Follow these steps for swift setup and usage of the DLaaS system:
