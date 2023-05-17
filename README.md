@@ -39,7 +39,10 @@ Follow these steps for swift setup and usage of the DLaaS system:
 
 9. **Set Up Worker**: In the worker folder create a .env file using .env.copy as a blueprint
 
-10. **Find API Info**: A Swagger file is still in the works, while your waiting you can go to the API Gateway Console settings in AWS to view all the available API's.
+10. **Find API Info**: A Swagger file is still in the works, while your waiting you 
+can go to the API Gateway Console settings in AWS to view all the available API's.
+
+11. **Setup uploader plugin on Chia Datalayer**: You need to modify your config.yaml to upload datalayer files to your cdn [Chia Datalayer Uploader Setup](./docs/setup-uploader-plugin.md)
 
 Congratulations, you're all set to use the DLaaS system!
 
