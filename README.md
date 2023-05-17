@@ -37,6 +37,10 @@ Follow these steps for swift setup and usage of the DLaaS system:
 
 8. **Clone Repository**: Clone the forked repository onto a machine running a Chia Wallet (full node not required). Ensure datalayer settings are enabled on this machine.
 
+9. **Set Up Worker**: In the worker folder create a .env file using .env.copy as a blueprint
+
+10. **Find API Info**: A Swagger file is still in the works, while your waiting you can go to the API Gateway Console settings in AWS to view all the available API's.
+
 Congratulations, you're all set to use the DLaaS system!
 
 ## Components
