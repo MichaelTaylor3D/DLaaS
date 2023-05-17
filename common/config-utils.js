@@ -1,5 +1,5 @@
 /**
- * @fileoverview This module provides a function to retrieve a configuration file 
+ * @fileoverview This module provides a function to retrieve a configuration file
  * from an S3 bucket using the AWS SDK for JavaScript (v3).
  */
 
@@ -56,6 +56,14 @@ const streamToString = (stream) => {
   });
 };
 
+const generateStoreUploadKey = (storeId, salt, filename) => {
+  if (filename) {
+    return `${storeId}/${salt}/${filename}`;
+  }
+  return `${storeId}/${salt}`;
+};
+
 module.exports = {
   getConfigurationFile,
+  generateStoreUploadKey,
 };

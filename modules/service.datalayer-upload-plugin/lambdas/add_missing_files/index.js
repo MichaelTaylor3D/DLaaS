@@ -25,14 +25,8 @@ exports.handler = async (event, context, callback) => {
     const chiaRPCPromises = files.map((file) =>
       sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file })
     );
-    const dbPromises = files.map((file) =>
-      dbQuery(
-        `INSERT INTO datalayer_files (filename, store_id) VALUES (:filename, :storeId);`,
-        { filename: file, storeId: store_id }
-      )
-    );
 
-    Promise.all([...chiaRPCPromises, ...dbPromises]);
+    Promise.all(chiaRPCPromises);
 
     callback(null, {
       statusCode: 200,

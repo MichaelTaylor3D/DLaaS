@@ -37,17 +37,6 @@ exports.handler = async (event, context, callback) => {
       }),
     ]);
 
-    dbQuery(
-      `INSERT INTO datalayer_files (filename, store_id)
-              VALUES (:filename1, :storeId1), (:filename2, :storeId2);`,
-      {
-        filename1: full_tree_filename,
-        storeId1: store_id,
-        filename2: diff_filename,
-        storeId2: store_id,
-      }
-    );
-
     // Invoke the callback function with a successful response
     callback(null, {
       statusCode: 200,

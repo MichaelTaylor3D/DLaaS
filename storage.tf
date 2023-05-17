@@ -34,6 +34,22 @@ resource "aws_s3_bucket" "storage-bucket" {
   bucket              = local.config.DEFAULT_S3_BUCKET
   force_destroy       = true
   acceleration_status = "Enabled"
+  acl                 = "public-read"
+
+  policy              = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "PublicReadGetObject",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::${local.config.DEFAULT_S3_BUCKET}/*"
+      }
+    ]
+  })
 
   cors_rule {
     allowed_headers = ["*"]
@@ -49,8 +65,11 @@ resource "aws_s3_bucket" "storage-bucket" {
   }
 }
 
-resource "aws_s3_bucket_object" "public-folder" {
+resource "aws_s3_bucket_public_access_block" "access_block" {
   bucket = aws_s3_bucket.storage-bucket.id
-  key    = "public/"
-  source = "/dev/null"
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }

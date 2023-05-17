@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS ${db_name}.user_mirrors(
   name VARCHAR(100),
   active BOOLEAN DEFAULT false,
   subscription_id INT,
-  salt VARCHAR(24),
+  salt VARCHAR(100),
   permissioned_for JSON
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

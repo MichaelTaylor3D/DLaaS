@@ -11,7 +11,7 @@ const {
 } = require("@aws-sdk/client-s3");
 const fs = require("fs");
 const path = require("path");
-const { dbQuery } = require("../../../common");
+const { dbQuery, generateStoreUploadKey } = require("../../../common");
 const config = require("../../../common/config.json");
 const { getChiaRoot } = require("../../utils");
 
@@ -32,16 +32,7 @@ async function uploadFileToS3(payload) {
     return false;
   }
 
-  const result = await fetchSaltsAndPermissionsForFiles(file);
-
-  await uploadFilesToS3(
-    s3,
-    result,
-    Bucket,
-    store_id,
-    file,
-    sourceFilePath
-  );
+  await uploadFilesToS3(s3, Bucket, store_id, file, sourceFilePath);
 
   return true;
 }
@@ -75,30 +66,18 @@ function isFileExists(sourceFilePath) {
   return true;
 }
 
-async function fetchSaltsAndPermissionsForFiles(file) {
-  const query = `SELECT user_mirrors.salt, user_mirrors.permissioned_for 
-                 FROM datalayer_files 
-                 JOIN user_mirrors ON datalayer_files.store_id = user_mirrors.singleton_id 
-                 WHERE datalayer_files.filename = :filename`;
-  const params = { filename: file };
-  return await dbQuery(query, params);
-}
+async function uploadFilesToS3(s3, Bucket, storeId, file, sourceFilePath) {
+  const mirrors = await dbQuery(
+    `SELECT salt, permissioned_for FROM user_mirrors WHERE singleton_id = :storeId`,
+    { storeId }
+  );
 
-async function uploadFilesToS3(
-  s3,
-  stores,
-  Bucket,
-  store_id,
-  file,
-  sourceFilePath
-) {
-  
-  for (const { salt, permissioned_for } of stores) {
-    const destinationKey = `public/${salt}/${store_id}/${file}`;
+  for (const { salt, permissioned_for } of mirrors) {
+    const destinationKey = generateStoreUploadKey(storeId, salt, file);
     const permissionedEmailAddresses = JSON.parse(permissioned_for);
     const fileStream = fs.createReadStream(sourceFilePath);
 
-    uploadIndexHtml(store_id, salt);
+    uploadIndexHtml(storeId, salt);
 
     const params = generateParamsForS3(
       Bucket,
@@ -106,6 +85,8 @@ async function uploadFilesToS3(
       fileStream,
       permissionedEmailAddresses
     );
+
+    console.log(`Uploading file to S3: ${destinationKey}`);
 
     try {
       await s3.send(new PutObjectCommand(params));
@@ -155,10 +136,11 @@ async function uploadIndexHtml(storeId, salt) {
   const s3 = new S3Client({ region: config.AWS_REGION });
   const filePath = "./index.html";
   const fileContent = fs.readFileSync(path.resolve(__dirname, filePath));
+  const destinationKey = generateStoreUploadKey(storeId, salt, "index.html");
 
   const params = {
     Bucket: config.DEFAULT_S3_BUCKET,
-    Key: `public/${salt}/${storeId}/index.html`,
+    Key: destinationKey,
     Body: fileContent,
     ContentType: "text/html",
   };

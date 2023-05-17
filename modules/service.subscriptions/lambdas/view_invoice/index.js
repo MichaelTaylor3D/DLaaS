@@ -279,7 +279,7 @@ exports.handler = async (event, context, callback) => {
       </head>
       <body>
       <div>
-          #${invoiceData.guid}
+          ${invoiceData.guid}
       </div>
       <div id="container">
         <h1>Invoice for subscription: ${product.name}</h1>
@@ -304,26 +304,36 @@ exports.handler = async (event, context, callback) => {
         </div>
         ${
           ["unpaid", "overdue"].includes(invoiceData.status)
-            ? `<p>
-                <span onclick="copyToClipboard('${invoiceData.xch_payment_address}')" style="cursor: pointer;">
-                  <span id="xch-payment-address" onclick="copyToClipboard('${invoiceData.xch_payment_address}')">${invoiceData.xch_payment_address}</span>
+            ? `<div>
+              <p>
+                <span onclick="copyToClipboard('${
+                  invoiceData.xch_payment_address
+                }')" style="cursor: pointer;">
+                  <span id="xch-payment-address" onclick="copyToClipboard('${
+                    invoiceData.xch_payment_address
+                  }')">${invoiceData.xch_payment_address}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
                     <path d="M6 1a2 2 0 0 0-2 2v1H1v10h14V4h-3V3a2 2 0 0 0-2-2h-4zm0 3h4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1H3V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1z"/>
                   </svg>
                 </span>
               </p>
-              `
-            : ""
+               <p>
+                Subscription start date: <span id="start-date">${new Date().toLocaleDateString()}</span><br />
+                Subscription end date: <span id="end-date">${new Date(
+                  new Date().setFullYear(new Date().getFullYear() + 1)
+                ).toLocaleDateString()}</span>
+              </p>
+              </div>`
+            : `<p>
+                Subscription start date: <span id="start-date">${new Date(
+                  subscription[0].start_date
+                ).toLocaleDateString()}</span><br />
+                Subscription end date: <span id="end-date">${new Date(
+                  subscription[0].end_date
+                ).toLocaleDateString()}</span>
+              </p>`
         }
-        <p>
-          Subscription start date: <span id="start-date">${new Date(
-            subscription[0].start_date
-          ).toLocaleDateString()}</span><br />
-          Subscription end date: <span id="end-date">${new Date(
-            subscription[0].end_date
-          ).toLocaleDateString()}</span>
-        </p>
-
+        
         <p><b><i>When your subscription is getting close to renewal you will receive a new invoice in your email to renew this subscription for the next year. </i></b></p>
         <br />
         <br />

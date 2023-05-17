@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const os = require("os");
 const path = require("path");
+const fs = require("fs");
 
 const getChiaRoot = _.memoize(() => {
   let chiaRoot;
@@ -22,9 +23,23 @@ const matchKey = (json, string) => {
     }
   }
   return false;
-}
+};
+
+const getFilesBySubstring = (substring) => {
+  const chiaRoot = getChiaRoot();
+  const directory = path.join(
+    chiaRoot,
+    "data_layer",
+    "db",
+    "server_files_location_mainnet"
+  );
+  const files = fs.readdirSync(directory);
+  const matchedFiles = files.filter((file) => file.includes(substring));
+  return matchedFiles;
+};
 
 module.exports = {
   getChiaRoot,
+  getFilesBySubstring,
   matchKey,
 };

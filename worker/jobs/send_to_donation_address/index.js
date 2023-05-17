@@ -53,7 +53,7 @@ const sendToDonationAddress = async (payload) => {
       wallet_id: "1",
       address: config.DONATION_ADDRESS,
       amount: payload.amountInMojos,
-      memos: "Donation to DLaaS development support.",
+      memos: ["Donation to DLaaS development support."],
       fee: 6000000,
     });
 

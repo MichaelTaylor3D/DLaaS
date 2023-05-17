@@ -7,12 +7,12 @@ const {
   dbQuery,
   sendEmailWithTemplate,
   generateSalt,
-  getFilenamesForStore,
+  generateStoreUploadKey,
 } = require("../../../common");
 
 const config = require("../../../common/config.json");
 
-const { getChiaRoot } = require("../../utils");
+const { getChiaRoot, getFilesBySubstring } = require("../../utils");
 const { uploadFileToS3 } = require("../upload_file_to_s3");
 const chiaRoot = getChiaRoot();
 const certFile = path.resolve(
@@ -27,7 +27,10 @@ const createMirror = async (payload) => {
     const cdnConfig = await getConfigurationFile("cdn.config.json");
 
     const salt = await generateSalt(24);
-    const mirrorUrl = `https://${cdnConfig.public}/${salt}/${payload.id}`;
+    const mirrorUrl = `https://${cdnConfig.public}/${generateStoreUploadKey(
+      payload.id,
+      salt
+    )}`;
 
     console.log("SUBSCRIBING:", { id: payload.id });
 
@@ -115,13 +118,13 @@ const createMirror = async (payload) => {
         subject: "Your Mirror is being created",
         template: "mirror-activation.handlebars",
         values: {
-          serviceName: config.serviceName,
+          serviceName: config.SERVICE_NAME,
           mirrorUrl,
         },
       });
     }
 
-    const previouslyExistingFiles = await getFilenamesForStore(payload.id);
+    const previouslyExistingFiles = await getFilesBySubstring(payload.id);
 
     previouslyExistingFiles.forEach((file) => {
       uploadFileToS3({ store_id: payload.id, file });
@@ -142,20 +145,20 @@ const createMirror = async (payload) => {
           subject: "Mirror Creation Failed",
           template: "mirror-failed-invalid-storeid.handlebars",
           values: {
-            serviceName: config.serviceName,
+            serviceName: config.SERVICE_NAME,
             storeId: payload.id,
           },
         });
       } else if (error.message === "Creating mirror failed") {
-         sendEmailWithTemplate({
-           email: user[0].email,
-           subject: "Mirror Creation Failed",
-           template: "mirror-failed-general-error.handlebars",
-           values: {
-             serviceName: config.serviceName,
-             storeId: payload.id,
-           },
-         });
+        sendEmailWithTemplate({
+          email: user[0].email,
+          subject: "Mirror Creation Failed",
+          template: "mirror-failed-general-error.handlebars",
+          values: {
+            serviceName: config.SERVICE_NAME,
+            storeId: payload.id,
+          },
+        });
       } else if (error.message === "Mirror already exists.") {
         console.log(error.message);
       }

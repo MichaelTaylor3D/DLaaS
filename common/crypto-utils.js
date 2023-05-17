@@ -66,7 +66,8 @@ const generateSalt = async (saltLength) => {
 
   return crypto
     .randomBytes(saltLength || pbkdf2.dynamic_salt_length)
-    .toString(pbkdf2.byte_to_string_encoding);
+    .toString(pbkdf2.byte_to_string_encoding)
+    .replace(/[^A-Za-z0-9\-._~]/g, '_');
 };
 
 /**
