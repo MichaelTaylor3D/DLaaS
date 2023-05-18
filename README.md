@@ -30,6 +30,8 @@ Follow these steps for swift setup and usage of the DLaaS system:
 4. **Modify Project Settings**: Update properties in `common/config.json` and `modules/service.subscriptions/products.json` to align with your project. Retaining default properties may result in deployment errors due to AWS resource conflicts.
 
 5. **Define Terraform Variables**: Define the following variables in your Terraform workspace: `aws_access_key`, `aws_secret_key`, and `owner_email`.
+> **Important:** There is a known bug in the javascript AWS SDK where slashes in the `aws_secret_key` dont excape correctly. Please try to generate a `aws_secret_key`
+without slashes.
 
 6. **Verify AWS Identity**: Upon the first deployment, AWS will email a verification request. Complete this promptly to prevent deployment delays.
 
