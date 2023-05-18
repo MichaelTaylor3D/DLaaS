@@ -34,7 +34,6 @@ resource "aws_s3_bucket" "storage-bucket" {
   bucket              = local.config.DEFAULT_S3_BUCKET
   force_destroy       = true
   acceleration_status = "Enabled"
-  acl                 = "public-read"
 
   policy              = jsonencode({
     "Version": "2012-10-17",
