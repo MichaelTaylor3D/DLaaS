@@ -4,9 +4,10 @@
  */
 
 const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const config = require("./config.json");
 
 const s3 = new S3Client({
-  region: "us-east-1",
+  region: config.AWS_REGION,
 });
 
 const appConfig = require("./config.json");

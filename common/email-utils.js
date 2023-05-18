@@ -2,9 +2,10 @@ const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 const fs = require("fs");
 const Handlebars = require("handlebars");
 const path = require("path");
+const config = require("./config.json");
 
 const sesClient = new SESClient({
-  region: "us-east-1",
+  region: config.AWS_REGION,
 });
 
 const getEmailTemplate = async (templateName, values) => {

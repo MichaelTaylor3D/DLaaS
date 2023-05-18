@@ -30,21 +30,21 @@ resource "aws_subnet" "public-1" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = "true"
-  availability_zone       = "us-east-1a"
+  availability_zone       = "${local.config.AWS_REGION}a"
 }
 
 resource "aws_subnet" "public-2" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = "true"
-  availability_zone       = "us-east-1b"
+  availability_zone       = "${local.config.AWS_REGION}b"
 }
 
 resource "aws_subnet" "public-3" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.3.0/24"
   map_public_ip_on_launch = "true"
-  availability_zone       = "us-east-1c"
+  availability_zone       = "${local.config.AWS_REGION}c"
 }
 
 # Private Subnets
@@ -52,21 +52,21 @@ resource "aws_subnet" "private-1" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.4.0/24"
   map_public_ip_on_launch = "false"
-  availability_zone       = "us-east-1a"
+  availability_zone       = "${local.config.AWS_REGION}a"
 }
 
 resource "aws_subnet" "private-2" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.5.0/24"
   map_public_ip_on_launch = "false"
-  availability_zone       = "us-east-1b"
+  availability_zone       = "${local.config.AWS_REGION}b"
 }
 
 resource "aws_subnet" "private-3" {
   vpc_id                  = aws_vpc.main-services-vpc.id
   cidr_block              = "10.0.6.0/24"
   map_public_ip_on_launch = "false"
-  availability_zone       = "us-east-1c"
+  availability_zone       = "${local.config.AWS_REGION}c"
 }
 
 # Internet Gateway
