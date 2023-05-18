@@ -1,9 +1,9 @@
 terraform {
   backend "remote" {
-    organization = "TaylorDigitalServices"
+    organization = "personal-dlaas"
 
     workspaces {
-      name = "DatalayerStorageService"
+      name = "DLaaS"
     }
   }
 }
