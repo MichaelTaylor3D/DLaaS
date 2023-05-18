@@ -50,7 +50,7 @@ const sendEmail = async (email, title, message, htmlMessage) => {
         },
       },
     },
-    Source: "support@datalayer.storage",
+    Source: `support@${config.SERVICE_DOMAIN}`,
   });
 
   try {
