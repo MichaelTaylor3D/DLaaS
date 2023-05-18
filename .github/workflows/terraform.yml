@@ -72,9 +72,9 @@ jobs:
       run: cd common && npm install && cd ../
 
     - name: Build common lambda folder
-      run: mkdir -p common-layer/nodejs/common && \
-           cp -R common/node_modules common-layer/nodejs && \
-           cp -R common/* common-layer/nodejs/common && \
+      run: mkdir -p common-layer/nodejs/common && 
+           cp -R common/node_modules common-layer/nodejs && 
+           cp -R common/* common-layer/nodejs/common && 
            rm -rf common-layer/nodejs/common/node_modules
 
     - name: Install All Node Packages
