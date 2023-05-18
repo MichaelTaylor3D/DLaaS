@@ -3,3 +3,4 @@
 .credentials
 credentials.csv
 node_modules
+package-lock.json

@@ -42,19 +42,15 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'Terraform'
+name: "Terraform"
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-
-permissions:
-  contents: read
-
+    branches: ["main"]
+    
 jobs:
   terraform:
-    name: 'Terraform'
+    name: "Terraform"
     runs-on: ubuntu-latest
     environment: production
 
@@ -64,36 +60,44 @@ jobs:
         shell: bash
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v3
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Install Lambda Layer
-      run: cd common && npm install && cd ../
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
 
-    - name: Build common lambda folder
-      run: cp -R common/node_modules common-layer/nodejs && 
-           cp -R common/* common-layer/nodejs/common && 
-           rm -rf common-layer/nodejs/common/node_modules
+      - name: Clear npm cache
+        run: npm cache clean --force
 
-    - name: Install All Node Packages
-      run: node ./utils/npm-install-all.js    
-      
-    - name: Build All Node Packages
-      run: node ./utils/node-build-all.js
+      - name: Install Lambda Layer
+        run: cd common && npm install --unsafe-perm && cd ../
 
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Build common lambda folder
+        run: cp -R common/node_modules common-layer/nodejs &&
+          cp -R common/* common-layer/nodejs/common &&
+          rm -rf common-layer/nodejs/common/node_modules
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
+      - name: Install All Node Packages
+        run: node ./utils/npm-install-all.js
 
-      # On push to "main", build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    - name: Terraform Apply
-      #if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+      - name: Build All Node Packages
+        run: node ./utils/node-build-all.js
+
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform init
+
+        # On push to "main", build or change infrastructure according to Terraform configuration files
+        # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+      - name: Terraform Apply
+        #if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
