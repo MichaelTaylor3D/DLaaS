@@ -47,7 +47,7 @@ name: "Terraform"
 on:
   push:
     branches: ["main"]
-    
+
 jobs:
   terraform:
     name: "Terraform"
@@ -73,7 +73,7 @@ jobs:
         run: npm cache clean --force
 
       - name: Install Lambda Layer
-        run: cd common && npm install --unsafe-perm && cd ../
+        run: cd common && npm install && ls -al && --unsafe-perm && cd ../
 
       - name: Build common lambda folder
         run: cp -R common/node_modules common-layer/nodejs &&
