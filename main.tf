@@ -40,7 +40,7 @@ module "service-datalayer-upload-plugin" {
   wildcard_certificate_arn    = aws_acm_certificate.wildcard-domain.arn
 
   # lambda
-  lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+  lambda_layer_arn            = aws_lambda_layer_version.common-layer.arn
 }
 
 module "service-system-utils" {
@@ -60,7 +60,7 @@ module "service-system-utils" {
   default_lambda_role_arn     = aws_iam_role.default-lambda-role.arn
 
   # lambda
-  lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+  lambda_layer_arn            = aws_lambda_layer_version.common-layer.arn
 
   # API Root
   api_gateway_id              = aws_api_gateway_rest_api.main.id
@@ -107,7 +107,7 @@ module "service-user" {
   app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
 
   # lambda
-  lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+  lambda_layer_arn            = aws_lambda_layer_version.common-layer.arn
 
   depends_on = [
     aws_db_instance.default,
@@ -150,7 +150,7 @@ module "service-subscriptions" {
   app_gateway_arn             = aws_api_gateway_rest_api.www.execution_arn
 
   # lambda
-  lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+  lambda_layer_arn            = aws_lambda_layer_version.common-layer.arn
 
   depends_on = [
     module.service-user,
@@ -183,5 +183,5 @@ module "service-worker-gateway" {
   api_gateway_arn             = aws_api_gateway_rest_api.main.execution_arn
 
   # lambda
-  lambda_layer_arn            = aws_lambda_layer_version.common_layer.arn
+  lambda_layer_arn            = aws_lambda_layer_version.common-layer.arn
 }
