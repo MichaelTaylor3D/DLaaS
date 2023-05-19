@@ -32,9 +32,13 @@ cd terraform-project
 
 ### 1.1. Set up AWS User Permissions
 
-Before deploying the Terraform project, ensure that the AWS user associated with your `aws_access_key` and `aws_secret_key` has the necessary permissions to create and manage resources. The user must have at least the following IAM policies attached:
+Before deploying the Terraform project, ensure that the AWS user associated with your `aws_access_key` and `aws_secret_key` has the necessary permissions to create and manage resources. 
 
-- `AmazonRDSFullAccess`: This policy allows Terraform to create and manage RDS instances and associated resources such as parameter groups and subnet groups.
+AS an MVP this I used a very wide open settings. Its in the TODO to bring this down to more specific permissions:
+
+The user must have at least the following IAM policies attached:
+
+- `AdministratorAccess`: This policy allows Terraform to do pretty much anything. Its not best practice to use this policy and this will be updated in the future.
 - `AmazonS3FullAccess`: This policy allows Terraform to create and manage S3 buckets and objects, which are used in this file to upload a JSON configuration file to an S3 bucket.
 - `IAMFullAccess`: This policy allows Terraform to create and manage IAM roles, which are used in this file to create an IAM role for RDS to import MySQL backups from S3.
 
@@ -84,31 +88,4 @@ After deploying the infrastructure with Terraform Cloud, you'll need to update t
 
 ### 4. Configure Terraform Cloud Settings
 
-In your Terraform Cloud workspace, navigate to the "Settings" tab and configure the following options:
-
-- **Terraform version**: Choose the Terraform version that matches your project's requirements.
-- **Apply method**: Choose "Auto apply" if you want Terraform Cloud to automatically apply changes when a new commit is pushed to the repository, or "Manual apply" if you prefer to review and confirm the changes manually.
-
-Save your settings.
-
-### 5. Trigger a Run
-
-Once your workspace is configured, you can trigger a run by pushing changes to the connected Git repository or manually queueing a run in the Terraform Cloud workspace. Terraform Cloud will perform a `terraform init`, `terraform validate`, and `terraform plan` before applying the changes.
-
-### 6. Review and Apply Changes
-
-If you have configured the "Manual apply" option, review the generated plan in the "Runs" tab of your Terraform Cloud workspace. If the changes align with your expectations, confirm and apply the plan.
-
-### 7. Verify Deployment
-
-Once the apply operation completes successfully, check the AWS Management Console or use the AWS CLI to verify that the resources have been created.
-
-### 8. Destroy the Infrastructure (Optional)
-
-If you need to destroy the infrastructure created by this Terraform project, you can manually queue a new run in the Terraform Cloud workspace with the "Destroy Infrastructure" option enabled. Review and confirm the destruction plan.
-
-## Additional Resources
-
-For more information on working with Terraform Cloud, refer to the official [Terraform Cloud documentation](https://www.terraform.io/docs/cloud/index.html).
-
-For more information on working with Terraform in general, refer to the official [Terraform documentation](https://www.terraform.io/docs/index.html).
+[Please follow this tutorial to set up your terraform workspace](https://developer.hashicorp.com/terraform/tutorials/automation/github-actions)
