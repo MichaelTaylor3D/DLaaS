@@ -26,7 +26,7 @@ exports.handler = async (event, context, callback) => {
       sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file })
     );
 
-    Promise.all(chiaRPCPromises);
+    await Promise.all(chiaRPCPromises);
 
     callback(null, {
       statusCode: 200,
