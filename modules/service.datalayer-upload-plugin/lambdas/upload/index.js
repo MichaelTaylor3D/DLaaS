@@ -25,27 +25,16 @@ exports.handler = async (event, context, callback) => {
   const full_tree_filename = requestBody.full_tree_filename;
   const diff_filename = requestBody.diff_filename;
 
-  await sendChiaRPCCommand(`START_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
-    type: "log",
-    ...requestBody,
-  });
-
   try {
-    await Promise.all([
-      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
-        store_id,
-        file: full_tree_filename,
-      }),
-      sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
-        store_id,
-        file: diff_filename,
-      }),
-    ]);
-
-    await sendChiaRPCCommand(`END_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
-      type: "log",
+    sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
+      store_id,
+      file: full_tree_filename,
     });
-
+    
+    sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
+      store_id,
+      file: diff_filename,
+    });
     // Invoke the callback function with a successful response
     callback(null, {
       statusCode: 200,

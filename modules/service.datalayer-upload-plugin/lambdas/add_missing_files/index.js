@@ -22,20 +22,8 @@ exports.handler = async (event, context, callback) => {
   try {
     const { store_id, files } = JSON.parse(event.body);
 
-    await sendChiaRPCCommand(
-      `START_${rpc.UPLOAD_FILE_TO_S3}_ADD_MISSING_FILES_ENDPOINT`,
-      { type: "log", store_id, files }
-    );
-
-    const chiaRPCPromises = files.map((file) =>
+    files.map((file) =>
       sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, { store_id, file })
-    );
-
-    await Promise.all(chiaRPCPromises);
-
-    await sendChiaRPCCommand(
-      `END_${rpc.UPLOAD_FILE_TO_S3}_ADD_MISSING_FILES_ENDPOINT`,
-      { type: "log" }
     );
 
     callback(null, {
