@@ -25,6 +25,10 @@ exports.handler = async (event, context, callback) => {
   const full_tree_filename = requestBody.full_tree_filename;
   const diff_filename = requestBody.diff_filename;
 
+  await sendChiaRPCCommand(`START_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
+    type: "log",
+  });
+
   try {
     await Promise.all([
       sendChiaRPCCommand(rpc.UPLOAD_FILE_TO_S3, {
@@ -37,6 +41,10 @@ exports.handler = async (event, context, callback) => {
       }),
     ]);
 
+    await sendChiaRPCCommand(`END_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
+      type: "log",
+    });
+
     // Invoke the callback function with a successful response
     callback(null, {
       statusCode: 200,
@@ -45,9 +53,13 @@ exports.handler = async (event, context, callback) => {
   } catch (error) {
     console.error(error);
 
+    await sendChiaRPCCommand(`ERROR_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
+      type: "log",
+    });
+
     // Invoke the callback function with an error response
     callback(null, {
-      statusCode: 500,
+      statusCode: 400,
       body: JSON.stringify({ uploaded: false }),
     });
   }
