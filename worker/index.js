@@ -28,10 +28,15 @@ const processJob = async (jobKey, payload, connectionId, options) => {
 
   let result;
 
-  try {
-    result = await jobs[jobKey](payload);
-  } catch (error) {
-    console.log(jobKey, error.message);
+  if (payload?.type === "log") {
+    console.log("!#", jobKey, payload);
+    result = true;
+  } else {
+    try {
+      result = await jobs[jobKey](payload);
+    } catch (error) {
+      console.log(jobKey, error.message);
+    }
   }
 
   const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
@@ -75,8 +80,8 @@ const runWorker = async () => {
       handleMessage: async (message) => {
         try {
           const body = JSON.parse(message.Body);
-          console.log("received message", body);
           const data = JSON.parse(body.message);
+          console.log("received message", data);
           const connectionId =
             message?.MessageAttributes?.connectionId?.StringValue || 1;
           // fire and forget

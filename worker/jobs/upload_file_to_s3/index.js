@@ -127,8 +127,8 @@ function generateParamsForS3(
 
 function isStorePermissioned(permissionedEmailAddresses) {
   return (
-    permissionedEmailAddresses.length > 0 &&
-    permissionedEmailAddresses[0] !== "All"
+    permissionedEmailAddresses?.length > 0 &&
+    permissionedEmailAddresses?.[0] !== "All"
   );
 }
 
