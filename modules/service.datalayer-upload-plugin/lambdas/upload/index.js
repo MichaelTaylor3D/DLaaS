@@ -27,6 +27,7 @@ exports.handler = async (event, context, callback) => {
 
   await sendChiaRPCCommand(`START_${rpc.UPLOAD_FILE_TO_S3}_UPLOAD_ENDPOINT`, {
     type: "log",
+    ...requestBody,
   });
 
   try {

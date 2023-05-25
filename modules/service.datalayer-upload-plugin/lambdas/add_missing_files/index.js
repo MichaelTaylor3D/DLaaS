@@ -24,7 +24,7 @@ exports.handler = async (event, context, callback) => {
 
     await sendChiaRPCCommand(
       `START_${rpc.UPLOAD_FILE_TO_S3}_ADD_MISSING_FILES_ENDPOINT`,
-      { type: "log" }
+      { type: "log", store_id, files }
     );
 
     const chiaRPCPromises = files.map((file) =>
